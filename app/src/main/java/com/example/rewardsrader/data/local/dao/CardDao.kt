@@ -1,0 +1,29 @@
+package com.example.rewardsrader.data.local.dao
+
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import com.example.rewardsrader.data.local.entity.CardEntity
+import com.example.rewardsrader.data.local.entity.CardWithBenefits
+
+@Dao
+interface CardDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(card: CardEntity): Long
+
+    @Delete
+    suspend fun delete(card: CardEntity)
+
+    @Query("DELETE FROM cards WHERE id = :cardId")
+    suspend fun deleteById(cardId: Long)
+
+    @Query("SELECT * FROM cards")
+    suspend fun getAll(): List<CardEntity>
+
+    @Transaction
+    @Query("SELECT * FROM cards")
+    suspend fun getAllWithBenefits(): List<CardWithBenefits>
+}

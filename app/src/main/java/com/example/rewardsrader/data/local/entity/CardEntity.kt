@@ -1,0 +1,17 @@
+package com.example.rewardsrader.data.local.entity
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "cards")
+data class CardEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val issuer: String,
+    val productName: String,
+    val network: String,
+    val annualFeeUsd: Double,
+    val openDateUtc: String? = null,
+    val closeDateUtc: String? = null,
+    val status: String,
+    val notes: String? = null
+)
