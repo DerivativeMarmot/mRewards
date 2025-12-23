@@ -32,7 +32,7 @@ class CardRepositoryTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        repository = CardRepository(db.cardDao(), db.benefitDao())
+        repository = CardRepository(db.cardDao(), db.benefitDao(), db.applicationDao())
     }
 
     @After
@@ -49,6 +49,8 @@ class CardRepositoryTest {
             network = "Visa",
             annualFeeUsd = 95.0,
             openDateUtc = "01/01/2025 09:00",
+            statementCutUtc = "01/15/2025 09:00",
+            welcomeOfferProgress = "50%",
             status = "open"
         )
         val benefits = listOf(

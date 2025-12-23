@@ -18,3 +18,10 @@
 - `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Room database wiring DAOs and entities.
 - `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Repository to add a card with benefits, list, join, and remove.
 - `app/src/test/java/com/example/rewardsrader/data/CardRepositoryTest.kt`: In-memory Room test (Robolectric) covering add/list/join/remove behavior.
+
+## Files added/used (Step 4)
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/CardEntity.kt`: Added `statementCutUtc` and `welcomeOfferProgress`.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Version bumped to 2 to reflect entity change.
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Extended to accept `ApplicationDao` and to insert application details when adding cards from templates.
+- `app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt`: Maps selected config templates to Room entities and persists card + benefits + application.
+- `app/src/test/java/com/example/rewardsrader/template/CardTemplateImporterTest.kt`: Robolectric test validating import flow and persistence of user-provided fields.

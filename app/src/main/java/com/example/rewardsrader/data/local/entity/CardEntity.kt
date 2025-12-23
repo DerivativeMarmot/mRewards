@@ -12,6 +12,8 @@ data class CardEntity(
     val annualFeeUsd: Double,
     val openDateUtc: String? = null,
     val closeDateUtc: String? = null,
+    val statementCutUtc: String? = null,
+    val welcomeOfferProgress: String? = null,
     val status: String,
     val notes: String? = null
 )

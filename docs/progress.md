@@ -17,3 +17,9 @@
 - Added DAOs for CRUD and joins, plus `AppDatabase`.
 - Implemented `CardRepository` to add/list/remove cards with benefits.
 - Added `CardRepositoryTest` (Robolectric, in-memory Room) for add/list/join/remove flow.
+
+## 2025-12-23 – Step 4 (Import card from template)
+- Extended data to store statement cut and welcome-offer progress in `CardEntity`; bumped `AppDatabase` to version 2.
+- Updated `CardRepository` to attach `Application` details and wire `ApplicationDao`.
+- Added `CardTemplateImporter` to map a selected config template into card/benefits/application and persist them.
+- Added `CardTemplateImporterTest` (Robolectric) covering import flow; adjusted repository test wiring for new fields/DAO.
