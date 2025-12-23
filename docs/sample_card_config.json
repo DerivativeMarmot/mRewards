@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "data_version": "2025.12.23",
+  "cards": [
+    {
+      "card_id": 1,
+      "issuer": "Example Bank",
+      "product_name": "Example Cash Preferred",
+      "network": "Visa",
+      "annual_fee_usd": 95,
+      "last_updated": "12/23/2025 10:00",
+      "data_source": "RewardsRader Maintainers",
+      "notes": "US-only benefits; requires enrollment for partner offers."
+    }
+  ],
+  "benefits": [
+    {
+      "benefit_id": 101,
+      "card_id": 1,
+      "type": "credit",
+      "amount_usd": 10,
+      "cap_usd": 10,
+      "cadence": "monthly",
+      "category": "dining",
+      "merchant": "Restaurant partners",
+      "enrollment_required": true,
+      "effective_date": "01/01/2025 09:00",
+      "expiry_date": "12/31/2025 11:59",
+      "terms": "Enroll each calendar year; credit resets monthly.",
+      "notes": "Credit applies per statement month."
+    },
+    {
+      "benefit_id": 102,
+      "card_id": 1,
+      "type": "multiplier",
+      "amount_usd": null,
+      "cap_usd": 6000,
+      "cadence": "annual",
+      "category": "groceries",
+      "merchant": "US supermarkets 22",
+      "enrollment_required": false,
+      "effective_date": "01/01/2025 09:00",
+      "expiry_date": "12/31/2025 11:59",
+      "terms": "6x points on up to $6k annual supermarket spend; excludes superstores.",
+      "notes": null
+    }
+  ]
+}
