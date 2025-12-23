@@ -25,3 +25,12 @@
 - `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Extended to accept `ApplicationDao` and to insert application details when adding cards from templates.
 - `app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt`: Maps selected config templates to Room entities and persists card + benefits + application.
 - `app/src/test/java/com/example/rewardsrader/template/CardTemplateImporterTest.kt`: Robolectric test validating import flow and persistence of user-provided fields.
+
+## Files added/used (Step 5)
+- `app/src/main/java/com/example/rewardsrader/AppContainer.kt`: Simple DI container to build Room DB and `CardRepository`.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Loads card summaries; exposes loading/error/empty states.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Compose list UI with state handling and item selection.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Loads a card with benefits and applications into UI-friendly models.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Compose detail UI showing card metadata, application timeline, and benefits.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Hosts navigation between list and detail using viewmodels from `AppContainer`.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: UI tests validating list/detail rendering with provided state.

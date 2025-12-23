@@ -23,3 +23,10 @@
 - Updated `CardRepository` to attach `Application` details and wire `ApplicationDao`.
 - Added `CardTemplateImporter` to map a selected config template into card/benefits/application and persist them.
 - Added `CardTemplateImporterTest` (Robolectric) covering import flow; adjusted repository test wiring for new fields/DAO.
+
+## 2025-12-23 – Step 5 (Card list & detail UI)
+- Added DI container (`AppContainer`) to wire Room DB and `CardRepository`.
+- Added viewmodels: `CardListViewModel` (list with loading/error/empty) and `CardDetailViewModel` (detail + applications/benefits mapping).
+- Added Compose screens: `CardListScreen` (list with states) and `CardDetailScreen` (metadata, application timeline, benefits).
+- Updated `MainActivity` to navigate between list and detail using the viewmodels.
+- Added UI tests (`CardScreensTest`) for rendering list/detail content with provided state.

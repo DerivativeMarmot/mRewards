@@ -41,4 +41,6 @@ class CardRepository(
     suspend fun removeCard(cardId: Long) {
         cardDao.deleteById(cardId)
     }
+
+    suspend fun getApplicationsForCard(cardId: Long) = applicationDao.getForCard(cardId)
 }
