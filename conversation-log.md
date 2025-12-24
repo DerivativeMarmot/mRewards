@@ -174,3 +174,10 @@ User: UI adjustments (icons, title removal, read-only product on edit)
 Assistant: Swapped icon buttons on detail/edit bars, removed detail title, added product name display on edit.
 
 ---
+
+## 2025-12-23 06:15:00 UTC
+
+User: start implementing card delete behavior in card list page.
+Assistant: Added delete/undo support with snapshots, DAO/repo helpers, snackbar flow; wired in list screen.
+
+---

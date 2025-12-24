@@ -34,7 +34,13 @@ class CardTemplateImporterTest {
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .build()
-        repository = CardRepository(db.cardDao(), db.benefitDao(), db.applicationDao())
+        repository = CardRepository(
+            db.cardDao(),
+            db.benefitDao(),
+            db.applicationDao(),
+            db.usageEntryDao(),
+            db.notificationRuleDao()
+        )
         importer = CardTemplateImporter(repository)
     }
 

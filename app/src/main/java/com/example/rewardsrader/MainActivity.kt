@@ -64,7 +64,10 @@ class MainActivity : ComponentActivity() {
                         },
                         onAddCard = {
                             screen = Screen.Create
-                        }
+                        },
+                        onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
+                        onUndoDelete = { cardListViewModel.undoDelete() },
+                        onSnackbarShown = { cardListViewModel.snackbarShown() }
                     )
                     is Screen.Detail -> {
                         CardDetailScreen(

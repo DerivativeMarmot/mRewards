@@ -3,15 +3,21 @@ package com.example.rewardsrader.data.local.repository
 import com.example.rewardsrader.data.local.dao.ApplicationDao
 import com.example.rewardsrader.data.local.dao.BenefitDao
 import com.example.rewardsrader.data.local.dao.CardDao
+import com.example.rewardsrader.data.local.dao.NotificationRuleDao
+import com.example.rewardsrader.data.local.dao.UsageEntryDao
+import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardWithBenefits
-import com.example.rewardsrader.data.local.entity.ApplicationEntity
+import com.example.rewardsrader.data.local.entity.NotificationRuleEntity
+import com.example.rewardsrader.data.local.entity.UsageEntryEntity
 
 class CardRepository(
     private val cardDao: CardDao,
     private val benefitDao: BenefitDao,
-    private val applicationDao: ApplicationDao
+    private val applicationDao: ApplicationDao,
+    private val usageEntryDao: UsageEntryDao,
+    private val notificationRuleDao: NotificationRuleDao
 ) {
     suspend fun addCard(card: CardEntity, benefits: List<BenefitEntity>): Long {
         val cardId = cardDao.insert(card)
@@ -48,5 +54,25 @@ class CardRepository(
 
     suspend fun updateCard(card: CardEntity) {
         cardDao.update(card)
+    }
+
+    suspend fun getBenefitsForCard(cardId: Long): List<BenefitEntity> = benefitDao.getForCard(cardId)
+
+    suspend fun getUsageForBenefits(benefitIds: List<Long>): List<UsageEntryEntity> =
+        if (benefitIds.isEmpty()) emptyList() else usageEntryDao.getForBenefits(benefitIds)
+
+    suspend fun getNotificationRulesForBenefits(benefitIds: List<Long>): List<NotificationRuleEntity> =
+        if (benefitIds.isEmpty()) emptyList() else notificationRuleDao.getForBenefits(benefitIds)
+
+    suspend fun insertUsageEntries(entries: List<UsageEntryEntity>) {
+        if (entries.isNotEmpty()) usageEntryDao.insertAll(entries)
+    }
+
+    suspend fun insertNotificationRules(rules: List<NotificationRuleEntity>) {
+        if (rules.isNotEmpty()) notificationRuleDao.insertAll(rules)
+    }
+
+    suspend fun insertApplications(applications: List<ApplicationEntity>) {
+        if (applications.isNotEmpty()) applicationDao.insertAll(applications)
     }
 }

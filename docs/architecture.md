@@ -56,3 +56,7 @@
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: BackHandler for in-app navigation; routes to edit screen via detail.
 - `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Included in `AppContainer` to wire migrations on DB build.
 - Card detail top bar now icon-only; edit screen shows read-only product name.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Supports delete with undo via snapshot of related data and snackbar state.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Delete icon per card, snackbar handling for undo.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/DeletedCardSnapshot.kt`: Captures card/benefits/applications/usage/notification rules for undo restore.
+- DAOs/repos extended for bulk inserts/queries to support undo (`UsageEntryDao`, `NotificationRuleDao`, `ApplicationDao`, `CardDao`, `CardRepository`).

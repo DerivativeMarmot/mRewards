@@ -46,3 +46,4 @@
 - Added BackHandler in MainActivity to prevent system back from exiting; routes back within screens (detail/create/edit).
 - Card detail top bar switched to icon-only (no title); edit screen shows read-only product name.
 - Added Go-back icon to edit bar; saved via icon. Room migrations added to AppContainer.
+- Added card delete with undo on the card list: delete icon per card, snackbar with undo, snapshot/restore of related data.

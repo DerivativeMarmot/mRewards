@@ -11,6 +11,12 @@ interface NotificationRuleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(rule: NotificationRuleEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(rules: List<NotificationRuleEntity>)
+
     @Query("SELECT * FROM notification_rules WHERE benefitId = :benefitId")
     suspend fun getForBenefit(benefitId: Long): List<NotificationRuleEntity>
+
+    @Query("SELECT * FROM notification_rules WHERE benefitId IN (:benefitIds)")
+    suspend fun getForBenefits(benefitIds: List<Long>): List<NotificationRuleEntity>
 }

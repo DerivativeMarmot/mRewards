@@ -2,8 +2,9 @@
 
 ## Card (step-by-step, pending unless checked)
 - [x] Creation flow: Select issuer then card product; app loads the correct template based on selection (single template for now). Add minimal form for open date, statement cut, status, welcome-offer progress.
+- [x] Card index page
 - [ ] Card face display: Show built-in card face on list/detail (placeholder asset now; replace later).
-- [ ] Editable fields: Allow editing all fields except issuer (fixed after creation); no validation initially.
+- [x] Editable fields: Allow editing all fields except issuer (fixed after creation); no validation initially.
 - [ ] Delete behavior: Delete card and all attached data (benefits, applications, usage, notifications) with an undo snackbar.
 - [ ] Welcome offer UI: Show spending progress bar and deadline (reminder integration deferred).
 - [ ] Card management: Update card details; confirm destructive actions and refresh state.

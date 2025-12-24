@@ -11,6 +11,9 @@ interface ApplicationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(application: ApplicationEntity): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(applications: List<ApplicationEntity>)
+
     @Query("SELECT * FROM applications WHERE cardId = :cardId")
     suspend fun getForCard(cardId: Long): List<ApplicationEntity>
 }

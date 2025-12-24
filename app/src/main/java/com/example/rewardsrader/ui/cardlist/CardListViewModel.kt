@@ -20,7 +20,9 @@ data class CardSummaryUi(
 data class CardListUiState(
     val isLoading: Boolean = true,
     val cards: List<CardSummaryUi> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val snackbarMessage: String? = null,
+    val showUndo: Boolean = false
 )
 
 class CardListViewModel(
@@ -29,6 +31,7 @@ class CardListViewModel(
 
     private val _state = MutableStateFlow(CardListUiState())
     val state: StateFlow<CardListUiState> = _state.asStateFlow()
+    private var lastDeleted: DeletedCardSnapshot? = null
 
     init {
         loadCards()
@@ -41,6 +44,48 @@ class CardListViewModel(
                 .onSuccess { cards -> _state.value = CardListUiState(isLoading = false, cards = cards.map(::mapCard)) }
                 .onFailure { _state.value = CardListUiState(isLoading = false, error = it.message) }
         }
+    }
+
+    fun deleteCard(cardId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                val cardWithBenefits = repository.getCard(cardId)?.let { card ->
+                    val benefits = repository.getBenefitsForCard(cardId)
+                    val benefitIds = benefits.map { it.id }
+                    val usage = repository.getUsageForBenefits(benefitIds)
+                    val rules = repository.getNotificationRulesForBenefits(benefitIds)
+                    val applications = repository.getApplicationsForCard(cardId)
+                    DeletedCardSnapshot(card, benefits, applications, usage, rules)
+                } ?: return@launch
+                lastDeleted = cardWithBenefits
+                repository.removeCard(cardId)
+                loadCards()
+                _state.value = _state.value.copy(snackbarMessage = "Card deleted", showUndo = true)
+            }.onFailure {
+                _state.value = _state.value.copy(error = it.message)
+            }
+        }
+    }
+
+    fun undoDelete() {
+        val snapshot = lastDeleted ?: return
+        viewModelScope.launch {
+            runCatching {
+                val cardId = repository.addCard(snapshot.card.copy(id = snapshot.card.id), snapshot.benefits)
+                repository.insertApplications(snapshot.applications.map { it.copy(cardId = cardId, id = it.id) })
+                repository.insertUsageEntries(snapshot.usageEntries.map { it.copy(id = it.id) })
+                repository.insertNotificationRules(snapshot.notificationRules.map { it.copy(id = it.id) })
+                lastDeleted = null
+                loadCards()
+            }.onFailure {
+                _state.value = _state.value.copy(error = it.message)
+            }
+        }
+        _state.value = _state.value.copy(snackbarMessage = null, showUndo = false)
+    }
+
+    fun snackbarShown() {
+        _state.value = _state.value.copy(snackbarMessage = null, showUndo = false)
     }
 
     private fun mapCard(card: CardEntity): CardSummaryUi =

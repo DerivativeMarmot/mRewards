@@ -23,7 +23,9 @@ class AppContainer(context: Context) {
     val cardRepository: CardRepository = CardRepository(
         db.cardDao(),
         db.benefitDao(),
-        db.applicationDao()
+        db.applicationDao(),
+        db.usageEntryDao(),
+        db.notificationRuleDao()
     )
 
     private val cardConfigLoader = CardConfigLoader(context)

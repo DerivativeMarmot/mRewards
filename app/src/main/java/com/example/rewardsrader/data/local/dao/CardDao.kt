@@ -33,4 +33,8 @@ interface CardDao {
 
     @Update
     suspend fun update(card: CardEntity)
+
+    @Transaction
+    @Query("SELECT * FROM cards WHERE id = :cardId LIMIT 1")
+    suspend fun getWithBenefits(cardId: Long): CardWithBenefits?
 }
