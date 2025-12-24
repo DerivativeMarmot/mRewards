@@ -43,3 +43,14 @@
 - `app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt`: Implements importer contract used by the create flow.
 - `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`: Unit test with fakes for config and importer; asserts load/reset behavior.
 - `app/src/main/assets/card_config.json`: Expanded sample config with multiple issuers/products, all sharing sample benefits.
+
+## Files added/used (Card editing enhancements)
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/CardEntity.kt`: Added `nickname`, `lastFour`.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Room migrations 1→2 and 2→3 (statementCut/welcomeOffer; nickname/lastFour).
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: DB version bumped to 3.
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/CardDao.kt`: Added getById/update.
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Exposes getCard/updateCard.
+- `app/src/test/java/com/example/rewardsrader/data/CardRepositoryTest.kt`: Covers update with nickname/lastFour.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt` / `CardDetailScreen.kt`: Show nickname/last4 when present.
+- `app/src/main/java/com/example/rewardsrader/ui/cardedit/CardEditState.kt`, `CardEditViewModel.kt`, `CardEditScreen.kt`: Edit flow with nickname/last4, date/status pickers, and app bar back/save icons.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: BackHandler for in-app navigation; routes to edit screen via detail.

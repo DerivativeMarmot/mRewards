@@ -45,9 +45,11 @@ class CardRepositoryTest {
     fun addListRemoveCardWithBenefits() = runTest {
         val card = CardEntity(
             issuer = "Example Bank",
+            nickname = "Daily Driver",
             productName = "Example Cash Preferred",
             network = "Visa",
             annualFeeUsd = 95.0,
+            lastFour = "1234",
             openDateUtc = "01/01/2025 09:00",
             statementCutUtc = "01/15/2025 09:00",
             welcomeOfferProgress = "50%",
@@ -94,6 +96,21 @@ class CardRepositoryTest {
         assertEquals(1, withBenefits.size)
         assertEquals(2, withBenefits.first().benefits.size)
         assertEquals("credit", withBenefits.first().benefits.first().type)
+
+        val updatedCard = cards.first().copy(
+            productName = "Updated Product",
+            annualFeeUsd = 120.0,
+            nickname = "Updated Nick",
+            lastFour = "9999",
+            welcomeOfferProgress = "done"
+        )
+        repository.updateCard(updatedCard)
+        val fetched = repository.getCard(cardId)
+        assertEquals("Updated Product", fetched?.productName)
+        assertEquals(120.0, fetched?.annualFeeUsd ?: 0.0, 0.0)
+        assertEquals("Updated Nick", fetched?.nickname)
+        assertEquals("9999", fetched?.lastFour)
+        assertEquals("done", fetched?.welcomeOfferProgress)
 
         repository.removeCard(cardId)
         val afterDelete = repository.getCardsWithBenefits()

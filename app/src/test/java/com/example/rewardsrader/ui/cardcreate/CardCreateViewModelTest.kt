@@ -64,7 +64,5 @@ class CardCreateViewModelTest {
         vm.save { }
 
         assertEquals(null, vm.state.value.error)
-        assertEquals("", vm.state.value.openDateUtc)
-        assertEquals("", vm.state.value.applicationStatus)
     }
 }

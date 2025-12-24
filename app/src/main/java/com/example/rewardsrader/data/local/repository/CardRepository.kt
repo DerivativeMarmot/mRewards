@@ -43,4 +43,10 @@ class CardRepository(
     }
 
     suspend fun getApplicationsForCard(cardId: Long) = applicationDao.getForCard(cardId)
+
+    suspend fun getCard(cardId: Long): CardEntity? = cardDao.getById(cardId)
+
+    suspend fun updateCard(card: CardEntity) {
+        cardDao.update(card)
+    }
 }

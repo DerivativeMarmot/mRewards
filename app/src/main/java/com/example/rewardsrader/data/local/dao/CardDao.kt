@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardWithBenefits
 
@@ -26,4 +27,10 @@ interface CardDao {
     @Transaction
     @Query("SELECT * FROM cards")
     suspend fun getAllWithBenefits(): List<CardWithBenefits>
+
+    @Query("SELECT * FROM cards WHERE id = :cardId LIMIT 1")
+    suspend fun getById(cardId: Long): CardEntity?
+
+    @Update
+    suspend fun update(card: CardEntity)
 }

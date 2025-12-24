@@ -21,7 +21,7 @@ import com.example.rewardsrader.data.local.entity.UsageEntryEntity
         UsageEntryEntity::class,
         NotificationRuleEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

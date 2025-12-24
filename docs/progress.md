@@ -36,3 +36,11 @@
 - Expanded bundled config with multiple issuers/products (Chase, Citi, Bank of America, Amex) for selection; all reuse sample benefits for now.
 - Added date pickers for open/statement dates (format `MM/dd/yyyy`) and a status selection dialog (pending/approved/denied).
 - Form resets after successful create; creation viewmodel/state updated for issuers/templates and reset handling.
+
+## 2025-12-23 – Card editing (editable fields)
+- Extended `CardEntity` with `nickname` and `lastFour`; Room DB bumped to v3 and migrations added (1→2, 2→3).
+- Repository/DAO now support get/update; tests updated to cover nickname/lastFour.
+- Card detail shows nickname/last 4 when present.
+- Added edit flow: viewmodel, screen with modal date/status pickers; product/network removed from edit; nickname/last4 editable.
+- Edit screen app bar now has back and save (check) icons; bottom buttons removed.
+- Added BackHandler in MainActivity to prevent system back from exiting; routes back within screens (detail/create/edit).

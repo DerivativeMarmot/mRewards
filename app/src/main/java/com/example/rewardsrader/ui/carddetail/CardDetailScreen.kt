@@ -29,7 +29,8 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun CardDetailScreen(
     stateFlow: StateFlow<CardDetailState>,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onEdit: (Long) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val detail = state.detail
@@ -40,6 +41,13 @@ fun CardDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Text("<")
+                    }
+                },
+                actions = {
+                    detail?.let { d ->
+                        Button(onClick = { onEdit(d.id) }) {
+                            Text("Edit")
+                        }
                     }
                 }
             )
@@ -67,6 +75,8 @@ private fun DetailContent(detail: CardDetailUi, modifier: Modifier = Modifier) {
         item {
             Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
             Text("${detail.issuer} • ${detail.network}", style = MaterialTheme.typography.bodyMedium)
+            detail.nickname?.let { Text("Nickname: $it", style = MaterialTheme.typography.bodySmall) }
+            detail.lastFour?.let { Text("Last 4: $it", style = MaterialTheme.typography.bodySmall) }
             Text("Status: ${detail.status}", style = MaterialTheme.typography.bodySmall)
             Text("Annual fee: ${detail.annualFee}", style = MaterialTheme.typography.bodySmall)
             detail.openDate?.let { Text("Open date: $it", style = MaterialTheme.typography.bodySmall) }
