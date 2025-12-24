@@ -30,3 +30,9 @@
 - Added Compose screens: `CardListScreen` (list with states) and `CardDetailScreen` (metadata, application timeline, benefits).
 - Updated `MainActivity` to navigate between list and detail using the viewmodels.
 - Added UI tests (`CardScreensTest`) for rendering list/detail content with provided state.
+
+## 2025-12-23 – Step 5.1 (Card creation flow)
+- Added issuer/product selection with modal dialogs; renamed “Select template” to “Select product.”
+- Expanded bundled config with multiple issuers/products (Chase, Citi, Bank of America, Amex) for selection; all reuse sample benefits for now.
+- Added date pickers for open/statement dates (format `MM/dd/yyyy`) and a status selection dialog (pending/approved/denied).
+- Form resets after successful create; creation viewmodel/state updated for issuers/templates and reset handling.

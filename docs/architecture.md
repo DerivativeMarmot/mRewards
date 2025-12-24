@@ -34,3 +34,12 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Compose detail UI showing card metadata, application timeline, and benefits.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Hosts navigation between list and detail using viewmodels from `AppContainer`.
 - `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: UI tests validating list/detail rendering with provided state.
+
+## Files added/used (Step 5.1)
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateState.kt`: State for issuer/product selection and user fields.
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModel.kt`: Loads issuers/templates from config provider, updates selections, saves via importer, resets form on success.
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateScreen.kt`: Compose screen with modal dialogs for issuer/product selection, date pickers for open/statement dates, status selection dialog, and form fields.
+- `app/src/main/java/com/example/rewardsrader/config/CardConfigProvider.kt`: Abstraction over config loader used by the create flow.
+- `app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt`: Implements importer contract used by the create flow.
+- `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`: Unit test with fakes for config and importer; asserts load/reset behavior.
+- `app/src/main/assets/card_config.json`: Expanded sample config with multiple issuers/products, all sharing sample benefits.
