@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -27,7 +28,8 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun CardListScreen(
     stateFlow: StateFlow<CardListUiState>,
-    onSelectCard: (Long) -> Unit
+    onSelectCard: (Long) -> Unit,
+    onAddCard: () -> Unit
     ) {
     val state by stateFlow.collectAsState()
     val error = state.error
@@ -44,6 +46,7 @@ fun CardListScreen(
                 modifier = Modifier.padding(padding)
             )
         }
+        AddCardButton(onAddCard = onAddCard, modifier = Modifier.padding(padding))
     }
 }
 
@@ -103,5 +106,23 @@ private fun EmptyMessage(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text("No cards yet. Add one from a template.")
+    }
+}
+
+@Composable
+private fun AddCardButton(onAddCard: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        Button(
+            onClick = onAddCard,
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Text("Add card")
+        }
     }
 }

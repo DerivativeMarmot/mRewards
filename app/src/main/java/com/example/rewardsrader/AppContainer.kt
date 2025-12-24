@@ -2,8 +2,12 @@ package com.example.rewardsrader
 
 import android.content.Context
 import androidx.room.Room
+import com.example.rewardsrader.config.CardConfigLoader
+import com.example.rewardsrader.config.CardConfigProvider
+import com.example.rewardsrader.config.DefaultCardConfigProvider
 import com.example.rewardsrader.data.local.AppDatabase
 import com.example.rewardsrader.data.local.repository.CardRepository
+import com.example.rewardsrader.template.CardTemplateImporter
 
 class AppContainer(context: Context) {
     private val db: AppDatabase = Room.databaseBuilder(
@@ -17,4 +21,8 @@ class AppContainer(context: Context) {
         db.benefitDao(),
         db.applicationDao()
     )
+
+    private val cardConfigLoader = CardConfigLoader(context)
+    val cardConfigProvider: CardConfigProvider = DefaultCardConfigProvider(cardConfigLoader)
+    val cardTemplateImporter = CardTemplateImporter(cardRepository)
 }

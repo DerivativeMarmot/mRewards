@@ -13,10 +13,21 @@ sealed class ImportResult {
     data class Failure(val reason: String) : ImportResult()
 }
 
+interface CardTemplateImporterContract {
+    suspend fun importFromConfig(
+        config: CardConfig,
+        selectedCardId: Int,
+        openDateUtc: String?,
+        statementCutUtc: String?,
+        applicationStatus: String,
+        welcomeOfferProgress: String?
+    ): ImportResult
+}
+
 class CardTemplateImporter(
     private val repository: CardRepository
-) {
-    suspend fun importFromConfig(
+) : CardTemplateImporterContract {
+    override suspend fun importFromConfig(
         config: CardConfig,
         selectedCardId: Int,
         openDateUtc: String?,

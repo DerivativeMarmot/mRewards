@@ -27,6 +27,11 @@
 - Implement a card detail screen showing benefits (type, amount/cap, cadence, expiry) and application timeline.
 - **Test**: UI test to add a card via the flow, then verify list item renders and detail shows the expected benefits and application fields.
 
+## 5.1) Card creation from template (minimal form)
+- Add an “Add card” action on the list screen; show a minimal form to choose a template and enter user fields (open date, statement cut, application status, welcome-offer progress).
+- Use the template importer to persist card + benefits + application; refresh the list on success and show inline errors on failure.
+- **Test**: UI test to create a card from a template, then verify it appears in the list and detail shows user-supplied fields and pre-populated benefits.
+
 ## 6) Benefit usage tracking (minimal)
 - Allow marking a benefit usage entry (date + amount/value used + note) stored in UTC `MM/dd/yyyy hh:mm`.
 - Update remaining value display for the benefit.
