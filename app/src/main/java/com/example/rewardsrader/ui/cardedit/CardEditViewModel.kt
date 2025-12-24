@@ -31,6 +31,7 @@ class CardEditViewModel(
                         _state.value = CardEditState(
                             cardId = card.id,
                             issuer = card.issuer,
+                            productName = card.productName,
                             nickname = card.nickname.orEmpty(),
                             annualFee = card.annualFeeUsd.toString(),
                             lastFour = card.lastFour.orEmpty(),

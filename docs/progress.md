@@ -44,3 +44,5 @@
 - Added edit flow: viewmodel, screen with modal date/status pickers; product/network removed from edit; nickname/last4 editable.
 - Edit screen app bar now has back and save (check) icons; bottom buttons removed.
 - Added BackHandler in MainActivity to prevent system back from exiting; routes back within screens (detail/create/edit).
+- Card detail top bar switched to icon-only (no title); edit screen shows read-only product name.
+- Added Go-back icon to edit bar; saved via icon. Room migrations added to AppContainer.

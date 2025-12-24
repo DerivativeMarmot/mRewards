@@ -96,6 +96,7 @@ fun CardEditScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text("Issuer: ${state.issuer}")
+                Text("Product: ${state.productName}")
 
                 OutlinedTextField(
                     value = state.nickname,

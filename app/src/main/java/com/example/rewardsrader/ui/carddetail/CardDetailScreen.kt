@@ -7,15 +7,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Card
-import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,16 +41,16 @@ fun CardDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(detail?.productName ?: "Card Detail") },
+                title = {},
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Text("<")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     detail?.let { d ->
-                        Button(onClick = { onEdit(d.id) }) {
-                            Text("Edit")
+                        IconButton(onClick = { onEdit(d.id) }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit")
                         }
                     }
                 }

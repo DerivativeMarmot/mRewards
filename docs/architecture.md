@@ -54,3 +54,5 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt` / `CardDetailScreen.kt`: Show nickname/last4 when present.
 - `app/src/main/java/com/example/rewardsrader/ui/cardedit/CardEditState.kt`, `CardEditViewModel.kt`, `CardEditScreen.kt`: Edit flow with nickname/last4, date/status pickers, and app bar back/save icons.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: BackHandler for in-app navigation; routes to edit screen via detail.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Included in `AppContainer` to wire migrations on DB build.
+- Card detail top bar now icon-only; edit screen shows read-only product name.
