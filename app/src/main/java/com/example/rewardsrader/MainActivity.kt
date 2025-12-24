@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
                     Screen.Create -> CardCreateScreen(
                         stateFlow = cardCreateViewModel.state,
                         onLoad = { cardCreateViewModel.loadTemplates() },
+                        onIssuerSelected = { cardCreateViewModel.updateSelectedIssuer(it) },
                         onTemplateSelected = { cardCreateViewModel.updateSelectedTemplate(it) },
                         onOpenDateChange = { cardCreateViewModel.updateOpenDate(it) },
                         onStatementCutChange = { cardCreateViewModel.updateStatementCut(it) },

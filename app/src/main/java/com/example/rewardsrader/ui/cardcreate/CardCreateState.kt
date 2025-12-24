@@ -1,6 +1,8 @@
 package com.example.rewardsrader.ui.cardcreate
 
 data class CardCreateState(
+    val issuers: List<String> = emptyList(),
+    val selectedIssuer: String? = null,
     val templates: List<com.example.rewardsrader.config.CardTemplate> = emptyList(),
     val selectedTemplateId: Int? = null,
     val openDateUtc: String = "",

@@ -18,6 +18,7 @@
 - Package paths mirror features; keep `MainActivity` lean and move UI/state into feature packages as they grow.
 - Use Material 3 components and the shared theme (`RewardsRaderTheme`) for colors/typography. Name composables as `FeatureActionScreen`, `FeatureActionCard`, etc.
 - Features are modularized; avoid oversized single files—split UI/state/data by feature as they grow.
+- Instead of creating your own code, search for open-source libraries that can achieve the goal. downlod it to `reference` folder and use it.
 
 ## Testing Guidelines
 - Unit tests: JUnit4 in `app/src/test/java`; name files `<Subject>Test.kt`. Aim to cover viewmodels/use-cases as they appear.

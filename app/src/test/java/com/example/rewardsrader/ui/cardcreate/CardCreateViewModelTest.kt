@@ -56,12 +56,15 @@ class CardCreateViewModelTest {
         val vm = CardCreateViewModel(provider, importer)
         vm.loadTemplates()
         assertEquals(1, vm.state.value.templates.size)
+        assertEquals(listOf("Example Bank"), vm.state.value.issuers)
+        assertEquals("Example Bank", vm.state.value.selectedIssuer)
         vm.updateSelectedTemplate(1)
         vm.updateOpenDate("01/01/2025 09:00")
         vm.updateApplicationStatus("approved")
         vm.save { }
 
-        assertTrue(vm.state.value.success)
         assertEquals(null, vm.state.value.error)
+        assertEquals("", vm.state.value.openDateUtc)
+        assertEquals("", vm.state.value.applicationStatus)
     }
 }

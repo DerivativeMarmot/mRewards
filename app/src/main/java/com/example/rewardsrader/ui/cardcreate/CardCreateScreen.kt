@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,16 +21,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.rewardsrader.config.CardTemplate
 import kotlinx.coroutines.flow.StateFlow
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardCreateScreen(
     stateFlow: StateFlow<CardCreateState>,
     onLoad: () -> Unit,
+    onIssuerSelected: (String) -> Unit,
     onTemplateSelected: (Int) -> Unit,
     onOpenDateChange: (String) -> Unit,
     onStatementCutChange: (String) -> Unit,
@@ -40,6 +49,13 @@ fun CardCreateScreen(
 ) {
     val state by stateFlow.collectAsState()
     LaunchedEffect(Unit) { onLoad() }
+    var showIssuerDialog by remember { mutableStateOf(false) }
+    var showProductDialog by remember { mutableStateOf(false) }
+    var showOpenDatePicker by remember { mutableStateOf(false) }
+    var showStatementDatePicker by remember { mutableStateOf(false) }
+    var showStatusDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,29 +71,33 @@ fun CardCreateScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            TemplateSelector(
-                templates = state.templates,
-                selected = state.selectedTemplateId,
-                onSelect = onTemplateSelected
+            SelectionRow(
+                label = "Issuer",
+                value = state.selectedIssuer ?: "Select issuer",
+                onClick = { showIssuerDialog = true }
             )
 
-            OutlinedTextField(
-                value = state.openDateUtc,
-                onValueChange = onOpenDateChange,
-                label = { Text("Open date (MM/dd/yyyy hh:mm UTC)") },
-                modifier = Modifier.fillMaxWidth()
+            SelectionRow(
+                label = "Product",
+                value = state.templates.firstOrNull { it.cardId == state.selectedTemplateId }?.productName
+                    ?: "Select product",
+                onClick = { showProductDialog = true }
             )
-            OutlinedTextField(
-                value = state.statementCutUtc,
-                onValueChange = onStatementCutChange,
-                label = { Text("Statement cut (MM/dd/yyyy hh:mm UTC)") },
-                modifier = Modifier.fillMaxWidth()
+
+            SelectionRow(
+                label = "Open date (MM/dd/yyyy)",
+                value = state.openDateUtc.ifBlank { "Select date" },
+                onClick = { showOpenDatePicker = true }
             )
-            OutlinedTextField(
-                value = state.applicationStatus,
-                onValueChange = onApplicationStatusChange,
-                label = { Text("Application status") },
-                modifier = Modifier.fillMaxWidth()
+            SelectionRow(
+                label = "Statement cut (MM/dd/yyyy)",
+                value = state.statementCutUtc.ifBlank { "Select date" },
+                onClick = { showStatementDatePicker = true }
+            )
+            SelectionRow(
+                label = "Application status",
+                value = state.applicationStatus.ifBlank { "Select status" },
+                onClick = { showStatusDialog = true }
             )
             OutlinedTextField(
                 value = state.welcomeOfferProgress,
@@ -99,26 +119,131 @@ fun CardCreateScreen(
             }
         }
     }
+
+    if (showIssuerDialog) {
+        SimpleSelectionDialog(
+            title = "Select issuer",
+            options = state.issuers,
+            selected = state.selectedIssuer,
+            onSelect = {
+                onIssuerSelected(it)
+                showIssuerDialog = false
+            },
+            onDismiss = { showIssuerDialog = false }
+        )
+    }
+
+    if (showProductDialog) {
+        SimpleSelectionDialog(
+            title = "Select product",
+            options = state.templates.filter { template ->
+                state.selectedIssuer?.let { template.issuer == it } ?: true
+            }.map { it.productName },
+            selected = state.templates.firstOrNull { it.cardId == state.selectedTemplateId }?.productName,
+            onSelect = { productName ->
+                state.templates.firstOrNull { it.productName == productName }?.cardId?.let(onTemplateSelected)
+                showProductDialog = false
+            },
+            onDismiss = { showProductDialog = false }
+        )
+    }
+
+    if (showOpenDatePicker) {
+        DatePickerDialog(
+            onDismiss = { showOpenDatePicker = false },
+            onDateSelected = { formatted ->
+                onOpenDateChange(formatted)
+                showOpenDatePicker = false
+            },
+            context = context
+        )
+    }
+
+    if (showStatementDatePicker) {
+        DatePickerDialog(
+            onDismiss = { showStatementDatePicker = false },
+            onDateSelected = { formatted ->
+                onStatementCutChange(formatted)
+                showStatementDatePicker = false
+            },
+            context = context
+        )
+    }
+
+    if (showStatusDialog) {
+        SimpleSelectionDialog(
+            title = "Application status",
+            options = listOf("pending", "approved", "denied"),
+            selected = state.applicationStatus,
+            onSelect = {
+                onApplicationStatusChange(it)
+                showStatusDialog = false
+            },
+            onDismiss = { showStatusDialog = false }
+        )
+    }
 }
 
 @Composable
-private fun TemplateSelector(
-    templates: List<CardTemplate>,
-    selected: Int?,
-    onSelect: (Int) -> Unit
-) {
+private fun SelectionRow(label: String, value: String, onClick: () -> Unit) {
     Column {
-        Text("Select template")
-        Spacer(Modifier.height(8.dp))
-        templates.forEach { template ->
-            val isSelected = template.cardId == selected
-            Button(
-                onClick = { onSelect(template.cardId) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isSelected
-            ) {
-                Text("${template.productName} (${template.issuer})")
-            }
+        Text(label)
+        Spacer(Modifier.height(4.dp))
+        Button(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+            Text(value)
         }
+    }
+}
+
+@Composable
+private fun SimpleSelectionDialog(
+    title: String,
+    options: List<String>,
+    selected: String?,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                options.forEach { option ->
+                    val label = if (option == selected) "$option (selected)" else option
+                    Button(onClick = { onSelect(option) }, modifier = Modifier.fillMaxWidth()) {
+                        Text(label)
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            Button(onClick = onDismiss) { Text("Close") }
+        }
+    )
+}
+
+@Composable
+private fun DatePickerDialog(
+    onDismiss: () -> Unit,
+    onDateSelected: (String) -> Unit,
+    context: android.content.Context
+) {
+    val calendar = Calendar.getInstance()
+    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.US)
+    android.app.DatePickerDialog(
+        context,
+        { _, year, month, day ->
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.DAY_OF_MONTH, day)
+            onDateSelected(formatter.format(calendar.time))
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    ).apply {
+        setOnDismissListener { onDismiss() }
+        show()
     }
 }

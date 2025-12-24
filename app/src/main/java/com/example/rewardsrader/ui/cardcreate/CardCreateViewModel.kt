@@ -21,15 +21,22 @@ class CardCreateViewModel(
     val state: StateFlow<CardCreateState> = _state.asStateFlow()
 
     private var config: CardConfig? = null
+    private var defaultIssuer: String? = null
+    private var defaultTemplateId: Int? = null
 
     fun loadTemplates() {
         viewModelScope.launch {
             when (val result = configProvider.load()) {
                 is CardConfigResult.Success -> {
                     config = result.config
+                    val issuers = result.config.cards.map { it.issuer }.distinct()
+                    defaultIssuer = issuers.firstOrNull()
+                    defaultTemplateId = result.config.cards.firstOrNull { it.issuer == defaultIssuer }?.cardId
                     _state.value = _state.value.copy(
+                        issuers = issuers,
+                        selectedIssuer = defaultIssuer,
                         templates = result.config.cards,
-                        selectedTemplateId = result.config.cards.firstOrNull()?.cardId
+                        selectedTemplateId = defaultTemplateId
                     )
                 }
                 is CardConfigResult.Failure -> {
@@ -37,6 +44,14 @@ class CardCreateViewModel(
                 }
             }
         }
+    }
+
+    fun updateSelectedIssuer(issuer: String) {
+        val nextTemplate = _state.value.templates.firstOrNull { it.issuer == issuer }
+        _state.value = _state.value.copy(
+            selectedIssuer = issuer,
+            selectedTemplateId = nextTemplate?.cardId
+        )
     }
 
     fun updateSelectedTemplate(cardId: Int) {
@@ -81,7 +96,8 @@ class CardCreateViewModel(
                 )
             ) {
                 is com.example.rewardsrader.template.ImportResult.Success -> {
-                    _state.value = _state.value.copy(isSaving = false, success = true)
+                    resetForm()
+                    _state.value = _state.value.copy(isSaving = false, error = null, success = false)
                     onSuccess()
                 }
                 is com.example.rewardsrader.template.ImportResult.Failure -> {
@@ -89,6 +105,19 @@ class CardCreateViewModel(
                 }
             }
         }
+    }
+
+    private fun resetForm() {
+        _state.value = _state.value.copy(
+            selectedIssuer = defaultIssuer,
+            selectedTemplateId = defaultTemplateId,
+            openDateUtc = "",
+            statementCutUtc = "",
+            applicationStatus = "",
+            welcomeOfferProgress = "",
+            error = null,
+            success = false
+        )
     }
 
     companion object {
