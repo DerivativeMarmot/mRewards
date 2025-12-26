@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,7 +38,8 @@ fun CardDetailScreen(
     stateFlow: StateFlow<CardDetailState>,
     onBack: () -> Unit,
     onEdit: (Long) -> Unit,
-    onAddBenefit: (Long, String) -> Unit
+    onAddBenefit: (Long, String) -> Unit,
+    onDeleteBenefit: (Long) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val detail = state.detail
@@ -68,6 +69,7 @@ fun CardDetailScreen(
             else -> DetailContent(
                 detail = detail,
                 onAddBenefit = { onAddBenefit(detail.id, detail.productName) },
+                onDeleteBenefit = onDeleteBenefit,
                 modifier = Modifier.padding(padding)
             )
         }
@@ -92,6 +94,7 @@ private fun BenefitsHeader(onAddBenefit: () -> Unit) {
 private fun DetailContent(
     detail: CardDetailUi,
     onAddBenefit: () -> Unit,
+    onDeleteBenefit: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -130,15 +133,35 @@ private fun DetailContent(
             Divider(modifier = Modifier.padding(vertical = 8.dp))
             BenefitsHeader(onAddBenefit = onAddBenefit)
         }
-        items(detail.benefits) { benefit ->
-            Card(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text(benefit.type, fontWeight = FontWeight.SemiBold)
-                    if (benefit.amount.isNotBlank()) Text(benefit.amount)
-                    Text("Cadence: ${benefit.cadence}")
-                    benefit.expiry?.let { Text("Expiry: $it") }
-                    benefit.notes?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
-                }
+        items(detail.benefits, key = { it.id }) { benefit ->
+            BenefitCard(
+                benefit = benefit,
+                onDelete = { onDeleteBenefit(benefit.id) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun BenefitCard(benefit: BenefitUi, onDelete: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(benefit.type, fontWeight = FontWeight.SemiBold)
+                if (benefit.amount.isNotBlank()) Text(benefit.amount)
+                Text("Cadence: ${benefit.cadence}")
+                benefit.expiry?.let { Text("Expiry: $it") }
+                benefit.notes?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+            }
+            IconButton(onClick = onDelete) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete benefit",
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
         }
     }

@@ -34,7 +34,14 @@ class CardScreensTest {
             )
         )
         composeRule.setContent {
-            CardListScreen(stateFlow = state, onSelectCard = {})
+            CardListScreen(
+                stateFlow = state,
+                onSelectCard = {},
+                onAddCard = {},
+                onDeleteCard = {},
+                onUndoDelete = {},
+                onSnackbarShown = {}
+            )
         }
 
         composeRule.onNodeWithText("Example Cash Preferred").assertIsDisplayed()
@@ -67,6 +74,7 @@ class CardScreensTest {
                     ),
                     benefits = listOf(
                         BenefitUi(
+                            id = 1L,
                             type = "credit",
                             amount = "$10.0 (cap $10.0)",
                             cadence = "monthly",
@@ -80,7 +88,13 @@ class CardScreensTest {
         )
 
         composeRule.setContent {
-            CardDetailScreen(stateFlow = detailState, onBack = {})
+            CardDetailScreen(
+                stateFlow = detailState,
+                onBack = {},
+                onEdit = {},
+                onAddBenefit = { _, _ -> },
+                onDeleteBenefit = {}
+            )
         }
 
         composeRule.onNodeWithText("Example Cash Preferred").assertIsDisplayed()

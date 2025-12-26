@@ -69,3 +69,11 @@
 ## Files updated (Benefit UI polish)
 - `ui/benefitcreate/BenefitCreateScreen.kt`: Selection rows now open radio-button dialogs with tappable rows; cadence label fixed to “annually”; dividers run edge-to-edge; categories header uses edit icon to open modal.
 - `ui/benefitcreate/BenefitCreateViewModel.kt`: Custom categories are scoped per issuer, persist after deselection, and can be removed via modal; toggling chips no longer drops custom entries across issuers.
+
+## 2025-12-27 – Files updated (Benefit deletion)
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/BenefitDao.kt`: Added `deleteById`.
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Exposes `deleteBenefit`.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Maps benefit IDs into UI, tracks current card, and deletes benefits with reload and error surfacing.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Replaced swipe delete attempts with a simple trailing trash icon per benefit card; tap triggers deletion.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Passes delete callback to detail screen.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated BenefitUi to carry IDs and screen call signatures.

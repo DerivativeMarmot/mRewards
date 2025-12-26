@@ -90,6 +90,9 @@ class MainActivity : ComponentActivity() {
                                 val issuer = cardDetailViewModel.state.value.detail?.issuer ?: ""
                                 benefitCreateViewModel.init(id, productName, issuer)
                                 screen = Screen.AddBenefit(id, productName, issuer)
+                            },
+                            onDeleteBenefit = { benefitId ->
+                                cardDetailViewModel.deleteBenefit(benefitId)
                             }
                         )
                     }

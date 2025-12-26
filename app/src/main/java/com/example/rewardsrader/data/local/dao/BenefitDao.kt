@@ -16,4 +16,7 @@ interface BenefitDao {
 
     @Query("SELECT * FROM benefits WHERE cardId = :cardId")
     suspend fun getForCard(cardId: Long): List<BenefitEntity>
+
+    @Query("DELETE FROM benefits WHERE id = :benefitId")
+    suspend fun deleteById(benefitId: Long)
 }

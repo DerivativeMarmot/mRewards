@@ -20,6 +20,7 @@ data class ApplicationUi(
 )
 
 data class BenefitUi(
+    val id: Long,
     val type: String,
     val amount: String,
     val cadence: String,
@@ -55,8 +56,10 @@ class CardDetailViewModel(
 
     private val _state = MutableStateFlow(CardDetailState())
     val state: StateFlow<CardDetailState> = _state.asStateFlow()
+    private var currentCardId: Long? = null
 
     fun load(cardId: Long) {
+        currentCardId = cardId
         _state.value = CardDetailState(isLoading = true)
         viewModelScope.launch {
             runCatching {
@@ -71,6 +74,19 @@ class CardDetailViewModel(
                 )
             }.onFailure {
                 _state.value = CardDetailState(isLoading = false, error = it.message)
+            }
+        }
+    }
+
+    fun deleteBenefit(benefitId: Long) {
+        val cardId = currentCardId ?: return
+        viewModelScope.launch {
+            runCatching {
+                repository.deleteBenefit(benefitId)
+            }.onSuccess {
+                load(cardId)
+            }.onFailure {
+                _state.value = _state.value.copy(error = it.message)
             }
         }
     }
@@ -102,6 +118,7 @@ class CardDetailViewModel(
             },
             benefits = benefits.map { benefit ->
                 BenefitUi(
+                    id = benefit.id,
                     type = benefit.type,
                     amount = buildAmount(benefit),
                     cadence = benefit.cadence.replaceFirstChar { it.uppercase() },

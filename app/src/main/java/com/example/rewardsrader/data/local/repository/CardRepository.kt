@@ -60,6 +60,10 @@ class CardRepository(
 
     suspend fun addBenefit(benefit: BenefitEntity): Long = benefitDao.insert(benefit)
 
+    suspend fun deleteBenefit(benefitId: Long) {
+        benefitDao.deleteById(benefitId)
+    }
+
     suspend fun getUsageForBenefits(benefitIds: List<Long>): List<UsageEntryEntity> =
         if (benefitIds.isEmpty()) emptyList() else usageEntryDao.getForBenefits(benefitIds)
 

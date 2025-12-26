@@ -201,3 +201,45 @@ Assistant: Replaced categories plus with edit icon opening modal for adding/remo
 Assistant: Updated progress log to reflect benefit UI polish and category fixes dated 2025-12-26.
 
 ---
+
+## 2025-12-27 09:05:00 UTC
+
+User: do you remember what we did so far.  
+Assistant: No prior context in session; asked what to revisit.
+
+---
+
+## 2025-12-27 09:08:00 UTC
+
+User: read all docs in docs/ and conversation-log.md  
+Assistant: Listed and read all docs and conversation log.
+
+---
+
+## 2025-12-27 09:15:00 UTC
+
+User: do you have a general understanding of what we are doing and what is the progress so far?  
+Assistant: Summarized current app scope and completed work (config, Room, UI flows, benefit creation, tests).
+
+---
+
+## 2025-12-27 09:25:00 UTC
+
+User: start implementing benefit deletion (swipe left, show trash icon with red background, tap to delete).  
+Assistant: Added benefit delete DAO/repo methods, viewmodel delete hook, swipe-to-dismiss UI with red trash action; wired through MainActivity and tests.
+
+---
+
+## 2025-12-27 09:50:00 UTC
+
+User: Build errors and UI feedback (experimental API, red background bleed).  
+Assistant: Added Material dependency, fixed SwipeToDismiss API usage, opted in to experimental, clipped background to shape.
+
+---
+
+## 2025-12-27 10:10:00 UTC
+
+User: Requested swipe reveal menu with open-source library; later disliked swipe auto-delete.  
+Assistant: Tried me.saket swipe, then RevealSwipe via JitPack; resolved dependency coords, but networking blocked. Ultimately reverted swipe behavior and implemented a simple per-benefit trash icon on the right that deletes on tap; removed swipe libs and JitPack.
+
+---

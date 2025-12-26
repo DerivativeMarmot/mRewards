@@ -59,3 +59,8 @@
 - Cleaned the form: show product, drop issuer/merchant inputs, simplify date labels, and keep dividers edge-to-edge.
 - Categories header now uses an edit icon opening a modal to add scoped custom categories and remove custom ones; custom entries persist per issuer even after toggling off.
 - Category chips merge common issuer-scoped presets with saved custom entries; additions no longer leak across issuers or disappear when deselected.
+
+## 2025-12-27 – Benefit deletion UI
+- Added DAO/repository support to delete benefits by id and exposed delete in `CardDetailViewModel` with card reload after removal.
+- Card detail UI now shows a trailing trash icon on each benefit card (no swipe); tapping deletes the benefit via the viewmodel.
+- Updated tests and wiring to pass benefit IDs; retained Material dependency for icon usage.
