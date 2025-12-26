@@ -104,7 +104,7 @@ class CardDetailViewModel(
                 BenefitUi(
                     type = benefit.type,
                     amount = buildAmount(benefit),
-                    cadence = benefit.cadence,
+                    cadence = benefit.cadence.replaceFirstChar { it.uppercase() },
                     expiry = benefit.expiryDateUtc,
                     notes = benefit.notes ?: benefit.terms
                 )

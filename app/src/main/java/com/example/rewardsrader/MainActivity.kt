@@ -14,6 +14,8 @@ import com.example.rewardsrader.ui.carddetail.CardDetailScreen
 import com.example.rewardsrader.ui.carddetail.CardDetailViewModel
 import com.example.rewardsrader.ui.cardedit.CardEditScreen
 import com.example.rewardsrader.ui.cardedit.CardEditViewModel
+import com.example.rewardsrader.ui.benefitcreate.BenefitCreateScreen
+import com.example.rewardsrader.ui.benefitcreate.BenefitCreateViewModel
 import com.example.rewardsrader.ui.cardcreate.CardCreateScreen
 import com.example.rewardsrader.ui.cardcreate.CardCreateViewModel
 import com.example.rewardsrader.ui.cardlist.CardListScreen
@@ -36,6 +38,9 @@ class MainActivity : ComponentActivity() {
         val cardEditViewModel: com.example.rewardsrader.ui.cardedit.CardEditViewModel by viewModels {
             com.example.rewardsrader.ui.cardedit.CardEditViewModel.factory(appContainer.cardRepository)
         }
+        val benefitCreateViewModel: BenefitCreateViewModel by viewModels {
+            BenefitCreateViewModel.factory(appContainer.cardRepository)
+        }
         val cardCreateViewModel: CardCreateViewModel by viewModels {
             CardCreateViewModel.factory(appContainer.cardConfigProvider, appContainer.cardTemplateImporter)
         }
@@ -49,6 +54,10 @@ class MainActivity : ComponentActivity() {
                         Screen.Create -> Screen.List
                         is Screen.Edit -> {
                             val id = (screen as Screen.Edit).id
+                            Screen.Detail(id)
+                        }
+                        is Screen.AddBenefit -> {
+                            val id = (screen as Screen.AddBenefit).cardId
                             Screen.Detail(id)
                         }
                         Screen.List -> Screen.List
@@ -76,6 +85,11 @@ class MainActivity : ComponentActivity() {
                             onEdit = { id ->
                                 cardEditViewModel.load(id)
                                 screen = Screen.Edit(id)
+                            },
+                            onAddBenefit = { id, productName ->
+                                val issuer = cardDetailViewModel.state.value.detail?.issuer ?: ""
+                                benefitCreateViewModel.init(id, productName, issuer)
+                                screen = Screen.AddBenefit(id, productName, issuer)
                             }
                         )
                     }
@@ -119,6 +133,33 @@ class MainActivity : ComponentActivity() {
                             onNotesChange = { value -> cardEditViewModel.updateNotes(value) }
                         )
                     }
+                    is Screen.AddBenefit -> {
+                        val addId = (screen as Screen.AddBenefit).cardId
+                        val productName = (screen as Screen.AddBenefit).productName
+                        val issuer = (screen as Screen.AddBenefit).issuer
+                        BenefitCreateScreen(
+                            stateFlow = benefitCreateViewModel.state,
+                            onInit = { benefitCreateViewModel.init(addId, productName, issuer) },
+                            onBack = { screen = Screen.Detail(addId) },
+                            onSave = {
+                                benefitCreateViewModel.save {
+                                    cardDetailViewModel.load(addId)
+                                    screen = Screen.Detail(addId)
+                                }
+                            },
+                            onTypeChange = { benefitCreateViewModel.setType(it) },
+                            onAmountChange = { benefitCreateViewModel.setAmount(it) },
+                            onCapChange = { benefitCreateViewModel.setCap(it) },
+                            onCadenceChange = { benefitCreateViewModel.setCadence(it) },
+                            onEffectiveDateChange = { benefitCreateViewModel.setEffectiveDate(it) },
+                            onExpiryDateChange = { benefitCreateViewModel.setExpiryDate(it) },
+                            onNotesChange = { benefitCreateViewModel.setNotes(it) },
+                            onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
+                            onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },
+                            onAddCustomCategory = { benefitCreateViewModel.addCustomCategory() },
+                            onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) }
+                        )
+                    }
                 }
             }
         }
@@ -130,4 +171,5 @@ private sealed class Screen {
     data class Detail(val id: Long) : Screen()
     data object Create : Screen()
     data class Edit(val id: Long) : Screen()
+    data class AddBenefit(val cardId: Long, val productName: String, val issuer: String) : Screen()
 }

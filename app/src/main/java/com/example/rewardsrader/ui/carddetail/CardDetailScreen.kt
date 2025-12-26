@@ -3,13 +3,16 @@ package com.example.rewardsrader.ui.carddetail
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -34,7 +37,8 @@ import kotlinx.coroutines.flow.StateFlow
 fun CardDetailScreen(
     stateFlow: StateFlow<CardDetailState>,
     onBack: () -> Unit,
-    onEdit: (Long) -> Unit
+    onEdit: (Long) -> Unit,
+    onAddBenefit: (Long, String) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val detail = state.detail
@@ -63,6 +67,7 @@ fun CardDetailScreen(
             detail == null -> DetailMessage("No details available.", Modifier.padding(padding))
             else -> DetailContent(
                 detail = detail,
+                onAddBenefit = { onAddBenefit(detail.id, detail.productName) },
                 modifier = Modifier.padding(padding)
             )
         }
@@ -70,7 +75,25 @@ fun CardDetailScreen(
 }
 
 @Composable
-private fun DetailContent(detail: CardDetailUi, modifier: Modifier = Modifier) {
+private fun BenefitsHeader(onAddBenefit: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text("Benefits", style = MaterialTheme.typography.titleMedium)
+        IconButton(onClick = onAddBenefit) {
+            Icon(Icons.Default.Add, contentDescription = "Add benefit")
+        }
+    }
+}
+
+@Composable
+private fun DetailContent(
+    detail: CardDetailUi,
+    onAddBenefit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -105,7 +128,7 @@ private fun DetailContent(detail: CardDetailUi, modifier: Modifier = Modifier) {
 
         item {
             Divider(modifier = Modifier.padding(vertical = 8.dp))
-            Text("Benefits", style = MaterialTheme.typography.titleMedium)
+            BenefitsHeader(onAddBenefit = onAddBenefit)
         }
         items(detail.benefits) { benefit ->
             Card(modifier = Modifier.fillMaxSize()) {

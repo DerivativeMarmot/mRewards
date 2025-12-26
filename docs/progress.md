@@ -47,3 +47,15 @@
 - Card detail top bar switched to icon-only (no title); edit screen shows read-only product name.
 - Added Go-back icon to edit bar; saved via icon. Room migrations added to AppContainer.
 - Added card delete with undo on the card list: delete icon per card, snackbar with undo, snapshot/restore of related data.
+
+## 2025-12-26 – Benefit creation UI enhancements
+- Added benefit creation flow with modal selectors for type/frequency, issuer-scoped categories (common + custom), date pickers, and notes; product shown at top.
+- Added benefit creation navigation from detail (plus icon in benefits header) and dedicated AddBenefit screen/viewmodel wiring.
+- Scoped custom categories per issuer; allow adding via modal and removing custom categories; chips show scoped categories; merchant field removed.
+- Updated dividers and labels (expiration date wording) and modal UI consistency (radio/row taps).
+
+## 2025-12-26 – Benefit UI polish & category fixes
+- Swapped selection controls to radio-button dialogs with full-row taps for type and frequency; fixed cadence labeling (“annually”) to render horizontally and match selection-UI rules.
+- Cleaned the form: show product, drop issuer/merchant inputs, simplify date labels, and keep dividers edge-to-edge.
+- Categories header now uses an edit icon opening a modal to add scoped custom categories and remove custom ones; custom entries persist per issuer even after toggling off.
+- Category chips merge common issuer-scoped presets with saved custom entries; additions no longer leak across issuers or disappear when deselected.

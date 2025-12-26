@@ -60,3 +60,12 @@
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Delete icon per card, snackbar handling for undo.
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/DeletedCardSnapshot.kt`: Captures card/benefits/applications/usage/notification rules for undo restore.
 - DAOs/repos extended for bulk inserts/queries to support undo (`UsageEntryDao`, `NotificationRuleDao`, `ApplicationDao`, `CardDao`, `CardRepository`).
+
+## Files added/used (Benefit creation UI)
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateState.kt`, `BenefitCreateViewModel.kt`, `BenefitCreateScreen.kt`, `CategoryItem.kt`: Benefit add flow with modal selectors (type/frequency radio), issuer-scoped categories (common + custom via edit modal), date pickers, notes; merchant removed.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: AddBenefit navigation wired; passes product/issuer; back handler updated earlier.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Benefits header shows add icon for navigating to AddBenefit.
+
+## Files updated (Benefit UI polish)
+- `ui/benefitcreate/BenefitCreateScreen.kt`: Selection rows now open radio-button dialogs with tappable rows; cadence label fixed to “annually”; dividers run edge-to-edge; categories header uses edit icon to open modal.
+- `ui/benefitcreate/BenefitCreateViewModel.kt`: Custom categories are scoped per issuer, persist after deselection, and can be removed via modal; toggling chips no longer drops custom entries across issuers.

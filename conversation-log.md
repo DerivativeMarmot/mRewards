@@ -181,3 +181,23 @@ User: start implementing card delete behavior in card list page.
 Assistant: Added delete/undo support with snapshots, DAO/repo helpers, snackbar flow; wired in list screen.
 
 ---
+
+## 2025-12-23 07:20:00 UTC
+
+User: start implementing benefit creation; asked to move add-benefit button, show product, rename cadence/frequency, switch selections to modals, clean date/status UI, and drop issuer/merchant fields.
+Assistant: Built AddBenefit screen/viewmodel with product header, radio selection dialogs (type/frequency), corrected “annually” layout, date pickers, dividers, and kept add button on benefits header; removed issuer/merchant inputs and ensured fields reset/labels simplified.
+
+---
+
+## 2025-12-23 08:00:00 UTC
+
+User: refine categories (edit icon modal, add/remove custom, keep scoped per issuer, persist after deselect, avoid leaking across issuers).
+Assistant: Replaced categories plus with edit icon opening modal for adding/removing scoped custom categories; chips combine common presets with issuer-scoped custom entries; selections persist per issuer without disappearing when toggled off.
+
+---
+
+## 2025-12-26 08:42:00 UTC
+
+Assistant: Updated progress log to reflect benefit UI polish and category fixes dated 2025-12-26.
+
+---
