@@ -9,10 +9,14 @@
 - [ ] Welcome offer UI: Show spending progress bar and deadline (reminder integration deferred).
 - [ ] Card management: Update card details; confirm destructive actions and refresh state.
 
-## Benefit
-- Benefit management: Add/update/remove benefits on a card; confirm destructive actions and refresh state.
-- Benefit types: Support types such as Credit and Multiplier (extendable). Each benefit defines amount, cap, refresh frequency (once/monthly/quarterly/annual), category/merchant, enrollment requirement, effective/expiry dates, and notes/terms.
-- Usage tracking UI: Add per-benefit usage entries (date, amount, note), update remaining value, and show history with `MM/dd/yyyy hh:mm` UTC validation/local display.
+## Benefit (pending unless checked)
+- [ ] Benefit management: Add/update/remove benefits on a card; confirm destructive actions and refresh state.
+- [ ] Benefit types/properties: Support two types:
+  - Credit: fixed amount; refresh cadence (once/monthly/quarterly/annual); category/merchant; effective/expiry; notes/terms. One-time credits use a checkbox; multi-use credits store each credit amount used.
+  - Multiplier: decimal rate (e.g., 0.05 for 5%/5x), optional cap on spend only; refresh cadence; category/merchant; effective/expiry; notes/terms.
+- [ ] Categories: Store issuer-scoped categories (e.g., “Dining (Chase)”, “Online Shopping (Amex)”) from a selectable list of common types (Dining, Grocery, Online Shopping, Travel, Gas, Drugstore, Streaming, Transit, Utilities) with ability to add custom types; support multi-select per benefit and only show categories for the benefit’s issuer.
+- [ ] Usage tracking UI: Multiplier tracks spend amount and derived rewards per transaction; credits track checkbox for single-use or per-use amounts for multi-use; history with `MM/dd/yyyy hh:mm` UTC stored, local display.
+- [ ] Status display: Show benefit status (active/expired/paused).
 
 ## Notification
 - Notification scheduling: Add triggers (days-before-expiry, statement cut offset, spend remaining thresholds); schedule/dispatch with UTC storage and local display.
