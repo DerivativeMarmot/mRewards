@@ -21,6 +21,7 @@ data class ApplicationUi(
 
 data class BenefitUi(
     val id: Long,
+    val title: String?,
     val type: String,
     val amount: String,
     val cadence: String,
@@ -119,11 +120,12 @@ class CardDetailViewModel(
             benefits = benefits.map { benefit ->
                 BenefitUi(
                     id = benefit.id,
+                    title = benefit.notes,
                     type = benefit.type,
                     amount = buildAmount(benefit),
                     cadence = benefit.cadence.replaceFirstChar { it.uppercase() },
                     expiry = benefit.expiryDateUtc,
-                    notes = benefit.notes ?: benefit.terms
+                    notes = benefit.terms ?: benefit.notes
                 )
             }
         )

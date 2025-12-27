@@ -64,3 +64,7 @@
 - Added DAO/repository support to delete benefits by id and exposed delete in `CardDetailViewModel` with card reload after removal.
 - Card detail UI now shows a trailing trash icon on each benefit card (no swipe); tapping deletes the benefit via the viewmodel.
 - Updated tests and wiring to pass benefit IDs; retained Material dependency for icon usage.
+
+## 2025-12-27 – Benefit creation title & reset
+- Added a Title field to the Add Benefit form; title is stored on the benefit and shown in detail.
+- Cleared Add Benefit form fields back to defaults after a successful save.

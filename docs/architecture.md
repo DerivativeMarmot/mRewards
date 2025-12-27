@@ -77,3 +77,10 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Replaced swipe delete attempts with a simple trailing trash icon per benefit card; tap triggers deletion.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Passes delete callback to detail screen.
 - `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated BenefitUi to carry IDs and screen call signatures.
+
+## 2025-12-27 – Files updated (Benefit creation title/reset)
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateState.kt`: Added `title`.
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateViewModel.kt`: Stores title on benefits, clears form fields to defaults after save.
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Title text field added.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires title change into the benefit create screen.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Includes title in `BenefitUi`; detail screen renders it when present.

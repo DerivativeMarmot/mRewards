@@ -21,6 +21,7 @@ class BenefitCreateViewModel(
         _state.value = _state.value.copy(cardId = cardId, productName = productName, issuer = issuer)
     }
 
+    fun setTitle(value: String) { _state.value = _state.value.copy(title = value) }
     fun setType(type: String) { _state.value = _state.value.copy(type = type) }
     fun setAmount(value: String) { _state.value = _state.value.copy(amount = value) }
     fun setCap(value: String) { _state.value = _state.value.copy(cap = value) }
@@ -79,14 +80,27 @@ class BenefitCreateViewModel(
             expiryDateUtc = _state.value.expiryDate.ifBlank { null },
             terms = _state.value.notes.ifBlank { null },
             dataSource = "user",
-            notes = null
+            notes = _state.value.title.ifBlank { null }
         )
         _state.value = _state.value.copy(isSaving = true, error = null)
         viewModelScope.launch {
             runCatching {
                 repository.addBenefit(benefit)
             }.onSuccess {
-                _state.value = _state.value.copy(isSaving = false)
+                _state.value = _state.value.copy(
+                    title = "",
+                    type = "credit",
+                    amount = "",
+                    cap = "",
+                    cadence = "monthly",
+                    categories = emptyList(),
+                    customCategory = "",
+                    effectiveDate = "",
+                    expiryDate = "",
+                    notes = "",
+                    isSaving = false,
+                    error = null
+                )
                 onSuccess()
             }.onFailure {
                 _state.value = _state.value.copy(isSaving = false, error = it.message)

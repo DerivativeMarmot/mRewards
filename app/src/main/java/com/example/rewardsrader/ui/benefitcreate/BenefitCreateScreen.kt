@@ -60,6 +60,7 @@ fun BenefitCreateScreen(
     onInit: () -> Unit,
     onBack: () -> Unit,
     onSave: () -> Unit,
+    onTitleChange: (String) -> Unit,
     onTypeChange: (String) -> Unit,
     onAmountChange: (String) -> Unit,
     onCapChange: (String) -> Unit,
@@ -108,6 +109,14 @@ fun BenefitCreateScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text("Product: ${state.productName}")
+            Divider(modifier = Modifier.fillMaxWidth())
+
+            OutlinedTextField(
+                value = state.title,
+                onValueChange = onTitleChange,
+                label = { Text("Title") },
+                modifier = Modifier.fillMaxWidth()
+            )
             Divider(modifier = Modifier.fillMaxWidth())
 
             SelectionRow(

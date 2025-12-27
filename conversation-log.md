@@ -243,3 +243,45 @@ User: Requested swipe reveal menu with open-source library; later disliked swipe
 Assistant: Tried me.saket swipe, then RevealSwipe via JitPack; resolved dependency coords, but networking blocked. Ultimately reverted swipe behavior and implemented a simple per-benefit trash icon on the right that deletes on tap; removed swipe libs and JitPack.
 
 ---
+
+## 2025-12-27 10:45:00 UTC
+
+User: read progress.md and architecture.md; log what you did.  
+Assistant: Logged benefit deletion work into progress and architecture docs.
+
+---
+
+## 2025-12-27 10:50:00 UTC
+
+User: add date to docs/architecture.md.  
+Assistant: Dated the benefit deletion section header.
+
+---
+
+## 2025-12-27 10:52:00 UTC
+
+User: I can see .gradle-local folder; should it be committed? add to .gitignore.  
+Assistant: Advised not to commit; added `.gradle-local` to .gitignore.
+
+---
+
+## 2025-12-27 11:05:00 UTC
+
+User: In add benefit page, add a Title field.  
+Assistant: Added title field to state, viewmodel, screen; stored title on benefit, displayed in detail; updated MainActivity and tests.
+
+---
+
+## 2025-12-27 11:15:00 UTC
+
+User: clear out user field or set to default after benefit creation.  
+Assistant: Reset Add Benefit form fields to defaults after successful save.
+
+---
+
+## 2025-12-27 11:20:00 UTC
+
+User: log what you did.  
+Assistant: Updated progress/architecture docs for title field and form reset.
+
+---

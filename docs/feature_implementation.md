@@ -18,6 +18,12 @@
 - [ ] Usage tracking UI: Multiplier tracks spend amount and derived rewards per transaction; credits track checkbox for single-use or per-use amounts for multi-use; history with `MM/dd/yyyy hh:mm` UTC stored, local display.
 - [ ] Status display: Show benefit status (active/expired/paused).
 
+## Offers
+
+
+## SUB (sign-up bonus)
+
+
 ## Notification
 - Notification scheduling: Add triggers (days-before-expiry, statement cut offset, spend remaining thresholds); schedule/dispatch with UTC storage and local display.
 

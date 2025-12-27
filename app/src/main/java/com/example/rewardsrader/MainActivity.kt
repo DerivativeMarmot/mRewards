@@ -156,6 +156,7 @@ class MainActivity : ComponentActivity() {
                             onCadenceChange = { benefitCreateViewModel.setCadence(it) },
                             onEffectiveDateChange = { benefitCreateViewModel.setEffectiveDate(it) },
                             onExpiryDateChange = { benefitCreateViewModel.setExpiryDate(it) },
+                            onTitleChange = { benefitCreateViewModel.setTitle(it) },
                             onNotesChange = { benefitCreateViewModel.setNotes(it) },
                             onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
                             onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },

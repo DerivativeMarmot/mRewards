@@ -150,6 +150,7 @@ private fun BenefitCard(benefit: BenefitUi, onDelete: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
+                benefit.title?.let { Text(it, fontWeight = FontWeight.SemiBold) }
                 Text(benefit.type, fontWeight = FontWeight.SemiBold)
                 if (benefit.amount.isNotBlank()) Text(benefit.amount)
                 Text("Cadence: ${benefit.cadence}")

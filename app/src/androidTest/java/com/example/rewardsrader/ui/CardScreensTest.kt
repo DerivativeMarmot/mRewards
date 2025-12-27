@@ -75,6 +75,7 @@ class CardScreensTest {
                     benefits = listOf(
                         BenefitUi(
                             id = 1L,
+                            title = "Dining credit",
                             type = "credit",
                             amount = "$10.0 (cap $10.0)",
                             cadence = "monthly",

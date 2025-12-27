@@ -4,6 +4,7 @@ data class BenefitCreateState(
     val cardId: Long = 0L,
     val productName: String = "",
     val issuer: String = "",
+    val title: String = "",
     val type: String = "credit", // credit | multiplier
     val amount: String = "",
     val cap: String = "",
