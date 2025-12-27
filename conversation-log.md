@@ -299,3 +299,59 @@ User: When scrolling, entire screen should scroll (card face not fixed).
 Assistant: Refactored detail layout to a single LazyColumn containing header, tabs, and tab content so everything scrolls together; simplified Card Info tab content.
 
 ---
+
+## 2025-12-27 12:05:00 UTC
+
+User: I noticed that after I saved a field value, it refreshes the whole page.  
+Assistant: Explained it reloads due to viewmodel calling load after update.
+
+---
+
+## 2025-12-27 12:10:00 UTC
+
+User: Make it update the edited field only.  
+Assistant: Updated viewmodel to mutate in-memory detail state instead of reloading.
+
+---
+
+## 2025-12-27 12:20:00 UTC
+
+User: For open date/statement date, show date picker on click.  
+Assistant: Added date pickers and inline wiring (noting Gradle download blocked for build).
+
+---
+
+## 2025-12-27 12:30:00 UTC
+
+User: Remove top edit button.  
+Assistant: Removed edit icon from detail top bar.
+
+---
+
+## 2025-12-27 12:40:00 UTC
+
+User: Add Notes back inline with icon/two-column layout; adjust status modal spacing/capitalization and dividers, remove welcome offer row, shared dividers, etc.  
+Assistant: Made notes borderless inline with icon/value, tweaked status modal (radio, capitalized, reduced spacing), single-line labels/values with shared dividers, removed welcome offer row.
+
+---
+
+## 2025-12-27 12:50:00 UTC
+
+User: Update modals to use Cancel/Save text buttons.  
+Assistant: Swapped modal actions to text buttons.
+
+---
+
+## 2025-12-27 13:00:00 UTC
+
+User: Make label/value larger, adjust Notes icon, and handle divider sharing tweaks.  
+Assistant: Increased typography on info rows; set shared dividers between fields; adjusted notes icon to valid vector.
+
+---
+
+## 2025-12-27 13:15:00 UTC
+
+User: Log what you did.  
+Assistant: Updated progress/architecture docs for inline edits/date pickers/notes/status and removal of edit screen.
+
+---

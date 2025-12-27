@@ -88,3 +88,9 @@
 ## 2025-12-27 – Files updated (Card detail tabs/scroll)
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Added card-face header and tab row (Card Info, Signup Bonus placeholder, Benefits, Offers placeholder); moved metadata/app timeline to Card Info tab; benefits tab uses existing list; converted layout to a single LazyColumn so header/tabs scroll together.
 - `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Adjusted test to tap Benefits tab before assertions.
+
+## 2025-12-27 – Files updated (Inline edits, date pickers, notes/status)
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Inline field updates now mutate in-memory detail state instead of reloading; tracks current card.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Inline editable rows with shared dividers, radio-button status modal with capitalized labels, borderless notes row with icon/value layout, date pickers for open/statement dates, removed top-bar edit icon.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Simplified detail navigation (removed edit screen) to rely on inline edits.
+- `app/src/main/java/com/example/rewardsrader/ui/cardedit/CardEditScreen.kt`: Removed in favor of inline edits.

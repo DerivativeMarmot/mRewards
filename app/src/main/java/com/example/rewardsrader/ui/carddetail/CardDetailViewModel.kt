@@ -41,6 +41,7 @@ data class CardDetailUi(
     val openDate: String?,
     val statementCut: String?,
     val welcomeOfferProgress: String?,
+    val notes: String?,
     val applications: List<ApplicationUi>,
     val benefits: List<BenefitUi>
 )
@@ -58,6 +59,7 @@ class CardDetailViewModel(
     private val _state = MutableStateFlow(CardDetailState())
     val state: StateFlow<CardDetailState> = _state.asStateFlow()
     private var currentCardId: Long? = null
+    private var currentCard: CardEntity? = null
 
     fun load(cardId: Long) {
         currentCardId = cardId
@@ -69,6 +71,7 @@ class CardDetailViewModel(
                 val applications = repository.getApplicationsForCard(cardId)
                 cards to applications
             }.onSuccess { (cardWithBenefits, applications) ->
+                currentCard = cardWithBenefits.card
                 _state.value = CardDetailState(
                     isLoading = false,
                     detail = mapDetail(cardWithBenefits.card, applications, cardWithBenefits.benefits)
@@ -92,6 +95,51 @@ class CardDetailViewModel(
         }
     }
 
+    fun updateNickname(value: String) = updateCard { it.copy(nickname = value.ifBlank { null }) }
+
+    fun updateAnnualFee(value: String) = updateCard {
+        val fee = value.toDoubleOrNull() ?: it.annualFeeUsd
+        it.copy(annualFeeUsd = fee)
+    }
+
+    fun updateLastFour(value: String) = updateCard { it.copy(lastFour = value.take(4).ifBlank { null }) }
+
+    fun updateOpenDate(value: String) = updateCard { it.copy(openDateUtc = value.ifBlank { null }) }
+
+    fun updateStatementCut(value: String) = updateCard { it.copy(statementCutUtc = value.ifBlank { null }) }
+
+    fun updateStatus(value: String) = updateCard { it.copy(status = value.ifBlank { it.status }) }
+
+    fun updateNotes(value: String) = updateCard { it.copy(notes = value.ifBlank { null }) }
+
+    private fun updateCard(update: (CardEntity) -> CardEntity) {
+        val card = currentCard ?: return
+        viewModelScope.launch {
+            runCatching {
+                val updated = update(card)
+                repository.updateCard(updated)
+                currentCard = updated
+                val currentDetail = _state.value.detail
+                if (currentDetail != null) {
+                    _state.value = _state.value.copy(
+                        detail = currentDetail.copy(
+                            nickname = updated.nickname,
+                            lastFour = updated.lastFour,
+                            status = updated.status,
+                            annualFee = "$${updated.annualFeeUsd}",
+                            openDate = updated.openDateUtc,
+                            statementCut = updated.statementCutUtc,
+                            welcomeOfferProgress = updated.welcomeOfferProgress,
+                            notes = updated.notes
+                        )
+                    )
+                }
+            }.onFailure {
+                _state.value = _state.value.copy(error = it.message)
+            }
+        }
+    }
+
     private fun mapDetail(
         card: CardEntity,
         applications: List<ApplicationEntity>,
@@ -109,6 +157,7 @@ class CardDetailViewModel(
             openDate = card.openDateUtc,
             statementCut = card.statementCutUtc,
             welcomeOfferProgress = card.welcomeOfferProgress,
+            notes = card.notes,
             applications = applications.map {
                 ApplicationUi(
                     status = it.status,

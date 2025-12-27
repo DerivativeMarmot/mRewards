@@ -12,8 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.example.rewardsrader.ui.carddetail.CardDetailScreen
 import com.example.rewardsrader.ui.carddetail.CardDetailViewModel
-import com.example.rewardsrader.ui.cardedit.CardEditScreen
-import com.example.rewardsrader.ui.cardedit.CardEditViewModel
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateScreen
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateViewModel
 import com.example.rewardsrader.ui.cardcreate.CardCreateScreen
@@ -35,9 +33,6 @@ class MainActivity : ComponentActivity() {
         val cardDetailViewModel: CardDetailViewModel by viewModels {
             CardDetailViewModel.factory(appContainer.cardRepository)
         }
-        val cardEditViewModel: com.example.rewardsrader.ui.cardedit.CardEditViewModel by viewModels {
-            com.example.rewardsrader.ui.cardedit.CardEditViewModel.factory(appContainer.cardRepository)
-        }
         val benefitCreateViewModel: BenefitCreateViewModel by viewModels {
             BenefitCreateViewModel.factory(appContainer.cardRepository)
         }
@@ -52,10 +47,6 @@ class MainActivity : ComponentActivity() {
                     screen = when (screen) {
                         is Screen.Detail -> Screen.List
                         Screen.Create -> Screen.List
-                        is Screen.Edit -> {
-                            val id = (screen as Screen.Edit).id
-                            Screen.Detail(id)
-                        }
                         is Screen.AddBenefit -> {
                             val id = (screen as Screen.AddBenefit).cardId
                             Screen.Detail(id)
@@ -82,10 +73,7 @@ class MainActivity : ComponentActivity() {
                         CardDetailScreen(
                             stateFlow = cardDetailViewModel.state,
                             onBack = { screen = Screen.List },
-                            onEdit = { id ->
-                                cardEditViewModel.load(id)
-                                screen = Screen.Edit(id)
-                            },
+                            onEdit = {},
                             onAddBenefit = { id, productName ->
                                 val issuer = cardDetailViewModel.state.value.detail?.issuer ?: ""
                                 benefitCreateViewModel.init(id, productName, issuer)
@@ -93,7 +81,14 @@ class MainActivity : ComponentActivity() {
                             },
                             onDeleteBenefit = { benefitId ->
                                 cardDetailViewModel.deleteBenefit(benefitId)
-                            }
+                            },
+                            onUpdateNickname = { cardDetailViewModel.updateNickname(it) },
+                            onUpdateAnnualFee = { cardDetailViewModel.updateAnnualFee(it) },
+                            onUpdateLastFour = { cardDetailViewModel.updateLastFour(it) },
+                            onUpdateOpenDate = { cardDetailViewModel.updateOpenDate(it) },
+                            onUpdateStatementCut = { cardDetailViewModel.updateStatementCut(it) },
+                            onUpdateStatus = { cardDetailViewModel.updateStatus(it) },
+                            onUpdateNotes = { cardDetailViewModel.updateNotes(it) }
                         )
                     }
                     Screen.Create -> CardCreateScreen(
@@ -113,29 +108,6 @@ class MainActivity : ComponentActivity() {
                         },
                         onBack = { screen = Screen.List }
                     )
-                    is Screen.Edit -> {
-                        val editId = (screen as Screen.Edit).id
-                        CardEditScreen(
-                            stateFlow = cardEditViewModel.state,
-                            onLoad = { id -> cardEditViewModel.load(id) },
-                            cardId = editId,
-                            onSave = {
-                                cardEditViewModel.save {
-                                    cardDetailViewModel.load(editId)
-                                    screen = Screen.Detail(editId)
-                                }
-                            },
-                            onBack = { screen = Screen.Detail(editId) },
-                            onNicknameChange = { value -> cardEditViewModel.updateNickname(value) },
-                            onAnnualFeeChange = { value -> cardEditViewModel.updateAnnualFee(value) },
-                            onLastFourChange = { value -> cardEditViewModel.updateLastFour(value) },
-                            onOpenDateChange = { value -> cardEditViewModel.updateOpenDate(value) },
-                            onStatementDateChange = { value -> cardEditViewModel.updateStatementCut(value) },
-                            onStatusChange = { value -> cardEditViewModel.updateStatus(value) },
-                            onWelcomeOfferChange = { value -> cardEditViewModel.updateWelcomeOffer(value) },
-                            onNotesChange = { value -> cardEditViewModel.updateNotes(value) }
-                        )
-                    }
                     is Screen.AddBenefit -> {
                         val addId = (screen as Screen.AddBenefit).cardId
                         val productName = (screen as Screen.AddBenefit).productName
@@ -174,6 +146,5 @@ private sealed class Screen {
     data object List : Screen()
     data class Detail(val id: Long) : Screen()
     data object Create : Screen()
-    data class Edit(val id: Long) : Screen()
     data class AddBenefit(val cardId: Long, val productName: String, val issuer: String) : Screen()
 }

@@ -73,3 +73,8 @@
 - Redesigned card detail: top card face with issuer/product, tab row for Card Info, Signup Bonus (placeholder), Benefits, Offers (placeholder).
 - Card Info tab now holds metadata and application timeline; Benefits tab reuses existing list; others blank for now.
 - Switched layout to a single scrollable list so the header and tabs scroll together.
+
+## 2025-12-27 – Inline edits & date pickers
+- Card Info fields are inline, with shared dividers and per-field dialogs; edits now update in-memory state without reloading the whole screen.
+- Notes are inline and borderless with an icon/value layout; status modal uses radio buttons with capitalized labels.
+- Open/statement dates trigger date pickers; edit toolbar icon removed (inline edits only).

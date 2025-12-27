@@ -64,6 +64,7 @@ class CardScreensTest {
                     openDate = "01/05/2025 09:00",
                     statementCut = "01/15/2025 09:00",
                     welcomeOfferProgress = "75%",
+                    notes = "",
                     applications = listOf(
                         ApplicationUi(
                             status = "approved",
@@ -94,7 +95,14 @@ class CardScreensTest {
                 onBack = {},
                 onEdit = {},
                 onAddBenefit = { _, _ -> },
-                onDeleteBenefit = {}
+                onDeleteBenefit = {},
+                onUpdateNickname = {},
+                onUpdateAnnualFee = {},
+                onUpdateLastFour = {},
+                onUpdateOpenDate = {},
+                onUpdateStatementCut = {},
+                onUpdateStatus = {},
+                onUpdateNotes = {}
             )
         }
 
