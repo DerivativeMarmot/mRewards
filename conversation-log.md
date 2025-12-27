@@ -285,3 +285,17 @@ User: log what you did.
 Assistant: Updated progress/architecture docs for title field and form reset.
 
 ---
+
+## 2025-12-27 11:35:00 UTC
+
+User: update card index page UI with top/bottom split and tabs; placeholders for signup bonus/offers.  
+Assistant: Added card face header, tab row (Card Info, Signup Bonus, Benefits, Offers); moved card info/application timeline to Card Info tab; benefits tab reused existing list; signup/offers left blank; test adjusted to tap Benefits tab.
+
+---
+
+## 2025-12-27 11:45:00 UTC
+
+User: When scrolling, entire screen should scroll (card face not fixed).  
+Assistant: Refactored detail layout to a single LazyColumn containing header, tabs, and tab content so everything scrolls together; simplified Card Info tab content.
+
+---

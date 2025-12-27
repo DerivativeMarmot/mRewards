@@ -98,11 +98,11 @@ class CardScreensTest {
             )
         }
 
+        composeRule.onNodeWithText("Benefits").performClick()
+
         composeRule.onNodeWithText("Example Cash Preferred").assertIsDisplayed()
-        composeRule.onNodeWithText("Application timeline").assertIsDisplayed()
         composeRule.onNodeWithText("Benefits").assertIsDisplayed()
         composeRule.onNodeWithText("credit").assertIsDisplayed()
-        composeRule.onNodeWithText("Status: approved").assertIsDisplayed()
         composeRule.onNodeWithText("Expiry: 12/31/2025 11:59").assertIsDisplayed()
     }
 }

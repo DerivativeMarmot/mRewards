@@ -68,3 +68,8 @@
 ## 2025-12-27 – Benefit creation title & reset
 - Added a Title field to the Add Benefit form; title is stored on the benefit and shown in detail.
 - Cleared Add Benefit form fields back to defaults after a successful save.
+
+## 2025-12-27 – Card detail tabs & scroll
+- Redesigned card detail: top card face with issuer/product, tab row for Card Info, Signup Bonus (placeholder), Benefits, Offers (placeholder).
+- Card Info tab now holds metadata and application timeline; Benefits tab reuses existing list; others blank for now.
+- Switched layout to a single scrollable list so the header and tabs scroll together.

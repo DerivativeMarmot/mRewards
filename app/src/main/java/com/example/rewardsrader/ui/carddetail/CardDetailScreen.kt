@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,11 +23,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -97,47 +104,67 @@ private fun DetailContent(
     onDeleteBenefit: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabs = listOf("Card Info", "Signup Bonus", "Benefits", "Offers")
+
     LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-            Text("${detail.issuer} • ${detail.network}", style = MaterialTheme.typography.bodyMedium)
-            detail.nickname?.let { Text("Nickname: $it", style = MaterialTheme.typography.bodySmall) }
-            detail.lastFour?.let { Text("Last 4: $it", style = MaterialTheme.typography.bodySmall) }
-            Text("Status: ${detail.status}", style = MaterialTheme.typography.bodySmall)
-            Text("Annual fee: ${detail.annualFee}", style = MaterialTheme.typography.bodySmall)
-            detail.openDate?.let { Text("Open date: $it", style = MaterialTheme.typography.bodySmall) }
-            detail.statementCut?.let { Text("Statement cut: $it", style = MaterialTheme.typography.bodySmall) }
-            detail.welcomeOfferProgress?.let { Text("Welcome offer: $it", style = MaterialTheme.typography.bodySmall) }
-        }
-
-        item {
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-            Text("Application timeline", style = MaterialTheme.typography.titleMedium)
-        }
-        items(detail.applications) { app ->
-            Card(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Text("Status: ${app.status}", fontWeight = FontWeight.SemiBold)
-                    app.applicationDateUtc?.let { Text("Applied: $it") }
-                    app.decisionDateUtc?.let { Text("Decision: $it") }
-                    app.bureau?.let { Text("Bureau: $it") }
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(140.dp)
+                    )
+                    Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
                 }
             }
         }
 
         item {
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-            BenefitsHeader(onAddBenefit = onAddBenefit)
+            TabRow(selectedTabIndex = selectedTab) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTab == index,
+                        onClick = { selectedTab = index },
+                        text = { Text(title) }
+                    )
+                }
+            }
         }
-        items(detail.benefits, key = { it.id }) { benefit ->
-            BenefitCard(
-                benefit = benefit,
-                onDelete = { onDeleteBenefit(benefit.id) }
-            )
+
+        when (selectedTab) {
+            0 -> {
+                item { CardInfoTab(detail) }
+            }
+            1 -> {
+                item { SignupBonusTab() }
+            }
+            2 -> {
+                item {
+                    BenefitsHeader(onAddBenefit = onAddBenefit)
+                }
+                items(detail.benefits, key = { it.id }) { benefit ->
+                    BenefitCard(
+                        benefit = benefit,
+                        onDelete = { onDeleteBenefit(benefit.id) }
+                    )
+                }
+            }
+            3 -> {
+                item { OffersTab() }
+            }
         }
     }
 }
@@ -176,5 +203,64 @@ private fun DetailMessage(message: String, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(message)
+    }
+}
+@Composable
+private fun CardInfoTab(detail: CardDetailUi) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("${detail.issuer} • ${detail.network}", style = MaterialTheme.typography.bodyMedium)
+        detail.nickname?.let { Text("Nickname: $it", style = MaterialTheme.typography.bodySmall) }
+        detail.lastFour?.let { Text("Last 4: $it", style = MaterialTheme.typography.bodySmall) }
+        Text("Status: ${detail.status}", style = MaterialTheme.typography.bodySmall)
+        Text("Annual fee: ${detail.annualFee}", style = MaterialTheme.typography.bodySmall)
+        detail.openDate?.let { Text("Open date: $it", style = MaterialTheme.typography.bodySmall) }
+        detail.statementCut?.let { Text("Statement cut: $it", style = MaterialTheme.typography.bodySmall) }
+        detail.welcomeOfferProgress?.let { Text("Welcome offer: $it", style = MaterialTheme.typography.bodySmall) }
+
+        Divider(modifier = Modifier.padding(vertical = 8.dp))
+        Text("Application timeline", style = MaterialTheme.typography.titleMedium)
+        detail.applications.forEach { app ->
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text("Status: ${app.status}", fontWeight = FontWeight.SemiBold)
+                    app.applicationDateUtc?.let { Text("Applied: $it") }
+                    app.decisionDateUtc?.let { Text("Decision: $it") }
+                    app.bureau?.let { Text("Bureau: $it") }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SignupBonusTab() {
+    DetailMessage("No signup bonus tracker yet.")
+}
+
+@Composable
+private fun OffersTab() {
+    DetailMessage("No offers yet.")
+}
+
+@Composable
+private fun BenefitsTab(
+    detail: CardDetailUi,
+    onAddBenefit: () -> Unit,
+    onDeleteBenefit: (Long) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(bottom = 16.dp)
+    ) {
+        item {
+            BenefitsHeader(onAddBenefit = onAddBenefit)
+        }
+        items(detail.benefits, key = { it.id }) { benefit ->
+            BenefitCard(
+                benefit = benefit,
+                onDelete = { onDeleteBenefit(benefit.id) }
+            )
+        }
     }
 }

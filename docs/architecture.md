@@ -84,3 +84,7 @@
 - `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Title text field added.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires title change into the benefit create screen.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Includes title in `BenefitUi`; detail screen renders it when present.
+
+## 2025-12-27 – Files updated (Card detail tabs/scroll)
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Added card-face header and tab row (Card Info, Signup Bonus placeholder, Benefits, Offers placeholder); moved metadata/app timeline to Card Info tab; benefits tab uses existing list; converted layout to a single LazyColumn so header/tabs scroll together.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Adjusted test to tap Benefits tab before assertions.
