@@ -69,8 +69,8 @@ class BenefitCreateViewModel(
 
     fun setTitle(value: String) { _state.value = _state.value.copy(title = value) }
     fun setType(type: String) { _state.value = _state.value.copy(type = type) }
-    fun setAmount(value: String) { _state.value = _state.value.copy(amount = value) }
-    fun setCap(value: String) { _state.value = _state.value.copy(cap = value) }
+    fun setAmount(value: String) { _state.value = _state.value.copy(amount = value.trimToScale(2)) }
+    fun setCap(value: String) { _state.value = _state.value.copy(cap = value.trimToScale(2)) }
     fun setCadence(value: String) { _state.value = _state.value.copy(cadence = value) }
     fun setEffectiveDate(value: String) { _state.value = _state.value.copy(effectiveDate = value) }
     fun setExpiryDate(value: String) { _state.value = _state.value.copy(expiryDate = value) }
@@ -155,6 +155,18 @@ class BenefitCreateViewModel(
             }.onFailure {
                 _state.value = _state.value.copy(isSaving = false, error = it.message)
             }
+        }
+    }
+
+    private fun String.trimToScale(scale: Int): String {
+        if (isBlank()) return ""
+        val normalized = replace(",", "").trim()
+        val parts = normalized.split(".", limit = 2)
+        return if (parts.size == 2) {
+            val decimals = parts[1].take(scale)
+            "${parts[0]}.${decimals}"
+        } else {
+            normalized
         }
     }
 
