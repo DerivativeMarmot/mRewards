@@ -2,6 +2,7 @@ package com.example.rewardsrader.ui.carddetail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +35,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -164,20 +167,6 @@ fun CardDetailScreen(
 }
 
 @Composable
-private fun BenefitsHeader(onAddBenefit: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text("Benefits", style = MaterialTheme.typography.titleMedium)
-        IconButton(onClick = onAddBenefit) {
-            Icon(Icons.Default.Add, contentDescription = "Add benefit")
-        }
-    }
-}
-
-@Composable
 private fun DetailContent(
     detail: CardDetailUi,
     onAddBenefit: () -> Unit,
@@ -203,81 +192,93 @@ private fun DetailContent(
     )
     var editingField by remember { mutableStateOf<CardField?>(null) }
     var editingValue by remember { mutableStateOf("") }
+    val showFab = selectedTab == 2
 
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        item {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Spacer(
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = if (showFab) 96.dp else 16.dp)
+        ) {
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(140.dp)
-                    )
-                    Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                    Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(140.dp)
+                        )
+                        Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                        Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
+                    }
                 }
             }
-        }
 
-        item {
-            TabRow(selectedTabIndex = selectedTab) {
-                tabs.forEachIndexed { index, tab ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(tab.icon, contentDescription = tab.label)
-                                Text(tab.label)
+            item {
+                TabRow(selectedTabIndex = selectedTab) {
+                    tabs.forEachIndexed { index, tab ->
+                        Tab(
+                            selected = selectedTab == index,
+                            onClick = { selectedTab = index },
+                            text = {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(tab.icon, contentDescription = tab.label)
+                                    Text(tab.label)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
+                }
+            }
+
+            when (selectedTab) {
+                0 -> {
+                    item {
+                        CardInfoTab(
+                            detail = detail,
+                            onStartEdit = { field, value ->
+                                editingField = field
+                                editingValue = value
+                            },
+                            onUpdateNotes = onUpdateNotes,
+                            onOpenDateClick = onOpenDateClick,
+                            onStatementDateClick = onStatementDateClick
+                        )
+                    }
+                }
+                1 -> {
+                    item { SignupBonusTab() }
+                }
+                2 -> {
+                    items(detail.benefits, key = { it.id }) { benefit ->
+                        BenefitCard(
+                            benefit = benefit,
+                            onEdit = { onEditBenefit(benefit.id) },
+                            onDelete = { onDeleteBenefit(benefit.id) }
+                        )
+                    }
+                }
+                3 -> {
+                    item { OffersTab() }
                 }
             }
         }
 
-        when (selectedTab) {
-            0 -> {
-                item {
-                    CardInfoTab(
-                        detail = detail,
-                        onStartEdit = { field, value ->
-                            editingField = field
-                            editingValue = value
-                        },
-                        onUpdateNotes = onUpdateNotes,
-                        onOpenDateClick = onOpenDateClick,
-                        onStatementDateClick = onStatementDateClick
-                    )
-                }
-            }
-            1 -> {
-                item { SignupBonusTab() }
-            }
-            2 -> {
-                item {
-                    BenefitsHeader(onAddBenefit = onAddBenefit)
-                }
-                items(detail.benefits, key = { it.id }) { benefit ->
-                    BenefitCard(
-                        benefit = benefit,
-                        onEdit = { onEditBenefit(benefit.id) },
-                        onDelete = { onDeleteBenefit(benefit.id) }
-                    )
-                }
-            }
-            3 -> {
-                item { OffersTab() }
+        if (showFab) {
+            FloatingActionButton(
+                onClick = onAddBenefit,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add benefit")
             }
         }
     }
@@ -559,20 +560,5 @@ private fun BenefitsTab(
     onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(bottom = 16.dp)
-    ) {
-        item {
-            BenefitsHeader(onAddBenefit = onAddBenefit)
-        }
-        items(detail.benefits, key = { it.id }) { benefit ->
-            BenefitCard(
-                benefit = benefit,
-                onEdit = { onEditBenefit(benefit.id) },
-                onDelete = { onDeleteBenefit(benefit.id) }
-            )
-        }
-    }
+    Box(modifier = Modifier.fillMaxWidth()) { }
 }
