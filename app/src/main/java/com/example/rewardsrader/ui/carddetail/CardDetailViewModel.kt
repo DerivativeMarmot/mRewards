@@ -178,9 +178,10 @@ class CardDetailViewModel(
     private fun buildAmount(benefit: BenefitEntity): String {
         return when (benefit.type) {
             "multiplier" -> {
-                val rate = benefit.amountUsd?.let { "${it}%" } ?: ""
-                val cap = benefit.capUsd?.let { " (cap $${it})" } ?: ""
-                rate + cap
+                val rate = benefit.amountUsd?.let {
+                    if (it % 1.0 == 0.0) "${it.toInt()}%" else "${it}%"
+                } ?: ""
+                rate.ifBlank { "" }
             }
             else -> {
                 when {

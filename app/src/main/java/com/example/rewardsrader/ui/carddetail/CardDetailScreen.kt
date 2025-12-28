@@ -456,12 +456,13 @@ private fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> 
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                benefit.title?.let { Text(it, fontWeight = FontWeight.SemiBold) }
-                Text(benefit.type, fontWeight = FontWeight.SemiBold)
-                if (benefit.amount.isNotBlank()) Text(benefit.amount)
-                Text("Cadence: ${benefit.cadence}")
-                benefit.expiry?.let { Text("Expiry: $it") }
-                benefit.notes?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                val primaryLine = listOf(benefit.amount, benefit.title.orEmpty())
+                    .filter { it.isNotBlank() }
+                    .joinToString(" – ")
+                if (primaryLine.isNotBlank()) {
+                    Text(primaryLine, fontWeight = FontWeight.SemiBold)
+                }
+                // Only show amount/rate and title
             }
             IconButton(onClick = onDelete) {
                 Icon(
