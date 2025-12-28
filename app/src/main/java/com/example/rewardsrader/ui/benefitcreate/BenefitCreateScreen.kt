@@ -115,8 +115,6 @@ fun BenefitCreateScreen(
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text("Product: ${state.productName}")
-            Divider(modifier = Modifier.fillMaxWidth())
 
             OutlinedTextField(
                 value = state.title,
