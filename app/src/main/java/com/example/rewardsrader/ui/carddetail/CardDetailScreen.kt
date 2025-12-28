@@ -18,6 +18,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -191,7 +195,12 @@ private fun DetailContent(
     modifier: Modifier = Modifier
 ) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Card Info", "Signup Bonus", "Benefits", "Offers")
+    val tabs = listOf(
+        TabItem("Info", Icons.Default.Info),
+        TabItem("SUB", Icons.Default.CardGiftcard),
+        TabItem("Benefits", Icons.Default.Verified),
+        TabItem("Offers", Icons.Default.LocalOffer)
+    )
     var editingField by remember { mutableStateOf<CardField?>(null) }
     var editingValue by remember { mutableStateOf("") }
 
@@ -222,11 +231,16 @@ private fun DetailContent(
 
         item {
             TabRow(selectedTabIndex = selectedTab) {
-                tabs.forEachIndexed { index, title ->
+                tabs.forEachIndexed { index, tab ->
                     Tab(
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
-                        text = { Text(title) }
+                        text = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(tab.icon, contentDescription = tab.label)
+                                Text(tab.label)
+                            }
+                        }
                     )
                 }
             }
@@ -426,6 +440,8 @@ private enum class CardField {
     LastFour,
     Status
 }
+
+private data class TabItem(val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
 @Composable
 private fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> Unit) {
