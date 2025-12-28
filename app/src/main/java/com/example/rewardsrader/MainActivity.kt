@@ -7,12 +7,17 @@ import androidx.activity.viewModels
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.view.inputmethod.InputMethodManager
 import kotlinx.coroutines.launch
 import com.example.rewardsrader.ui.carddetail.CardDetailScreen
 import com.example.rewardsrader.ui.carddetail.CardDetailViewModel
@@ -48,12 +53,29 @@ class MainActivity : ComponentActivity() {
             RewardsRaderTheme {
                 var screen by remember { mutableStateOf<Screen>(Screen.List) }
                 var benefitSheetMode by remember { mutableStateOf<BenefitSheetMode?>(null) }
-                val addBenefitSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                var allowSheetHide by remember { mutableStateOf(false) }
+                val addBenefitSheetState = rememberModalBottomSheetState(
+                    skipPartiallyExpanded = true,
+                    confirmValueChange = { target ->
+                        if (target == SheetValue.Hidden && !allowSheetHide) {
+                            false
+                        } else {
+                            true
+                        }
+                    }
+                )
                 val sheetScope = rememberCoroutineScope()
+                val focusManager = LocalFocusManager.current
+                val view = LocalView.current
+                val imm = view.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
 
                 val closeBenefitSheet: () -> Unit = {
                     sheetScope.launch {
+                        allowSheetHide = true
+                        focusManager.clearFocus(force = true)
+                        imm.hideSoftInputFromWindow(view.windowToken, 0)
                         addBenefitSheetState.hide()
+                        allowSheetHide = false
                         benefitSheetMode = null
                     }
                 }
