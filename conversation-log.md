@@ -355,3 +355,35 @@ User: Log what you did.
 Assistant: Updated progress/architecture docs for inline edits/date pickers/notes/status and removal of edit screen.
 
 ---
+
+## 2025-12-28 00:00:00 UTC
+
+User: read all docs in docs/, and conversation-log.md  
+Assistant: Confirmed all docs read and summarized contents.
+
+User: make benefit creation page a bottom sheet.  
+Assistant: Converted add-benefit flow to a bottom sheet, adjusted layout/header, and wired ModalBottomSheet in MainActivity.
+
+User: the bottom sheet does not close appropriately when click on close icon and save button  
+Assistant: Added coroutine-based sheet hide helper so close/save/back all dismiss and reset state.
+
+User: avoid the row that contains close button , title and save button to be scrolled  
+Assistant: Fixed header as non-scrollable; form scrolls separately.
+
+User: implement a benefit editing bottom sheet.  
+Assistant: Added benefit fetch/update in DAO/repo; viewmodel edit mode with prefill; benefit cards clickable with edit icon; unified add/edit sheet; updated callbacks.
+
+User: update the title to Edit benefit when editing  
+Assistant: Sheet title toggles between Add and Edit Benefit.
+
+User: update effective date and expiration date to use material3 UI.  
+Assistant: Switched to Material3 DatePickerDialog with prefill/format helpers.
+
+User: make field and value of effective date same row. allow user to click on the row to edit value.  
+Assistant: Inline tappable rows for effective/expiration dates.
+
+User: do the same to Type field and Frequency field.  
+Assistant: Type/Frequency now inline tappable rows.
+
+User: log what you did into progress.md and architechture.md  
+Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and architecture docs.

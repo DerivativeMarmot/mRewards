@@ -94,3 +94,12 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Inline editable rows with shared dividers, radio-button status modal with capitalized labels, borderless notes row with icon/value layout, date pickers for open/statement dates, removed top-bar edit icon.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Simplified detail navigation (removed edit screen) to rely on inline edits.
 - `app/src/main/java/com/example/rewardsrader/ui/cardedit/CardEditScreen.kt`: Removed in favor of inline edits.
+
+## 2025-12-28 – Benefit edit bottom sheet and Material date pickers
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/BenefitDao.kt`: Added `getById` and `update` to support editing benefits.
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Exposes benefit fetch/update helpers.
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateState.kt`: Tracks benefitId, edit mode flags, and metadata for editing.
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateViewModel.kt`: New `startEdit` loads an existing benefit and switches save to update; preserves custom categories.
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Bottom sheet header shows Add vs Edit; Material 3 date pickers with inline label/value rows; type/frequency/date rows are full-row tappable.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Benefit cards are clickable with edit icons; benefits tab passes edit callbacks.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Unifies add/edit benefit into a single bottom sheet with modes; back handling closes the sheet; wires edit callbacks and reloads detail on save.

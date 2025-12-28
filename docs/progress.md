@@ -78,3 +78,9 @@
 - Card Info fields are inline, with shared dividers and per-field dialogs; edits now update in-memory state without reloading the whole screen.
 - Notes are inline and borderless with an icon/value layout; status modal uses radio buttons with capitalized labels.
 - Open/statement dates trigger date pickers; edit toolbar icon removed (inline edits only).
+
+## 2025-12-28 – Benefit edit bottom sheet
+- Reworked add-benefit into a ModalBottomSheet for both add and edit; sheet closes reliably via shared helper and shows “Edit Benefit” in edit mode.
+- Benefit cards are clickable with an edit icon; launching edit preloads existing benefit data into the sheet.
+- Benefit viewmodel/state now support edit mode and call update instead of insert when editing.
+- Date fields use Material 3 date pickers with inline label/value rows; type/frequency rows also inline/tappable for dialogs.
