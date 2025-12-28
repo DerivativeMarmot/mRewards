@@ -463,12 +463,6 @@ private fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> 
                 benefit.expiry?.let { Text("Expiry: $it") }
                 benefit.notes?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             }
-            IconButton(onClick = onEdit) {
-                Icon(
-                    Icons.Default.Edit,
-                    contentDescription = "Edit benefit"
-                )
-            }
             IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Default.Delete,
@@ -498,6 +492,9 @@ private fun CardInfoTab(
     onOpenDateClick: () -> Unit,
     onStatementDateClick: () -> Unit
 ) {
+    var showNotesDialog by remember { mutableStateOf(false) }
+    var notesDraft by remember { mutableStateOf(detail.notes.orEmpty()) }
+
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         InfoRow(
             label = "Nickname",
@@ -535,10 +532,37 @@ private fun CardInfoTab(
             onClick = onStatementDateClick
         )
         Divider()
-        NotesRow(
+        InfoRow(
             label = "Notes",
-            value = detail.notes.orEmpty(),
-            onValueChange = onUpdateNotes
+            value = detail.notes.orEmpty().ifBlank { "Tap to add" },
+            onClick = {
+                notesDraft = detail.notes.orEmpty()
+                showNotesDialog = true
+            }
+        )
+    }
+
+    if (showNotesDialog) {
+        AlertDialog(
+            onDismissRequest = { showNotesDialog = false },
+            title = { Text("Edit notes") },
+            text = {
+                OutlinedTextField(
+                    value = notesDraft,
+                    onValueChange = { notesDraft = it },
+                    label = { Text("Notes") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onUpdateNotes(notesDraft)
+                    showNotesDialog = false
+                }) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showNotesDialog = false }) { Text("Cancel") }
+            }
         )
     }
 }
