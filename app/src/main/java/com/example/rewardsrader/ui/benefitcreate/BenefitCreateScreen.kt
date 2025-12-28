@@ -153,17 +153,12 @@ fun BenefitCreateScreen(
                     leadingIcon = { Text("$") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = state.cap,
-                    onValueChange = onCapChange,
-                    label = { Text("Cap on spend (USD, optional)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
             } else {
                 OutlinedTextField(
                     value = state.amount,
                     onValueChange = onAmountChange,
-                    label = { Text("Rate (decimal, e.g., 0.05)") },
+                    label = { Text("Rate") },
+                    trailingIcon = { Text("%") },
                     modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
