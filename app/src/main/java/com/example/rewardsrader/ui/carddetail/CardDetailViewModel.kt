@@ -83,12 +83,11 @@ class CardDetailViewModel(
     }
 
     fun deleteBenefit(benefitId: Long) {
-        val cardId = currentCardId ?: return
         viewModelScope.launch {
             runCatching {
                 repository.deleteBenefit(benefitId)
             }.onSuccess {
-                load(cardId)
+                removeBenefit(benefitId)
             }.onFailure {
                 _state.value = _state.value.copy(error = it.message)
             }
@@ -166,17 +165,7 @@ class CardDetailViewModel(
                     bureau = it.creditBureau
                 )
             },
-            benefits = benefits.map { benefit ->
-                BenefitUi(
-                    id = benefit.id,
-                    title = benefit.notes,
-                    type = benefit.type,
-                    amount = buildAmount(benefit),
-                    cadence = benefit.cadence.replaceFirstChar { it.uppercase() },
-                    expiry = benefit.expiryDateUtc,
-                    notes = benefit.terms ?: benefit.notes
-                )
-            }
+            benefits = benefits.map { mapBenefit(it) }
         )
     }
 
@@ -188,6 +177,37 @@ class CardDetailViewModel(
             benefit.capUsd != null -> "Cap $${benefit.capUsd}"
             else -> ""
         }
+    }
+
+    private fun mapBenefit(benefit: BenefitEntity): BenefitUi {
+        return BenefitUi(
+            id = benefit.id,
+            title = benefit.notes,
+            type = benefit.type,
+            amount = buildAmount(benefit),
+            cadence = benefit.cadence.replaceFirstChar { it.uppercase() },
+            expiry = benefit.expiryDateUtc,
+            notes = benefit.terms ?: benefit.notes
+        )
+    }
+
+    fun upsertBenefit(benefit: BenefitEntity) {
+        val detail = _state.value.detail ?: return
+        val updatedList = detail.benefits.toMutableList()
+        val index = updatedList.indexOfFirst { it.id == benefit.id }
+        val mapped = mapBenefit(benefit)
+        if (index >= 0) {
+            updatedList[index] = mapped
+        } else {
+            updatedList.add(mapped)
+        }
+        _state.value = _state.value.copy(detail = detail.copy(benefits = updatedList))
+    }
+
+    fun removeBenefit(benefitId: Long) {
+        val detail = _state.value.detail ?: return
+        val updated = detail.benefits.filterNot { it.id == benefitId }
+        _state.value = _state.value.copy(detail = detail.copy(benefits = updated))
     }
 
     companion object {

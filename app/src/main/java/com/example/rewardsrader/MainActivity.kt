@@ -93,8 +93,8 @@ class MainActivity : ComponentActivity() {
                             },
                             onBack = { closeBenefitSheet() },
                             onSave = {
-                                benefitCreateViewModel.save {
-                                    cardDetailViewModel.load(cardId)
+                                benefitCreateViewModel.save { savedBenefit ->
+                                    cardDetailViewModel.upsertBenefit(savedBenefit)
                                     closeBenefitSheet()
                                 }
                             },

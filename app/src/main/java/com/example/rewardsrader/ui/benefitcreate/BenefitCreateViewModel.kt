@@ -110,7 +110,7 @@ class BenefitCreateViewModel(
         _state.value = _state.value.copy(customCategory = value)
     }
 
-    fun save(onSuccess: () -> Unit) {
+    fun save(onSuccess: (BenefitEntity) -> Unit) {
         val isEditing = _state.value.isEditing && _state.value.benefitId != null
         val amount = _state.value.amount.toDoubleOrNull()
         val cap = _state.value.cap.toDoubleOrNull()
@@ -133,7 +133,13 @@ class BenefitCreateViewModel(
         _state.value = _state.value.copy(isSaving = true, error = null)
         viewModelScope.launch {
             runCatching {
-                if (isEditing) repository.updateBenefit(benefit) else repository.addBenefit(benefit)
+                if (isEditing) {
+                    repository.updateBenefit(benefit)
+                    benefit
+                } else {
+                    val id = repository.addBenefit(benefit)
+                    benefit.copy(id = id)
+                }
             }.onSuccess {
                 if (isEditing) {
                     _state.value = _state.value.copy(isSaving = false, error = null, isEditing = false)
@@ -145,7 +151,7 @@ class BenefitCreateViewModel(
                         customCategories = _state.value.customCategories
                     )
                 }
-                onSuccess()
+                onSuccess(it)
             }.onFailure {
                 _state.value = _state.value.copy(isSaving = false, error = it.message)
             }
