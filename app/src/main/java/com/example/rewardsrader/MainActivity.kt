@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import com.example.rewardsrader.ui.carddetail.CardDetailScreen
 import com.example.rewardsrader.ui.carddetail.CardDetailViewModel
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateScreen
@@ -50,10 +52,21 @@ class MainActivity : ComponentActivity() {
                 var addBenefitProductName by remember { mutableStateOf("") }
                 var addBenefitIssuer by remember { mutableStateOf("") }
                 val addBenefitSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+                val sheetScope = rememberCoroutineScope()
+
+                val closeAddBenefitSheet: () -> Unit = {
+                    sheetScope.launch {
+                        addBenefitSheetState.hide()
+                        showAddBenefitSheet = false
+                        addBenefitCardId = null
+                        addBenefitProductName = ""
+                        addBenefitIssuer = ""
+                    }
+                }
 
                 BackHandler(enabled = showAddBenefitSheet || screen != Screen.List) {
                     if (showAddBenefitSheet) {
-                        showAddBenefitSheet = false
+                        closeAddBenefitSheet()
                     } else {
                         screen = Screen.List
                     }
@@ -61,18 +74,18 @@ class MainActivity : ComponentActivity() {
 
                 if (showAddBenefitSheet && addBenefitCardId != null) {
                     ModalBottomSheet(
-                        onDismissRequest = { showAddBenefitSheet = false },
+                        onDismissRequest = { closeAddBenefitSheet() },
                         sheetState = addBenefitSheetState
                     ) {
                         val cardId = addBenefitCardId ?: return@ModalBottomSheet
                         BenefitCreateScreen(
                             stateFlow = benefitCreateViewModel.state,
                             onInit = { benefitCreateViewModel.init(cardId, addBenefitProductName, addBenefitIssuer) },
-                            onBack = { showAddBenefitSheet = false },
+                            onBack = { closeAddBenefitSheet() },
                             onSave = {
                                 benefitCreateViewModel.save {
                                     cardDetailViewModel.load(cardId)
-                                    showAddBenefitSheet = false
+                                    closeAddBenefitSheet()
                                 }
                             },
                             onTypeChange = { benefitCreateViewModel.setType(it) },
