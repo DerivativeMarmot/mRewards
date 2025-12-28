@@ -34,6 +34,8 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,6 +55,7 @@ import java.time.ZoneId
 @Composable
 fun CardDetailScreen(
     stateFlow: StateFlow<CardDetailState>,
+    events: kotlinx.coroutines.flow.SharedFlow<String>,
     onBack: () -> Unit,
     onAddBenefit: (Long, String) -> Unit,
     onEditBenefit: (Long) -> Unit,
@@ -71,7 +74,9 @@ fun CardDetailScreen(
     var showStatementDatePicker by remember { mutableStateOf(false) }
     val openDatePickerState = androidx.compose.material3.rememberDatePickerState()
     val statementDatePickerState = androidx.compose.material3.rememberDatePickerState()
+    val snackbarHostState = remember { SnackbarHostState() }
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {},
@@ -83,6 +88,11 @@ fun CardDetailScreen(
             )
         }
     ) { padding ->
+        androidx.compose.runtime.LaunchedEffect(events) {
+            events.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
+        }
         when {
             state.isLoading -> DetailMessage("Loading…", Modifier.padding(padding))
             state.error != null -> DetailMessage("Error: ${state.error}", Modifier.padding(padding))

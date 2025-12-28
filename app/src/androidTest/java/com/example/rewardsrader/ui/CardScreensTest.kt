@@ -92,6 +92,7 @@ class CardScreensTest {
         composeRule.setContent {
             CardDetailScreen(
                 stateFlow = detailState,
+                events = kotlinx.coroutines.flow.MutableSharedFlow(),
                 onBack = {},
                 onAddBenefit = { _, _ -> },
                 onEditBenefit = {},

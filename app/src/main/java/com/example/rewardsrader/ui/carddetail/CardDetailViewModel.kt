@@ -7,8 +7,11 @@ import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
@@ -58,6 +61,8 @@ class CardDetailViewModel(
 
     private val _state = MutableStateFlow(CardDetailState())
     val state: StateFlow<CardDetailState> = _state.asStateFlow()
+    private val _events = MutableSharedFlow<String>()
+    val events: SharedFlow<String> = _events.asSharedFlow()
     private var currentCardId: Long? = null
     private var currentCard: CardEntity? = null
 
@@ -88,6 +93,7 @@ class CardDetailViewModel(
                 repository.deleteBenefit(benefitId)
             }.onSuccess {
                 removeBenefit(benefitId)
+                _events.emit("Benefit removed")
             }.onFailure {
                 _state.value = _state.value.copy(error = it.message)
             }
@@ -202,6 +208,12 @@ class CardDetailViewModel(
             updatedList.add(mapped)
         }
         _state.value = _state.value.copy(detail = detail.copy(benefits = updatedList))
+    }
+
+    fun notifyBenefitSaved(isEdit: Boolean) {
+        viewModelScope.launch {
+            _events.emit(if (isEdit) "Benefit updated" else "Benefit added")
+        }
     }
 
     fun removeBenefit(benefitId: Long) {

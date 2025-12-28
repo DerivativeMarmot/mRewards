@@ -95,6 +95,7 @@ class MainActivity : ComponentActivity() {
                             onSave = {
                                 benefitCreateViewModel.save { savedBenefit ->
                                     cardDetailViewModel.upsertBenefit(savedBenefit)
+                                    cardDetailViewModel.notifyBenefitSaved(mode is BenefitSheetMode.Edit)
                                     closeBenefitSheet()
                                 }
                             },
@@ -131,6 +132,7 @@ class MainActivity : ComponentActivity() {
                     is Screen.Detail -> {
                         CardDetailScreen(
                             stateFlow = cardDetailViewModel.state,
+                            events = cardDetailViewModel.events,
                             onBack = { screen = Screen.List },
                             onAddBenefit = { id, productName ->
                                 val issuer = cardDetailViewModel.state.value.detail?.issuer ?: ""
