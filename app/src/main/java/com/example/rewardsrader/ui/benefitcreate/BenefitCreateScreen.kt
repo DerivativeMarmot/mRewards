@@ -5,17 +5,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -25,14 +23,12 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Checkbox
 import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -83,117 +80,119 @@ fun BenefitCreateScreen(
 
     LaunchedEffect(Unit) { onInit() }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Add Benefit") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onSave, enabled = !state.isSaving) {
-                        Icon(Icons.Default.Check, contentDescription = "Save")
-                    }
-                }
-            )
-        }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.9f)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Product: ${state.productName}")
-            Divider(modifier = Modifier.fillMaxWidth())
-
-            OutlinedTextField(
-                value = state.title,
-                onValueChange = onTitleChange,
-                label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Divider(modifier = Modifier.fillMaxWidth())
-
-            SelectionRow(
-                label = "Type",
-                value = state.type,
-                onClick = { showTypeDialog = true }
-            )
-
-            OutlinedTextField(
-                value = state.amount,
-                onValueChange = onAmountChange,
-                label = { Text(if (state.type == "credit") "Amount (USD)" else "Rate (decimal, e.g., 0.05)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            if (state.type == "multiplier") {
-                OutlinedTextField(
-                    value = state.cap,
-                    onValueChange = onCapChange,
-                    label = { Text("Cap on spend (USD, optional)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
             }
-
-            Divider(modifier = Modifier.fillMaxWidth())
-
-            SelectionRow(
-                label = "Frequency",
-                value = state.cadence,
-                onClick = { showFrequencyDialog = true }
+            Text(
+                text = "Add Benefit",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp),
+                textAlign = TextAlign.Center
             )
-            Divider(modifier = Modifier.fillMaxWidth())
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Categories")
-                IconButton(onClick = { showCategoryDialog = true }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit categories")
-                }
+            TextButton(onClick = onSave, enabled = !state.isSaving) {
+                Text(if (state.isSaving) "Saving..." else "Save")
             }
-            val issuerPrefix = "${state.issuer}:"
-            val scopedCommon = commonCategories.map { label -> CategoryItem(label = label, key = "$issuerPrefix$label") }
-            val scopedCustom = state.customCategories.filter { it.startsWith(issuerPrefix) }
-                .map { scoped ->
-                    CategoryItem(label = scoped.removePrefix(issuerPrefix), key = scoped)
-                }
-            val allCategories = (scopedCommon + scopedCustom).distinctBy { it.key }
-            FlowCategoryChips(
-                categories = allCategories,
-                selected = state.categories,
-                onToggle = onToggleCategory
-            )
-            Divider(modifier = Modifier.fillMaxWidth())
-
-            SelectionRow(
-                label = "Effective date",
-                value = state.effectiveDate.ifBlank { "Select date" },
-                onClick = { showEffectivePicker = true }
-            )
-            SelectionRow(
-                label = "Expiration date",
-                value = state.expiryDate.ifBlank { "Select date" },
-                onClick = { showExpiryPicker = true }
-            )
-            Divider(modifier = Modifier.fillMaxWidth())
-
-            OutlinedTextField(
-                value = state.notes,
-                onValueChange = onNotesChange,
-                label = { Text("Notes/terms") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            state.error?.let { Text("Error: $it") }
         }
+
+        Text("Product: ${state.productName}")
+        Divider(modifier = Modifier.fillMaxWidth())
+
+        OutlinedTextField(
+            value = state.title,
+            onValueChange = onTitleChange,
+            label = { Text("Title") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Divider(modifier = Modifier.fillMaxWidth())
+
+        SelectionRow(
+            label = "Type",
+            value = state.type,
+            onClick = { showTypeDialog = true }
+        )
+
+        OutlinedTextField(
+            value = state.amount,
+            onValueChange = onAmountChange,
+            label = { Text(if (state.type == "credit") "Amount (USD)" else "Rate (decimal, e.g., 0.05)") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (state.type == "multiplier") {
+            OutlinedTextField(
+                value = state.cap,
+                onValueChange = onCapChange,
+                label = { Text("Cap on spend (USD, optional)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        Divider(modifier = Modifier.fillMaxWidth())
+
+        SelectionRow(
+            label = "Frequency",
+            value = state.cadence,
+            onClick = { showFrequencyDialog = true }
+        )
+        Divider(modifier = Modifier.fillMaxWidth())
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Categories")
+            IconButton(onClick = { showCategoryDialog = true }) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit categories")
+            }
+        }
+        val issuerPrefix = "${state.issuer}:"
+        val scopedCommon = commonCategories.map { label -> CategoryItem(label = label, key = "$issuerPrefix$label") }
+        val scopedCustom = state.customCategories.filter { it.startsWith(issuerPrefix) }
+            .map { scoped ->
+                CategoryItem(label = scoped.removePrefix(issuerPrefix), key = scoped)
+            }
+        val allCategories = (scopedCommon + scopedCustom).distinctBy { it.key }
+        FlowCategoryChips(
+            categories = allCategories,
+            selected = state.categories,
+            onToggle = onToggleCategory
+        )
+        Divider(modifier = Modifier.fillMaxWidth())
+
+        SelectionRow(
+            label = "Effective date",
+            value = state.effectiveDate.ifBlank { "Select date" },
+            onClick = { showEffectivePicker = true }
+        )
+        SelectionRow(
+            label = "Expiration date",
+            value = state.expiryDate.ifBlank { "Select date" },
+            onClick = { showExpiryPicker = true }
+        )
+        Divider(modifier = Modifier.fillMaxWidth())
+
+        OutlinedTextField(
+            value = state.notes,
+            onValueChange = onNotesChange,
+            label = { Text("Notes/terms") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        state.error?.let { Text("Error: $it") }
     }
 
     if (showTypeDialog) {

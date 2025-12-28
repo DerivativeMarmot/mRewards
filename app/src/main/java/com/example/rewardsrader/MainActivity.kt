@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.activity.compose.BackHandler
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -39,19 +41,53 @@ class MainActivity : ComponentActivity() {
         val cardCreateViewModel: CardCreateViewModel by viewModels {
             CardCreateViewModel.factory(appContainer.cardConfigProvider, appContainer.cardTemplateImporter)
         }
+        @OptIn(ExperimentalMaterial3Api::class)
         setContent {
             RewardsRaderTheme {
                 var screen by remember { mutableStateOf<Screen>(Screen.List) }
+                var showAddBenefitSheet by remember { mutableStateOf(false) }
+                var addBenefitCardId by remember { mutableStateOf<Long?>(null) }
+                var addBenefitProductName by remember { mutableStateOf("") }
+                var addBenefitIssuer by remember { mutableStateOf("") }
+                val addBenefitSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-                BackHandler(enabled = screen != Screen.List) {
-                    screen = when (screen) {
-                        is Screen.Detail -> Screen.List
-                        Screen.Create -> Screen.List
-                        is Screen.AddBenefit -> {
-                            val id = (screen as Screen.AddBenefit).cardId
-                            Screen.Detail(id)
-                        }
-                        Screen.List -> Screen.List
+                BackHandler(enabled = showAddBenefitSheet || screen != Screen.List) {
+                    if (showAddBenefitSheet) {
+                        showAddBenefitSheet = false
+                    } else {
+                        screen = Screen.List
+                    }
+                }
+
+                if (showAddBenefitSheet && addBenefitCardId != null) {
+                    ModalBottomSheet(
+                        onDismissRequest = { showAddBenefitSheet = false },
+                        sheetState = addBenefitSheetState
+                    ) {
+                        val cardId = addBenefitCardId ?: return@ModalBottomSheet
+                        BenefitCreateScreen(
+                            stateFlow = benefitCreateViewModel.state,
+                            onInit = { benefitCreateViewModel.init(cardId, addBenefitProductName, addBenefitIssuer) },
+                            onBack = { showAddBenefitSheet = false },
+                            onSave = {
+                                benefitCreateViewModel.save {
+                                    cardDetailViewModel.load(cardId)
+                                    showAddBenefitSheet = false
+                                }
+                            },
+                            onTypeChange = { benefitCreateViewModel.setType(it) },
+                            onAmountChange = { benefitCreateViewModel.setAmount(it) },
+                            onCapChange = { benefitCreateViewModel.setCap(it) },
+                            onCadenceChange = { benefitCreateViewModel.setCadence(it) },
+                            onEffectiveDateChange = { benefitCreateViewModel.setEffectiveDate(it) },
+                            onExpiryDateChange = { benefitCreateViewModel.setExpiryDate(it) },
+                            onTitleChange = { benefitCreateViewModel.setTitle(it) },
+                            onNotesChange = { benefitCreateViewModel.setNotes(it) },
+                            onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
+                            onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },
+                            onAddCustomCategory = { benefitCreateViewModel.addCustomCategory() },
+                            onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) }
+                        )
                     }
                 }
 
@@ -76,8 +112,10 @@ class MainActivity : ComponentActivity() {
                             onEdit = {},
                             onAddBenefit = { id, productName ->
                                 val issuer = cardDetailViewModel.state.value.detail?.issuer ?: ""
-                                benefitCreateViewModel.init(id, productName, issuer)
-                                screen = Screen.AddBenefit(id, productName, issuer)
+                                addBenefitCardId = id
+                                addBenefitProductName = productName
+                                addBenefitIssuer = issuer
+                                showAddBenefitSheet = true
                             },
                             onDeleteBenefit = { benefitId ->
                                 cardDetailViewModel.deleteBenefit(benefitId)
@@ -108,34 +146,6 @@ class MainActivity : ComponentActivity() {
                         },
                         onBack = { screen = Screen.List }
                     )
-                    is Screen.AddBenefit -> {
-                        val addId = (screen as Screen.AddBenefit).cardId
-                        val productName = (screen as Screen.AddBenefit).productName
-                        val issuer = (screen as Screen.AddBenefit).issuer
-                        BenefitCreateScreen(
-                            stateFlow = benefitCreateViewModel.state,
-                            onInit = { benefitCreateViewModel.init(addId, productName, issuer) },
-                            onBack = { screen = Screen.Detail(addId) },
-                            onSave = {
-                                benefitCreateViewModel.save {
-                                    cardDetailViewModel.load(addId)
-                                    screen = Screen.Detail(addId)
-                                }
-                            },
-                            onTypeChange = { benefitCreateViewModel.setType(it) },
-                            onAmountChange = { benefitCreateViewModel.setAmount(it) },
-                            onCapChange = { benefitCreateViewModel.setCap(it) },
-                            onCadenceChange = { benefitCreateViewModel.setCadence(it) },
-                            onEffectiveDateChange = { benefitCreateViewModel.setEffectiveDate(it) },
-                            onExpiryDateChange = { benefitCreateViewModel.setExpiryDate(it) },
-                            onTitleChange = { benefitCreateViewModel.setTitle(it) },
-                            onNotesChange = { benefitCreateViewModel.setNotes(it) },
-                            onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
-                            onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },
-                            onAddCustomCategory = { benefitCreateViewModel.addCustomCategory() },
-                            onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) }
-                        )
-                    }
                 }
             }
         }
@@ -146,5 +156,4 @@ private sealed class Screen {
     data object List : Screen()
     data class Detail(val id: Long) : Screen()
     data object Create : Screen()
-    data class AddBenefit(val cardId: Long, val productName: String, val issuer: String) : Screen()
 }
