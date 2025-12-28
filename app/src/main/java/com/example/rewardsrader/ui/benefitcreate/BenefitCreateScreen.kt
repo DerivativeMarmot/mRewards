@@ -78,7 +78,7 @@ fun BenefitCreateScreen(
     var showFrequencyDialog by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { onInit() }
+    LaunchedEffect(onInit) { onInit() }
 
     val scrollState = rememberScrollState()
 
@@ -96,7 +96,7 @@ fun BenefitCreateScreen(
                 Icon(Icons.Default.Close, contentDescription = "Close")
             }
             Text(
-                text = "Add Benefit",
+                text = if (state.isEditing) "Edit Benefit" else "Add Benefit",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .weight(1f)

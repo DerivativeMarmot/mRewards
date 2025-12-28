@@ -16,7 +16,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
@@ -55,8 +54,8 @@ import java.time.ZoneId
 fun CardDetailScreen(
     stateFlow: StateFlow<CardDetailState>,
     onBack: () -> Unit,
-    onEdit: (Long) -> Unit,
     onAddBenefit: (Long, String) -> Unit,
+    onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit,
     onUpdateNickname: (String) -> Unit,
     onUpdateAnnualFee: (String) -> Unit,
@@ -91,6 +90,7 @@ fun CardDetailScreen(
             else -> DetailContent(
                 detail = detail,
                 onAddBenefit = { onAddBenefit(detail.id, detail.productName) },
+                onEditBenefit = onEditBenefit,
                 onDeleteBenefit = onDeleteBenefit,
                 onUpdateNickname = onUpdateNickname,
                 onUpdateAnnualFee = onUpdateAnnualFee,
@@ -167,6 +167,7 @@ private fun BenefitsHeader(onAddBenefit: () -> Unit) {
 private fun DetailContent(
     detail: CardDetailUi,
     onAddBenefit: () -> Unit,
+    onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit,
     onUpdateNickname: (String) -> Unit,
     onUpdateAnnualFee: (String) -> Unit,
@@ -246,6 +247,7 @@ private fun DetailContent(
                 items(detail.benefits, key = { it.id }) { benefit ->
                     BenefitCard(
                         benefit = benefit,
+                        onEdit = { onEditBenefit(benefit.id) },
                         onDelete = { onDeleteBenefit(benefit.id) }
                     )
                 }
@@ -416,8 +418,12 @@ private enum class CardField {
 }
 
 @Composable
-private fun BenefitCard(benefit: BenefitUi, onDelete: () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+private fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onEdit() }
+    ) {
         Row(
             modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -429,6 +435,12 @@ private fun BenefitCard(benefit: BenefitUi, onDelete: () -> Unit) {
                 Text("Cadence: ${benefit.cadence}")
                 benefit.expiry?.let { Text("Expiry: $it") }
                 benefit.notes?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+            }
+            IconButton(onClick = onEdit) {
+                Icon(
+                    Icons.Default.Edit,
+                    contentDescription = "Edit benefit"
+                )
             }
             IconButton(onClick = onDelete) {
                 Icon(
@@ -518,6 +530,7 @@ private fun OffersTab() {
 private fun BenefitsTab(
     detail: CardDetailUi,
     onAddBenefit: () -> Unit,
+    onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit
 ) {
     LazyColumn(
@@ -531,6 +544,7 @@ private fun BenefitsTab(
         items(detail.benefits, key = { it.id }) { benefit ->
             BenefitCard(
                 benefit = benefit,
+                onEdit = { onEditBenefit(benefit.id) },
                 onDelete = { onDeleteBenefit(benefit.id) }
             )
         }

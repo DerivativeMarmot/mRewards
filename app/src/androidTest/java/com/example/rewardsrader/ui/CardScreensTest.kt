@@ -93,8 +93,8 @@ class CardScreensTest {
             CardDetailScreen(
                 stateFlow = detailState,
                 onBack = {},
-                onEdit = {},
                 onAddBenefit = { _, _ -> },
+                onEditBenefit = {},
                 onDeleteBenefit = {},
                 onUpdateNickname = {},
                 onUpdateAnnualFee = {},
