@@ -145,13 +145,27 @@ fun BenefitCreateScreen(
                 onClick = { showTypeDialog = true }
             )
 
-            OutlinedTextField(
-                value = state.amount,
-                onValueChange = onAmountChange,
-                label = { Text(if (state.type == "credit") "Amount (USD)" else "Rate (decimal, e.g., 0.05)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            if (state.type == "multiplier") {
+            if (state.type == "credit") {
+                OutlinedTextField(
+                    value = state.amount,
+                    onValueChange = onAmountChange,
+                    label = { Text("Amount") },
+                    leadingIcon = { Text("$") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = state.cap,
+                    onValueChange = onCapChange,
+                    label = { Text("Cap on spend (USD, optional)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                OutlinedTextField(
+                    value = state.amount,
+                    onValueChange = onAmountChange,
+                    label = { Text("Rate (decimal, e.g., 0.05)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
                 OutlinedTextField(
                     value = state.cap,
                     onValueChange = onCapChange,
