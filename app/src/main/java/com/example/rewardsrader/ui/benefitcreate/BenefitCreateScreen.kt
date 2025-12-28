@@ -1,6 +1,5 @@
 package com.example.rewardsrader.ui.benefitcreate
 
-import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,13 +37,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.rememberDatePickerState
 import kotlinx.coroutines.flow.StateFlow
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 private val commonCategories = listOf(
     "Dining", "Grocery", "Online Shopping", "Travel", "Gas", "Drugstore", "Streaming", "Transit", "Utilities"
@@ -71,14 +73,27 @@ fun BenefitCreateScreen(
     onRemoveCustomCategory: (String) -> Unit
 ) {
     val state by stateFlow.collectAsState()
-    val context = LocalContext.current
     var showEffectivePicker by remember { mutableStateOf(false) }
     var showExpiryPicker by remember { mutableStateOf(false) }
     var showTypeDialog by remember { mutableStateOf(false) }
     var showFrequencyDialog by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
+    val effectiveDatePickerState = rememberDatePickerState()
+    val expiryDatePickerState = rememberDatePickerState()
 
     LaunchedEffect(onInit) { onInit() }
+    LaunchedEffect(showEffectivePicker, state.effectiveDate) {
+        if (showEffectivePicker) {
+            val millis = state.effectiveDate.toMillis()
+            effectiveDatePickerState.setSelection(millis)
+        }
+    }
+    LaunchedEffect(showExpiryPicker, state.expiryDate) {
+        if (showExpiryPicker) {
+            val millis = state.expiryDate.toMillis()
+            expiryDatePickerState.setSelection(millis)
+        }
+    }
 
     val scrollState = rememberScrollState()
 
@@ -124,7 +139,7 @@ fun BenefitCreateScreen(
             )
             Divider(modifier = Modifier.fillMaxWidth())
 
-            SelectionRow(
+            InlineSelectionRow(
                 label = "Type",
                 value = state.type,
                 onClick = { showTypeDialog = true }
@@ -147,7 +162,7 @@ fun BenefitCreateScreen(
 
             Divider(modifier = Modifier.fillMaxWidth())
 
-            SelectionRow(
+            InlineSelectionRow(
                 label = "Frequency",
                 value = state.cadence,
                 onClick = { showFrequencyDialog = true }
@@ -178,12 +193,12 @@ fun BenefitCreateScreen(
             )
             Divider(modifier = Modifier.fillMaxWidth())
 
-            SelectionRow(
+            InlineSelectionRow(
                 label = "Effective date",
                 value = state.effectiveDate.ifBlank { "Select date" },
                 onClick = { showEffectivePicker = true }
             )
-            SelectionRow(
+            InlineSelectionRow(
                 label = "Expiration date",
                 value = state.expiryDate.ifBlank { "Select date" },
                 onClick = { showExpiryPicker = true }
@@ -244,23 +259,33 @@ fun BenefitCreateScreen(
 
     if (showEffectivePicker) {
         DatePickerDialog(
-            onDismiss = { showEffectivePicker = false },
-            onDateSelected = {
-                onEffectiveDateChange(it)
-                showEffectivePicker = false
+            onDismissRequest = { showEffectivePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val formatted = effectiveDatePickerState.selectedDateMillis.toDateString()
+                    formatted?.let { onEffectiveDateChange(it) }
+                    showEffectivePicker = false
+                }) { Text("Save") }
             },
-            context = context
-        )
+            dismissButton = { TextButton(onClick = { showEffectivePicker = false }) { Text("Cancel") } }
+        ) {
+            DatePicker(state = effectiveDatePickerState)
+        }
     }
     if (showExpiryPicker) {
         DatePickerDialog(
-            onDismiss = { showExpiryPicker = false },
-            onDateSelected = {
-                onExpiryDateChange(it)
-                showExpiryPicker = false
+            onDismissRequest = { showExpiryPicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val formatted = expiryDatePickerState.selectedDateMillis.toDateString()
+                    formatted?.let { onExpiryDateChange(it) }
+                    showExpiryPicker = false
+                }) { Text("Save") }
             },
-            context = context
-        )
+            dismissButton = { TextButton(onClick = { showExpiryPicker = false }) { Text("Cancel") } }
+        ) {
+            DatePicker(state = expiryDatePickerState)
+        }
     }
 }
 
@@ -391,6 +416,20 @@ private fun SelectionRow(label: String, value: String, onClick: () -> Unit) {
 }
 
 @Composable
+private fun InlineSelectionRow(label: String, value: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, modifier = Modifier.weight(1f))
+        Text(value, modifier = Modifier.padding(start = 12.dp))
+    }
+}
+
+@Composable
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 private fun FlowCategoryChips(
     categories: List<CategoryItem>,
@@ -412,27 +451,20 @@ private fun FlowCategoryChips(
     }
 }
 
-@Composable
-private fun DatePickerDialog(
-    onDismiss: () -> Unit,
-    onDateSelected: (String) -> Unit,
-    context: android.content.Context
-) {
-    val calendar = Calendar.getInstance()
-    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.US)
-    DatePickerDialog(
-        context,
-        { _, year, month, day ->
-            calendar.set(Calendar.YEAR, year)
-            calendar.set(Calendar.MONTH, month)
-            calendar.set(Calendar.DAY_OF_MONTH, day)
-            onDateSelected(formatter.format(calendar.time))
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
-    ).apply {
-        setOnDismissListener { onDismiss() }
-        show()
-    }
+private val benefitDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+
+private fun String.toMillis(): Long? {
+    if (isBlank()) return null
+    return runCatching {
+        LocalDate.parse(this, benefitDateFormatter)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+    }.getOrNull()
+}
+
+private fun Long?.toDateString(): String? {
+    this ?: return null
+    val date = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+    return benefitDateFormatter.format(date)
 }
