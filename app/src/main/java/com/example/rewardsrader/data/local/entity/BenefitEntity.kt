@@ -31,5 +31,6 @@ data class BenefitEntity(
     val expiryDateUtc: String? = null,
     val terms: String? = null,
     val dataSource: String? = null,
-    val notes: String? = null
+    val notes: String? = null,
+    val transactionsJson: String? = null
 )

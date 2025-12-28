@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -72,16 +73,25 @@ fun BenefitCreateScreen(
     onToggleCategory: (String) -> Unit,
     onCustomCategoryChange: (String) -> Unit,
     onAddCustomCategory: () -> Unit,
-    onRemoveCustomCategory: (String) -> Unit
+    onRemoveCustomCategory: (String) -> Unit,
+    onTransactionAmountChange: (String) -> Unit,
+    onTransactionDateChange: (String) -> Unit,
+    onAddTransaction: () -> Unit,
+    onStartTransaction: () -> Unit,
+    onEditTransaction: (Int) -> Unit,
+    onDeleteTransaction: (Int) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     var showEffectivePicker by remember { mutableStateOf(false) }
     var showExpiryPicker by remember { mutableStateOf(false) }
+    var showTransactionPicker by remember { mutableStateOf(false) }
+    var showTransactionDialog by remember { mutableStateOf(false) }
     var showTypeDialog by remember { mutableStateOf(false) }
     var showFrequencyDialog by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
     val effectiveDatePickerState = rememberDatePickerState()
     val expiryDatePickerState = rememberDatePickerState()
+    val transactionDatePickerState = rememberDatePickerState()
 
     LaunchedEffect(onInit) { onInit() }
     LaunchedEffect(showEffectivePicker, state.effectiveDate) {
@@ -94,6 +104,12 @@ fun BenefitCreateScreen(
         if (showExpiryPicker) {
             val millis = state.expiryDate.toMillis()
             expiryDatePickerState.setSelection(millis)
+        }
+    }
+    LaunchedEffect(showTransactionPicker, state.transactionDate) {
+        if (showTransactionPicker) {
+            val millis = state.transactionDate.toMillis()
+            transactionDatePickerState.setSelection(millis)
         }
     }
 
@@ -126,12 +142,12 @@ fun BenefitCreateScreen(
         }
         Divider(modifier = Modifier.fillMaxWidth())
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
 
             OutlinedTextField(
                 value = state.title,
@@ -173,6 +189,47 @@ fun BenefitCreateScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Transactions", style = MaterialTheme.typography.titleMedium)
+                        IconButton(onClick = {
+                            onStartTransaction()
+                            showTransactionDialog = true
+                        }) {
+                            Icon(Icons.Default.Add, contentDescription = "Add transaction")
+                        }
+                    }
+                    if (state.transactions.isNotEmpty()) {
+                        state.transactions.forEachIndexed { index, entry ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onEditTransaction(index)
+                                        showTransactionDialog = true
+                                    }
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("${index + 1}. $${entry.amount}")
+                                    Text(entry.date, style = MaterialTheme.typography.bodySmall)
+                                }
+                                IconButton(onClick = { onDeleteTransaction(index) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete transaction")
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             Divider(modifier = Modifier.fillMaxWidth())
@@ -300,6 +357,58 @@ fun BenefitCreateScreen(
             dismissButton = { TextButton(onClick = { showExpiryPicker = false }) { Text("Cancel") } }
         ) {
             DatePicker(state = expiryDatePickerState)
+        }
+    }
+    if (showTransactionDialog) {
+        AlertDialog(
+            onDismissRequest = { showTransactionDialog = false },
+            title = { Text(if (state.editingTransactionIndex != null) "Edit transaction" else "Add transaction") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    OutlinedTextField(
+                        value = state.transactionAmount,
+                        onValueChange = onTransactionAmountChange,
+                        label = { Text("Amount") },
+                        leadingIcon = { Text("$") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    InlineSelectionRow(
+                        label = "Date",
+                        value = state.transactionDate.ifBlank { "Select date" },
+                        onClick = { showTransactionPicker = true }
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (state.transactionAmount.isNotBlank() && state.transactionDate.isNotBlank()) {
+                            onAddTransaction()
+                            showTransactionDialog = false
+                        }
+                    },
+                    enabled = state.transactionAmount.isNotBlank() && state.transactionDate.isNotBlank()
+                ) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTransactionDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
+    if (showTransactionPicker) {
+        DatePickerDialog(
+            onDismissRequest = { showTransactionPicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    val formatted = transactionDatePickerState.selectedDateMillis.toDateString()
+                    formatted?.let { onTransactionDateChange(it) }
+                    showTransactionPicker = false
+                }) { Text("Save") }
+            },
+            dismissButton = { TextButton(onClick = { showTransactionPicker = false }) { Text("Cancel") } }
+        ) {
+            DatePicker(state = transactionDatePickerState)
         }
     }
 }

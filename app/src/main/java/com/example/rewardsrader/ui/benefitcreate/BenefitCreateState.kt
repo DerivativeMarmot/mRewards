@@ -16,10 +16,19 @@ data class BenefitCreateState(
     val effectiveDate: String = "",
     val expiryDate: String = "",
     val notes: String = "",
+    val transactionAmount: String = "",
+    val transactionDate: String = "",
+    val transactions: List<TransactionEntry> = emptyList(),
+    val editingTransactionIndex: Int? = null,
     val dataSource: String? = null,
     val enrollmentRequired: Boolean = false,
     val merchant: String? = null,
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null
+)
+
+data class TransactionEntry(
+    val amount: String,
+    val date: String
 )

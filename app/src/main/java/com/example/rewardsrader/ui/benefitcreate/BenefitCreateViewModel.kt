@@ -39,6 +39,7 @@ class BenefitCreateViewModel(
                         ?.filter { it.isNotBlank() }
                         ?: emptyList()
                     existingCustom.addAll(categories)
+                    val transactions = decodeTransactions(benefit.transactionsJson)
                     _state.value = BenefitCreateState(
                         benefitId = benefit.id,
                         cardId = benefit.cardId,
@@ -55,6 +56,7 @@ class BenefitCreateViewModel(
                         effectiveDate = benefit.effectiveDateUtc,
                         expiryDate = benefit.expiryDateUtc.orEmpty(),
                         notes = benefit.terms.orEmpty(),
+                        transactions = transactions,
                         dataSource = benefit.dataSource,
                         enrollmentRequired = benefit.enrollmentRequired,
                         merchant = benefit.merchant,
@@ -71,6 +73,23 @@ class BenefitCreateViewModel(
     fun setType(type: String) { _state.value = _state.value.copy(type = type) }
     fun setAmount(value: String) { _state.value = _state.value.copy(amount = value.trimToScale(2)) }
     fun setCap(value: String) { _state.value = _state.value.copy(cap = value.trimToScale(2)) }
+    fun setTransactionAmount(value: String) { _state.value = _state.value.copy(transactionAmount = value.trimToScale(2)) }
+    fun setTransactionDate(value: String) { _state.value = _state.value.copy(transactionDate = value) }
+    fun startNewTransaction() {
+        _state.value = _state.value.copy(
+            transactionAmount = "",
+            transactionDate = "",
+            editingTransactionIndex = null
+        )
+    }
+    fun startEditTransaction(index: Int) {
+        val entry = _state.value.transactions.getOrNull(index) ?: return
+        _state.value = _state.value.copy(
+            transactionAmount = entry.amount,
+            transactionDate = entry.date,
+            editingTransactionIndex = index
+        )
+    }
     fun setCadence(value: String) { _state.value = _state.value.copy(cadence = value) }
     fun setEffectiveDate(value: String) { _state.value = _state.value.copy(effectiveDate = value) }
     fun setExpiryDate(value: String) { _state.value = _state.value.copy(expiryDate = value) }
@@ -110,6 +129,33 @@ class BenefitCreateViewModel(
         _state.value = _state.value.copy(customCategory = value)
     }
 
+    fun saveTransaction() {
+        val amount = _state.value.transactionAmount.trimToScale(2)
+        if (amount.isBlank() || _state.value.transactionDate.isBlank()) return
+        val updated = _state.value.transactions.toMutableList()
+        val editIndex = _state.value.editingTransactionIndex
+        val entry = TransactionEntry(amount = amount, date = _state.value.transactionDate)
+        if (editIndex != null && editIndex in updated.indices) {
+            updated[editIndex] = entry
+        } else {
+            updated.add(entry)
+        }
+        _state.value = _state.value.copy(
+            transactions = updated,
+            transactionAmount = "",
+            transactionDate = "",
+            editingTransactionIndex = null
+        )
+    }
+
+    fun deleteTransaction(index: Int) {
+        val updated = _state.value.transactions.toMutableList()
+        if (index in updated.indices) {
+            updated.removeAt(index)
+            _state.value = _state.value.copy(transactions = updated)
+        }
+    }
+
     fun save(onSuccess: (BenefitEntity) -> Unit) {
         val isEditing = _state.value.isEditing && _state.value.benefitId != null
         val amount = _state.value.amount.toDoubleOrNull()
@@ -128,7 +174,8 @@ class BenefitCreateViewModel(
             expiryDateUtc = _state.value.expiryDate.ifBlank { null },
             terms = _state.value.notes.ifBlank { null },
             dataSource = _state.value.dataSource ?: "user",
-            notes = _state.value.title.ifBlank { null }
+            notes = _state.value.title.ifBlank { null },
+            transactionsJson = encodeTransactions(_state.value.transactions)
         )
         _state.value = _state.value.copy(isSaving = true, error = null)
         viewModelScope.launch {
@@ -168,6 +215,20 @@ class BenefitCreateViewModel(
         } else {
             normalized
         }
+    }
+
+    private fun encodeTransactions(entries: List<TransactionEntry>): String? {
+        if (entries.isEmpty()) return null
+        return entries.joinToString("|") { "${it.amount}@${it.date}" }
+    }
+
+    private fun decodeTransactions(serialized: String?): List<TransactionEntry> {
+        if (serialized.isNullOrBlank()) return emptyList()
+        return serialized.split("|")
+            .mapNotNull { raw ->
+                val parts = raw.split("@", limit = 2)
+                if (parts.size == 2) TransactionEntry(parts[0], parts[1]) else null
+            }
     }
 
     companion object {
