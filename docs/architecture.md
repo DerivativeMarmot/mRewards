@@ -103,3 +103,11 @@
 - `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Bottom sheet header shows Add vs Edit; Material 3 date pickers with inline label/value rows; type/frequency/date rows are full-row tappable.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Benefit cards are clickable with edit icons; benefits tab passes edit callbacks.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Unifies add/edit benefit into a single bottom sheet with modes; back handling closes the sheet; wires edit callbacks and reloads detail on save.
+
+## 2025-12-28 – Transactions, progress, SUB persistence
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/BenefitEntity.kt`: Added `transactionsJson` for multiplier transactions with migration to DB v5 and AppContainer wiring.
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/CardEntity.kt`: Added SUB fields (`subSpendingUsd`, `subDuration`, `subDurationUnit`); migrations bumped DB to v5.
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/*`: Transaction modal (amount/date) with edit/delete/show-more, numeric inputs, 2-decimal trimming, multiplier-only progress bar vs cap.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Maps/saves SUB fields; benefit mapping simplified to amount/rate + title; updates detail state on SUB changes.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Benefits tab uses FAB; transaction list shows edit/delete/show-more and progress bar; SUB tab mirrors info rows with numeric dialogs and months/days dropdown unit.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires transaction callbacks and SUB update callbacks; DB migrations registered.

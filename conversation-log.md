@@ -387,3 +387,52 @@ Assistant: Type/Frequency now inline tappable rows.
 
 User: log what you did into progress.md and architechture.md  
 Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and architecture docs.
+
+---
+
+## 2025-12-28 15:30:00 UTC
+
+2025-12-28 13:00:00 UTC User: sometimes when i add, edit, or remove benefit, the entire page refreshes, prevent page refresh  
+2025-12-28 13:00:05 UTC Assistant: Updated benefit add/edit/delete to mutate in-memory state instead of reloading; save returns saved entity.
+
+2025-12-28 13:05:00 UTC User: close the bottom sheet while the keyboard is opening causing bottom sheet close first and then keyboard closes second. make keyboard closes at the same time as bottom sheet closes.  
+2025-12-28 13:05:05 UTC Assistant: Clear focus + hide keyboard (IMM/controller) before hiding sheet.
+
+2025-12-28 13:10:00 UTC User: after adding, editing, remove a benefit, show a snackbar.  
+2025-12-28 13:10:05 UTC Assistant: Added snackbar events for add/update/delete.
+
+2025-12-28 13:20:00 UTC User: update benefit tab labels/icons.  
+2025-12-28 13:20:05 UTC Assistant: Tabs now Info/SUB/Benefits/Offers with icons above labels.
+
+2025-12-28 13:30:00 UTC User: benefit index page tweaks (remove title/inline plus, add FAB, padding).  
+2025-12-28 13:30:05 UTC Assistant: Removed header/title, added FAB bottom-right, extra bottom space.
+
+2025-12-28 13:40:00 UTC User: app crashes (infinite constraints) when visiting benefit.  
+2025-12-28 13:40:05 UTC Assistant: Simplified layout to single LazyColumn with overlaid FAB only on Benefits tab.
+
+2025-12-28 13:50:00 UTC User: updated card info note field. when user click, a modal pops up allowing users to edit note.  
+2025-12-28 13:50:05 UTC Assistant: Notes now edited via dialog instead of inline field.
+
+2025-12-28 14:00:00 UTC User: in benefit creation / editing page, in amount field, add inline dollar sign.  
+2025-12-28 14:00:05 UTC Assistant: Credit amount shows leading $, split credit vs multiplier inputs, numeric keyboards.
+
+2025-12-28 14:05:00 UTC User: it seems that rate and amount field are sharing the same field, make them use different field  
+2025-12-28 14:05:05 UTC Assistant: Separate rate/cap for multipliers, hide cap for credit, % trailing icon, numeric keyboard.
+
+2025-12-28 14:10:00 UTC User: implement transaction creation and list section below cap field... modal with date...  
+2025-12-28 14:10:05 UTC Assistant: Added transaction modal (amount/date), list with edit/delete/show-more, progress vs cap; persisted in benefits via transactionsJson migration.
+
+2025-12-28 14:20:00 UTC User: in progress section, round current value to 2 decimals; SUB page spending/duration, unit toggle, persist.  
+2025-12-28 14:20:05 UTC Assistant: Rounded progress calc; added SUB fields/migration, SUB tab with dollar spending and months/days dropdown, numeric inputs, duration unit toggle.
+
+2025-12-28 14:30:00 UTC User: focus on spending input; show spending with $; duration unit dropdown; allow show more transactions.  
+2025-12-28 14:30:05 UTC Assistant: Spending dialog auto-focuses keyboard with $; duration edit uses value+unit dropdown; transactions list shows delete and show-more to reveal all.
+
+2025-12-28 15:00:00 UTC User: log what you did into progress.md and architechture.md  
+2025-12-28 15:00:05 UTC Assistant: Logged transactions/progress/SUB persistence in progress and architecture docs.
+
+2025-12-28 15:10:00 UTC User: save spending and duration values permanently.  
+2025-12-28 15:10:05 UTC Assistant: Added SUB fields to CardEntity, migration v5, viewmodel/UI updates; duration unit dropdown; spending with $.
+
+2025-12-28 15:20:00 UTC User: duration modal value/unit same row dropdown; build fixes.  
+2025-12-28 15:20:05 UTC Assistant: Duration dialog uses value + unit dropdown with ArrowDropDown; build passed.

@@ -84,3 +84,10 @@
 - Benefit cards are clickable with an edit icon; launching edit preloads existing benefit data into the sheet.
 - Benefit viewmodel/state now support edit mode and call update instead of insert when editing.
 - Date fields use Material 3 date pickers with inline label/value rows; type/frequency rows also inline/tappable for dialogs.
+
+## 2025-12-28 – Transactions, progress, and SUB persistence
+- Multiplier benefits: added transaction modal (amount + date) with list, edit, delete, show-more, and progress bar vs cap; transactions persist via `transactionsJson`.
+- Benefit create screens enforce numeric inputs, rate shows %; credit hides cap; amount/rate/cap trimmed to 2 decimals.
+- Benefit items simplified to show amount/rate + title only.
+- Added SUB spending/duration fields (months/days) with dropdown unit selector, dollar prefix, numeric keyboard; values saved on card and mirrored in UI tabs.
+- Database bumped to v5 with migration for SUB fields; AppContainer wired migrations; benefit entity stores transactions JSON.
