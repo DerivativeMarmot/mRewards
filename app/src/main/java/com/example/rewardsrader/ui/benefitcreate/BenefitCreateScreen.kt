@@ -245,7 +245,8 @@ fun BenefitCreateScreen(
                     }
                     if (state.cap.isNotBlank()) {
                         val capValue = state.cap.toDoubleOrNull() ?: 0.0
-                        val used = state.transactions.sumOf { it.amount.toDoubleOrNull() ?: 0.0 }
+                        val usedRaw = state.transactions.sumOf { it.amount.toDoubleOrNull() ?: 0.0 }
+                        val used = (usedRaw * 100).toInt() / 100.0
                         val progress = if (capValue > 0) (used / capValue).coerceAtMost(1.0) else 0.0
                         Column(
                             verticalArrangement = Arrangement.spacedBy(4.dp),
