@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -48,11 +49,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
@@ -570,8 +573,52 @@ private fun CardInfoTab(
 
 @Composable
 private fun SignupBonusTab() {
-    DetailMessage("No signup bonus tracker yet.")
+    var spending by rememberSaveable { mutableStateOf("") }
+    var duration by rememberSaveable { mutableStateOf("") }
+    var editingField by remember { mutableStateOf<BonusField?>(null) }
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        InfoRow(
+            label = "Spending",
+            value = spending.ifBlank { "Tap to add" },
+            onClick = { editingField = BonusField.Spending }
+        )
+        Divider()
+        InfoRow(
+            label = "Duration",
+            value = duration.ifBlank { "Tap to add" },
+            onClick = { editingField = BonusField.Duration }
+        )
+    }
+
+    editingField?.let { field ->
+        var draft by remember { mutableStateOf(if (field == BonusField.Spending) spending else duration) }
+        AlertDialog(
+            onDismissRequest = { editingField = null },
+            title = { Text(if (field == BonusField.Spending) "Edit spending" else "Edit duration") },
+            text = {
+                OutlinedTextField(
+                    value = draft,
+                    onValueChange = { draft = it },
+                    label = { Text("Value") },
+                    leadingIcon = if (field == BonusField.Spending) ({ Text("$") }) else null,
+                    keyboardOptions = if (field == BonusField.Spending) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (field == BonusField.Spending) spending = draft else duration = draft
+                    editingField = null
+                }) { Text("Save") }
+            },
+            dismissButton = {
+                TextButton(onClick = { editingField = null }) { Text("Cancel") }
+            }
+        )
+    }
 }
+
+private enum class BonusField { Spending, Duration }
 
 @Composable
 private fun OffersTab() {
