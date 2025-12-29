@@ -20,6 +20,7 @@ data class BenefitCreateState(
     val transactionDate: String = "",
     val transactions: List<TransactionEntry> = emptyList(),
     val editingTransactionIndex: Int? = null,
+    val progress: String = "",
     val dataSource: String? = null,
     val enrollmentRequired: Boolean = false,
     val merchant: String? = null,

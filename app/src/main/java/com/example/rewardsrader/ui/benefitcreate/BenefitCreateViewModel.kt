@@ -75,6 +75,7 @@ class BenefitCreateViewModel(
     fun setCap(value: String) { _state.value = _state.value.copy(cap = value.trimToScale(2)) }
     fun setTransactionAmount(value: String) { _state.value = _state.value.copy(transactionAmount = value.trimToScale(2)) }
     fun setTransactionDate(value: String) { _state.value = _state.value.copy(transactionDate = value) }
+    fun setProgress(value: String) { _state.value = _state.value.copy(progress = value.trimToScale(2)) }
     fun startNewTransaction() {
         _state.value = _state.value.copy(
             transactionAmount = "",

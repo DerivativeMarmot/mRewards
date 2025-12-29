@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.rememberDatePickerState
 import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
@@ -79,13 +80,15 @@ fun BenefitCreateScreen(
     onAddTransaction: () -> Unit,
     onStartTransaction: () -> Unit,
     onEditTransaction: (Int) -> Unit,
-    onDeleteTransaction: (Int) -> Unit
+    onDeleteTransaction: (Int) -> Unit,
+    onProgressChange: (String) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     var showEffectivePicker by remember { mutableStateOf(false) }
     var showExpiryPicker by remember { mutableStateOf(false) }
     var showTransactionPicker by remember { mutableStateOf(false) }
     var showTransactionDialog by remember { mutableStateOf(false) }
+    var showAllTransactions by remember { mutableStateOf(false) }
     var showTypeDialog by remember { mutableStateOf(false) }
     var showFrequencyDialog by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
@@ -111,6 +114,9 @@ fun BenefitCreateScreen(
             val millis = state.transactionDate.toMillis()
             transactionDatePickerState.setSelection(millis)
         }
+    }
+    LaunchedEffect(state.transactions.size) {
+        showAllTransactions = false
     }
 
     val scrollState = rememberScrollState()
@@ -207,12 +213,15 @@ fun BenefitCreateScreen(
                         }
                     }
                     if (state.transactions.isNotEmpty()) {
-                        state.transactions.forEachIndexed { index, entry ->
+                        val visible = if (showAllTransactions) state.transactions else state.transactions.take(3)
+                        val hiddenCount = state.transactions.size - visible.size
+                        visible.forEachIndexed { index, entry ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        onEditTransaction(index)
+                                        val actualIndex = if (showAllTransactions) index else index
+                                        onEditTransaction(actualIndex)
                                         showTransactionDialog = true
                                     }
                                     .padding(vertical = 4.dp),
@@ -227,6 +236,23 @@ fun BenefitCreateScreen(
                                     Icon(Icons.Default.Delete, contentDescription = "Delete transaction")
                                 }
                             }
+                        }
+                        if (hiddenCount > 0) {
+                            TextButton(onClick = { showAllTransactions = true }) {
+                                Text("Show more ($hiddenCount)")
+                            }
+                        }
+                    }
+                    if (state.cap.isNotBlank()) {
+                        val capValue = state.cap.toDoubleOrNull() ?: 0.0
+                        val used = state.transactions.sumOf { it.amount.toDoubleOrNull() ?: 0.0 }
+                        val progress = if (capValue > 0) (used / capValue).coerceAtMost(1.0) else 0.0
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            LinearProgressIndicator(progress = progress.toFloat(), modifier = Modifier.fillMaxWidth())
+                            Text("$${used} used of $${capValue}")
                         }
                     }
                 }

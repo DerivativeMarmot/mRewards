@@ -138,7 +138,8 @@ class MainActivity : ComponentActivity() {
                             onAddTransaction = { benefitCreateViewModel.saveTransaction() },
                             onStartTransaction = { benefitCreateViewModel.startNewTransaction() },
                             onEditTransaction = { benefitCreateViewModel.startEditTransaction(it) },
-                            onDeleteTransaction = { benefitCreateViewModel.deleteTransaction(it) }
+                            onDeleteTransaction = { benefitCreateViewModel.deleteTransaction(it) },
+                            onProgressChange = { benefitCreateViewModel.setProgress(it) }
                         )
                     }
                 }
