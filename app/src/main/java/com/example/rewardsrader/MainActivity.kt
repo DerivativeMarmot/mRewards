@@ -180,7 +180,9 @@ class MainActivity : ComponentActivity() {
                             onUpdateOpenDate = { cardDetailViewModel.updateOpenDate(it) },
                             onUpdateStatementCut = { cardDetailViewModel.updateStatementCut(it) },
                             onUpdateStatus = { cardDetailViewModel.updateStatus(it) },
-                            onUpdateNotes = { cardDetailViewModel.updateNotes(it) }
+                            onUpdateNotes = { cardDetailViewModel.updateNotes(it) },
+                            onUpdateSubSpending = { cardDetailViewModel.updateSubSpending(it) },
+                            onUpdateSubDuration = { value, unit -> cardDetailViewModel.updateSubDuration(value, unit) }
                         )
                     }
                     Screen.Create -> CardCreateScreen(

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -36,6 +37,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -44,7 +46,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,10 +59,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 import java.time.ZoneId
@@ -76,7 +85,9 @@ fun CardDetailScreen(
     onUpdateOpenDate: (String) -> Unit,
     onUpdateStatementCut: (String) -> Unit,
     onUpdateStatus: (String) -> Unit,
-    onUpdateNotes: (String) -> Unit
+    onUpdateNotes: (String) -> Unit,
+    onUpdateSubSpending: (String) -> Unit,
+    onUpdateSubDuration: (String, String) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val detail = state.detail
@@ -119,6 +130,8 @@ fun CardDetailScreen(
                 onUpdateStatementCut = onUpdateStatementCut,
                 onUpdateStatus = onUpdateStatus,
                 onUpdateNotes = onUpdateNotes,
+                onUpdateSubSpending = onUpdateSubSpending,
+                onUpdateSubDuration = onUpdateSubDuration,
                 onOpenDateClick = { showOpenDatePicker = true },
                 onStatementDateClick = { showStatementDatePicker = true },
                 modifier = Modifier.padding(padding)
@@ -182,6 +195,8 @@ private fun DetailContent(
     onUpdateStatementCut: (String) -> Unit,
     onUpdateStatus: (String) -> Unit,
     onUpdateNotes: (String) -> Unit,
+    onUpdateSubSpending: (String) -> Unit,
+    onUpdateSubDuration: (String, String) -> Unit,
     onOpenDateClick: () -> Unit,
     onStatementDateClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -257,7 +272,15 @@ private fun DetailContent(
                     }
                 }
                 1 -> {
-                    item { SignupBonusTab() }
+                    item {
+                        SignupBonusTab(
+                            spending = detail.subSpending,
+                            duration = detail.subDuration,
+                            durationUnit = detail.subDurationUnit ?: "months",
+                            onUpdateSpending = onUpdateSubSpending,
+                            onUpdateDuration = onUpdateSubDuration
+                        )
+                    }
                 }
                 2 -> {
                     items(detail.benefits, key = { it.id }) { benefit ->
@@ -571,43 +594,113 @@ private fun CardInfoTab(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SignupBonusTab() {
-    var spending by rememberSaveable { mutableStateOf("") }
-    var duration by rememberSaveable { mutableStateOf("") }
+private fun SignupBonusTab(
+    spending: String?,
+    duration: String?,
+    durationUnit: String,
+    onUpdateSpending: (String) -> Unit,
+    onUpdateDuration: (String, String) -> Unit
+) {
+    var spendingValue by rememberSaveable(spending) { mutableStateOf(spending.orEmpty()) }
+    var durationValue by rememberSaveable(duration) { mutableStateOf(duration.orEmpty()) }
+    var durationUnitSelection by rememberSaveable(durationUnit) {
+        mutableStateOf(if (durationUnit == DurationUnit.DAYS.label) DurationUnit.DAYS else DurationUnit.MONTHS)
+    }
     var editingField by remember { mutableStateOf<BonusField?>(null) }
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         InfoRow(
             label = "Spending",
-            value = spending.ifBlank { "Tap to add" },
+            value = if (spendingValue.isNotBlank()) "$$spendingValue" else "Tap to add",
             onClick = { editingField = BonusField.Spending }
         )
         Divider()
         InfoRow(
             label = "Duration",
-            value = duration.ifBlank { "Tap to add" },
+            value = durationValue.ifBlank { "Tap to add" }.let { if (durationValue.isNotBlank()) "$durationValue ${durationUnitSelection.label}" else it },
             onClick = { editingField = BonusField.Duration }
         )
     }
 
     editingField?.let { field ->
-        var draft by remember { mutableStateOf(if (field == BonusField.Spending) spending else duration) }
+        var draft by remember { mutableStateOf(if (field == BonusField.Spending) spendingValue else durationValue) }
+        val focusRequester = remember { FocusRequester() }
+        var unitSelection by remember { mutableStateOf(durationUnitSelection) }
         AlertDialog(
             onDismissRequest = { editingField = null },
             title = { Text(if (field == BonusField.Spending) "Edit spending" else "Edit duration") },
             text = {
-                OutlinedTextField(
-                    value = draft,
-                    onValueChange = { draft = it },
-                    label = { Text("Value") },
-                    leadingIcon = if (field == BonusField.Spending) ({ Text("$") }) else null,
-                    keyboardOptions = if (field == BonusField.Spending) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions.Default,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (field == BonusField.Duration) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = draft,
+                                onValueChange = { draft = it },
+                                label = { Text("Value") },
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .focusRequester(focusRequester)
+                            )
+                            var expanded by remember { mutableStateOf(false) }
+                            Box(modifier = Modifier.weight(1f)) {
+                                OutlinedTextField(
+                                    value = unitSelection.label,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("Unit") },
+                                    trailingIcon = {
+                                        IconButton(onClick = { expanded = !expanded }) {
+                                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Select unit")
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                DropdownMenu(
+                                    expanded = expanded,
+                                    onDismissRequest = { expanded = false }
+                                ) {
+                                    DurationUnit.values().forEach { unit ->
+                                        DropdownMenuItem(
+                                            text = { Text(unit.label) },
+                                            onClick = {
+                                                unitSelection = unit
+                                                expanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        OutlinedTextField(
+                            value = draft,
+                            onValueChange = { draft = it },
+                            label = { Text("Value") },
+                            leadingIcon = { Text("$") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(focusRequester)
+                        )
+                    }
+                }
             },
             confirmButton = {
                 TextButton(onClick = {
-                    if (field == BonusField.Spending) spending = draft else duration = draft
+                    if (field == BonusField.Spending) {
+                        spendingValue = draft
+                        onUpdateSpending(draft)
+                    } else {
+                        durationValue = draft
+                        durationUnitSelection = unitSelection
+                        onUpdateDuration(draft, unitSelection.label)
+                    }
                     editingField = null
                 }) { Text("Save") }
             },
@@ -615,10 +708,14 @@ private fun SignupBonusTab() {
                 TextButton(onClick = { editingField = null }) { Text("Cancel") }
             }
         )
+        LaunchedEffect(field) {
+            focusRequester.requestFocus()
+        }
     }
 }
 
 private enum class BonusField { Spending, Duration }
+private enum class DurationUnit(val label: String) { MONTHS("months"), DAYS("days") }
 
 @Composable
 private fun OffersTab() {

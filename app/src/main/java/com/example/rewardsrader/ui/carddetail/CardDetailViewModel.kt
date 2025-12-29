@@ -45,6 +45,9 @@ data class CardDetailUi(
     val statementCut: String?,
     val welcomeOfferProgress: String?,
     val notes: String?,
+    val subSpending: String?,
+    val subDuration: String?,
+    val subDurationUnit: String?,
     val applications: List<ApplicationUi>,
     val benefits: List<BenefitUi>
 )
@@ -116,6 +119,15 @@ class CardDetailViewModel(
     fun updateStatus(value: String) = updateCard { it.copy(status = value.ifBlank { it.status }) }
 
     fun updateNotes(value: String) = updateCard { it.copy(notes = value.ifBlank { null }) }
+    fun updateSubSpending(value: String) = updateCard {
+        val parsed = value.toDoubleOrNull()
+        it.copy(subSpendingUsd = parsed)
+    }
+
+    fun updateSubDuration(value: String, unit: String) = updateCard {
+        val parsed = value.toIntOrNull()
+        it.copy(subDuration = parsed, subDurationUnit = unit)
+    }
 
     private fun updateCard(update: (CardEntity) -> CardEntity) {
         val card = currentCard ?: return
@@ -135,7 +147,10 @@ class CardDetailViewModel(
                             openDate = updated.openDateUtc,
                             statementCut = updated.statementCutUtc,
                             welcomeOfferProgress = updated.welcomeOfferProgress,
-                            notes = updated.notes
+                            notes = updated.notes,
+                            subSpending = updated.subSpendingUsd?.toString(),
+                            subDuration = updated.subDuration?.toString(),
+                            subDurationUnit = updated.subDurationUnit ?: "months"
                         )
                     )
                 }
@@ -163,6 +178,9 @@ class CardDetailViewModel(
             statementCut = card.statementCutUtc,
             welcomeOfferProgress = card.welcomeOfferProgress,
             notes = card.notes,
+            subSpending = card.subSpendingUsd?.toString(),
+            subDuration = card.subDuration?.toString(),
+            subDurationUnit = card.subDurationUnit ?: "months",
             applications = applications.map {
                 ApplicationUi(
                     status = it.status,

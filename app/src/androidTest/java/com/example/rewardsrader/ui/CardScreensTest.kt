@@ -103,7 +103,9 @@ class CardScreensTest {
                 onUpdateOpenDate = {},
                 onUpdateStatementCut = {},
                 onUpdateStatus = {},
-                onUpdateNotes = {}
+                onUpdateNotes = {},
+                onUpdateSubSpending = {},
+                onUpdateSubDuration = { _, _ -> }
             )
         }
 

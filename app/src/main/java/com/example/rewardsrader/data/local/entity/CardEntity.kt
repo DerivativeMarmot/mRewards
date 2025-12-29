@@ -17,5 +17,8 @@ data class CardEntity(
     val statementCutUtc: String? = null,
     val welcomeOfferProgress: String? = null,
     val status: String,
-    val notes: String? = null
+    val notes: String? = null,
+    val subSpendingUsd: Double? = null,
+    val subDuration: Int? = null,
+    val subDurationUnit: String? = "months"
 )
