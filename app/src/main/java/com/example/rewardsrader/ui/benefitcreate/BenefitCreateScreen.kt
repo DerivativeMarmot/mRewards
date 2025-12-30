@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.clickable
@@ -29,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.RadioButton
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
@@ -60,7 +61,6 @@ private val commonCategories = listOf(
 @Composable
 fun BenefitCreateScreen(
     stateFlow: StateFlow<BenefitCreateState>,
-    onInit: () -> Unit,
     onBack: () -> Unit,
     onSave: () -> Unit,
     onTitleChange: (String) -> Unit,
@@ -96,7 +96,6 @@ fun BenefitCreateScreen(
     val expiryDatePickerState = rememberDatePickerState()
     val transactionDatePickerState = rememberDatePickerState()
 
-    LaunchedEffect(onInit) { onInit() }
     LaunchedEffect(showEffectivePicker, state.effectiveDate) {
         if (showEffectivePicker) {
             val millis = state.effectiveDate.toMillis()
@@ -124,7 +123,7 @@ fun BenefitCreateScreen(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .fillMaxHeight(0.9f)
+            .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(
@@ -132,7 +131,7 @@ fun BenefitCreateScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.Close, contentDescription = "Close")
+                Icon(Icons.Default.ArrowBack, contentDescription = "Close")
             }
             Text(
                 text = if (state.isEditing) "Edit Benefit" else "Add Benefit",
@@ -146,7 +145,6 @@ fun BenefitCreateScreen(
                 Text(if (state.isSaving) "Saving..." else "Save")
             }
         }
-        Divider(modifier = Modifier.fillMaxWidth())
 
             Column(
                 modifier = Modifier

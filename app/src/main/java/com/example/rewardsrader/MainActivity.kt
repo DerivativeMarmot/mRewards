@@ -5,20 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.activity.compose.BackHandler
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalView
-import android.content.Context.INPUT_METHOD_SERVICE
-import android.view.inputmethod.InputMethodManager
-import kotlinx.coroutines.launch
 import com.example.rewardsrader.ui.carddetail.CardDetailScreen
 import com.example.rewardsrader.ui.carddetail.CardDetailViewModel
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateScreen
@@ -48,103 +38,22 @@ class MainActivity : ComponentActivity() {
         val cardCreateViewModel: CardCreateViewModel by viewModels {
             CardCreateViewModel.factory(appContainer.cardConfigProvider, appContainer.cardTemplateImporter)
         }
-        @OptIn(ExperimentalMaterial3Api::class)
         setContent {
             RewardsRaderTheme {
                 var screen by remember { mutableStateOf<Screen>(Screen.List) }
-                var benefitSheetMode by remember { mutableStateOf<BenefitSheetMode?>(null) }
-                var allowSheetHide by remember { mutableStateOf(false) }
-                val addBenefitSheetState = rememberModalBottomSheetState(
-                    skipPartiallyExpanded = true,
-                    confirmValueChange = { target ->
-                        if (target == SheetValue.Hidden && !allowSheetHide) {
-                            false
-                        } else {
-                            true
+                BackHandler(enabled = screen != Screen.List) {
+                    screen = when (screen) {
+                        Screen.List -> Screen.List
+                        is Screen.Detail -> Screen.List
+                        Screen.Create -> Screen.List
+                        is Screen.Benefit -> {
+                            val detailId = (screen as Screen.Benefit).cardId
+                            Screen.Detail(detailId, initialTab = 2)
                         }
-                    }
-                )
-                val sheetScope = rememberCoroutineScope()
-                val focusManager = LocalFocusManager.current
-                val view = LocalView.current
-                val imm = view.context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-
-                val closeBenefitSheet: () -> Unit = {
-                    sheetScope.launch {
-                        allowSheetHide = true
-                        focusManager.clearFocus(force = true)
-                        imm.hideSoftInputFromWindow(view.windowToken, 0)
-                        addBenefitSheetState.hide()
-                        allowSheetHide = false
-                        benefitSheetMode = null
                     }
                 }
 
-                BackHandler(enabled = benefitSheetMode != null || screen != Screen.List) {
-                    if (benefitSheetMode != null) {
-                        closeBenefitSheet()
-                    } else {
-                        screen = Screen.List
-                    }
-                }
-
-                benefitSheetMode?.let { mode ->
-                    ModalBottomSheet(
-                        onDismissRequest = { closeBenefitSheet() },
-                        sheetState = addBenefitSheetState
-                    ) {
-                        val cardId = when (mode) {
-                            is BenefitSheetMode.Add -> mode.cardId
-                            is BenefitSheetMode.Edit -> mode.cardId
-                        }
-                        val productName = when (mode) {
-                            is BenefitSheetMode.Add -> mode.productName
-                            is BenefitSheetMode.Edit -> mode.productName
-                        }
-                        val issuer = when (mode) {
-                            is BenefitSheetMode.Add -> mode.issuer
-                            is BenefitSheetMode.Edit -> mode.issuer
-                        }
-                        BenefitCreateScreen(
-                            stateFlow = benefitCreateViewModel.state,
-                            onInit = {
-                                when (mode) {
-                                    is BenefitSheetMode.Add -> benefitCreateViewModel.init(cardId, productName, issuer)
-                                    is BenefitSheetMode.Edit -> benefitCreateViewModel.startEdit(mode.benefitId, productName, issuer)
-                                }
-                            },
-                            onBack = { closeBenefitSheet() },
-                            onSave = {
-                                benefitCreateViewModel.save { savedBenefit ->
-                                    cardDetailViewModel.upsertBenefit(savedBenefit)
-                                    cardDetailViewModel.notifyBenefitSaved(mode is BenefitSheetMode.Edit)
-                                    closeBenefitSheet()
-                                }
-                            },
-                            onTypeChange = { benefitCreateViewModel.setType(it) },
-                            onAmountChange = { benefitCreateViewModel.setAmount(it) },
-                            onCapChange = { benefitCreateViewModel.setCap(it) },
-                            onCadenceChange = { benefitCreateViewModel.setCadence(it) },
-                            onEffectiveDateChange = { benefitCreateViewModel.setEffectiveDate(it) },
-                            onExpiryDateChange = { benefitCreateViewModel.setExpiryDate(it) },
-                            onTitleChange = { benefitCreateViewModel.setTitle(it) },
-                            onNotesChange = { benefitCreateViewModel.setNotes(it) },
-                            onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
-                            onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },
-                            onAddCustomCategory = { benefitCreateViewModel.addCustomCategory() },
-                            onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) },
-                            onTransactionAmountChange = { benefitCreateViewModel.setTransactionAmount(it) },
-                            onTransactionDateChange = { benefitCreateViewModel.setTransactionDate(it) },
-                            onAddTransaction = { benefitCreateViewModel.saveTransaction() },
-                            onStartTransaction = { benefitCreateViewModel.startNewTransaction() },
-                            onEditTransaction = { benefitCreateViewModel.startEditTransaction(it) },
-                            onDeleteTransaction = { benefitCreateViewModel.deleteTransaction(it) },
-                            onProgressChange = { benefitCreateViewModel.setProgress(it) }
-                        )
-                    }
-                }
-
-                when (screen) {
+                when (val currentScreen = screen) {
                     is Screen.List -> CardListScreen(
                         stateFlow = cardListViewModel.state,
                         onSelectCard = { id ->
@@ -162,14 +71,17 @@ class MainActivity : ComponentActivity() {
                         CardDetailScreen(
                             stateFlow = cardDetailViewModel.state,
                             events = cardDetailViewModel.events,
+                            initialTab = currentScreen.initialTab,
                             onBack = { screen = Screen.List },
                             onAddBenefit = { id, productName ->
                                 val issuer = cardDetailViewModel.state.value.detail?.issuer ?: ""
-                                benefitSheetMode = BenefitSheetMode.Add(id, productName, issuer)
+                                benefitCreateViewModel.init(id, productName, issuer)
+                                screen = Screen.Benefit(id, BenefitMode.Add)
                             },
                             onEditBenefit = { benefitId ->
                                 val detail = cardDetailViewModel.state.value.detail ?: return@CardDetailScreen
-                                benefitSheetMode = BenefitSheetMode.Edit(detail.id, benefitId, detail.productName, detail.issuer)
+                                benefitCreateViewModel.startEdit(benefitId, detail.productName, detail.issuer)
+                                screen = Screen.Benefit(detail.id, BenefitMode.Edit(benefitId))
                             },
                             onDeleteBenefit = { benefitId ->
                                 cardDetailViewModel.deleteBenefit(benefitId)
@@ -202,6 +114,41 @@ class MainActivity : ComponentActivity() {
                         },
                         onBack = { screen = Screen.List }
                     )
+                    is Screen.Benefit -> {
+                        val mode = currentScreen
+                        BenefitCreateScreen(
+                            stateFlow = benefitCreateViewModel.state,
+                            onBack = {
+                                screen = Screen.Detail(mode.cardId, initialTab = 2)
+                            },
+                            onSave = {
+                                benefitCreateViewModel.save { savedBenefit ->
+                                    cardDetailViewModel.upsertBenefit(savedBenefit)
+                                    cardDetailViewModel.notifyBenefitSaved(mode.mode is BenefitMode.Edit)
+                                    screen = Screen.Detail(mode.cardId, initialTab = 2)
+                                }
+                            },
+                            onTypeChange = { benefitCreateViewModel.setType(it) },
+                            onAmountChange = { benefitCreateViewModel.setAmount(it) },
+                            onCapChange = { benefitCreateViewModel.setCap(it) },
+                            onCadenceChange = { benefitCreateViewModel.setCadence(it) },
+                            onEffectiveDateChange = { benefitCreateViewModel.setEffectiveDate(it) },
+                            onExpiryDateChange = { benefitCreateViewModel.setExpiryDate(it) },
+                            onTitleChange = { benefitCreateViewModel.setTitle(it) },
+                            onNotesChange = { benefitCreateViewModel.setNotes(it) },
+                            onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
+                            onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },
+                            onAddCustomCategory = { benefitCreateViewModel.addCustomCategory() },
+                            onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) },
+                            onTransactionAmountChange = { benefitCreateViewModel.setTransactionAmount(it) },
+                            onTransactionDateChange = { benefitCreateViewModel.setTransactionDate(it) },
+                            onAddTransaction = { benefitCreateViewModel.saveTransaction() },
+                            onStartTransaction = { benefitCreateViewModel.startNewTransaction() },
+                            onEditTransaction = { benefitCreateViewModel.startEditTransaction(it) },
+                            onDeleteTransaction = { benefitCreateViewModel.deleteTransaction(it) },
+                            onProgressChange = { benefitCreateViewModel.setProgress(it) }
+                        )
+                    }
                 }
             }
         }
@@ -210,11 +157,12 @@ class MainActivity : ComponentActivity() {
 
 private sealed class Screen {
     data object List : Screen()
-    data class Detail(val id: Long) : Screen()
+    data class Detail(val id: Long, val initialTab: Int = 0) : Screen()
     data object Create : Screen()
+    data class Benefit(val cardId: Long, val mode: BenefitMode) : Screen()
 }
 
-private sealed class BenefitSheetMode {
-    data class Add(val cardId: Long, val productName: String, val issuer: String) : BenefitSheetMode()
-    data class Edit(val cardId: Long, val benefitId: Long, val productName: String, val issuer: String) : BenefitSheetMode()
+private sealed class BenefitMode {
+    data object Add : BenefitMode()
+    data class Edit(val benefitId: Long) : BenefitMode()
 }

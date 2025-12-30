@@ -77,6 +77,7 @@ import java.time.format.DateTimeFormatter
 fun CardDetailScreen(
     stateFlow: StateFlow<CardDetailState>,
     events: kotlinx.coroutines.flow.SharedFlow<String>,
+    initialTab: Int = 0,
     onBack: () -> Unit,
     onAddBenefit: (Long, String) -> Unit,
     onEditBenefit: (Long) -> Unit,
@@ -122,6 +123,7 @@ fun CardDetailScreen(
             detail == null -> DetailMessage("No details available.", Modifier.padding(padding))
             else -> DetailContent(
                 detail = detail,
+                initialTab = initialTab,
                 onAddBenefit = { onAddBenefit(detail.id, detail.productName) },
                 onEditBenefit = onEditBenefit,
                 onDeleteBenefit = onDeleteBenefit,
@@ -187,6 +189,7 @@ fun CardDetailScreen(
 @Composable
 private fun DetailContent(
     detail: CardDetailUi,
+    initialTab: Int,
     onAddBenefit: () -> Unit,
     onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit,
@@ -203,7 +206,7 @@ private fun DetailContent(
     onStatementDateClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
     val tabs = listOf(
         TabItem("Info", Icons.Default.Info),
         TabItem("SUB", Icons.Default.CardGiftcard),
