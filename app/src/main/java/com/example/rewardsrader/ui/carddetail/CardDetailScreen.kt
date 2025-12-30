@@ -69,6 +69,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 import java.time.ZoneId
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -277,6 +279,7 @@ private fun DetailContent(
                             spending = detail.subSpending,
                             duration = detail.subDuration,
                             durationUnit = detail.subDurationUnit ?: "months",
+                            openDate = detail.openDate,
                             onUpdateSpending = onUpdateSubSpending,
                             onUpdateDuration = onUpdateSubDuration
                         )
@@ -600,6 +603,7 @@ private fun SignupBonusTab(
     spending: String?,
     duration: String?,
     durationUnit: String,
+    openDate: String?,
     onUpdateSpending: (String) -> Unit,
     onUpdateDuration: (String, String) -> Unit
 ) {
@@ -620,6 +624,14 @@ private fun SignupBonusTab(
             label = "Duration",
             value = durationValue.ifBlank { "Tap to add" }.let { if (durationValue.isNotBlank()) "$durationValue ${durationUnitSelection.label}" else it },
             onClick = { editingField = BonusField.Duration }
+        )
+        Divider()
+        val dueDate = remember(openDate, durationValue, durationUnitSelection) {
+            calculateDueDate(openDate, durationValue, durationUnitSelection)
+        }
+        StaticInfoRow(
+            label = "Due date",
+            value = dueDate ?: "Add open date and duration"
         )
     }
 
@@ -717,6 +729,19 @@ private fun SignupBonusTab(
 private enum class BonusField { Spending, Duration }
 private enum class DurationUnit(val label: String) { MONTHS("months"), DAYS("days") }
 
+private fun calculateDueDate(openDate: String?, duration: String, unit: DurationUnit): String? {
+    if (openDate.isNullOrBlank() || duration.isBlank()) return null
+    val startDate = runCatching {
+        LocalDate.parse(openDate, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+    }.getOrNull() ?: return null
+    val amount = duration.toLongOrNull() ?: return null
+    val due = when (unit) {
+        DurationUnit.MONTHS -> startDate.plusMonths(amount)
+        DurationUnit.DAYS -> startDate.plusDays(amount)
+    }
+    return "%02d/%02d/%d".format(due.monthValue, due.dayOfMonth, due.year)
+}
+
 @Composable
 private fun OffersTab() {
     DetailMessage("No offers yet.")
@@ -730,4 +755,18 @@ private fun BenefitsTab(
     onDeleteBenefit: (Long) -> Unit
 ) {
     Box(modifier = Modifier.fillMaxWidth()) { }
+}
+
+@Composable
+private fun StaticInfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyMedium)
+        Text(value, style = MaterialTheme.typography.bodyLarge)
+    }
 }
