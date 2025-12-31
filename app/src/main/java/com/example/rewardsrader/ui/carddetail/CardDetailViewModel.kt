@@ -70,6 +70,8 @@ class CardDetailViewModel(
     private var currentCard: CardEntity? = null
 
     fun load(cardId: Long) {
+        if (currentCardId == cardId && _state.value.detail != null) return
+
         currentCardId = cardId
         _state.value = CardDetailState(isLoading = true)
         viewModelScope.launch {

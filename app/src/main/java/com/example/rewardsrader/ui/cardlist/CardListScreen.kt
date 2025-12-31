@@ -67,15 +67,16 @@ fun CardListScreen(
         when {
             state.isLoading -> LoadingMessage(modifier = Modifier.padding(padding))
             error != null -> ErrorMessage(error, Modifier.padding(padding))
-            state.cards.isEmpty() -> EmptyMessage(modifier = Modifier.padding(padding))
+            // Removed state.cards.isEmpty() -> EmptyMessage, letting CardListContent handle empty list + button.
+            // This ensures the button is always visible.
             else -> CardListContent(
                 cards = state.cards,
                 onSelectCard = onSelectCard,
                 onDeleteCard = onDeleteCard,
+                onAddCard = onAddCard,
                 modifier = Modifier.padding(padding)
             )
         }
-        AddCardButton(onAddCard = onAddCard, modifier = Modifier.padding(padding))
     }
 }
 
@@ -84,37 +85,47 @@ private fun CardListContent(
     cards: List<CardSummaryUi>,
     onSelectCard: (Long) -> Unit,
     onDeleteCard: (Long) -> Unit,
+    onAddCard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(cards) { card ->
-            Card(
+    if (cards.isEmpty()) {
+        EmptyMessage(onAddCard = onAddCard, modifier = modifier)
+    } else {
+        Column(modifier = modifier.fillMaxSize()) {
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .clickable { onSelectCard(card.id) }
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                androidx.compose.foundation.layout.Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
+                items(cards) { card ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable { onSelectCard(card.id) }
                     ) {
-                        Text(card.productName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text(card.issuer, style = MaterialTheme.typography.bodyMedium)
-                        Text("Status: ${card.status}", style = MaterialTheme.typography.bodySmall)
-                    }
-                    IconButton(onClick = { onDeleteCard(card.id) }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete card")
+                        androidx.compose.foundation.layout.Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(card.productName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                                Text(card.issuer, style = MaterialTheme.typography.bodyMedium)
+                                Text("Status: ${card.status}", style = MaterialTheme.typography.bodySmall)
+                            }
+                            IconButton(onClick = { onDeleteCard(card.id) }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete card")
+                            }
+                        }
                     }
                 }
             }
+            AddCardButton(onAddCard = onAddCard)
         }
     }
 }
@@ -141,13 +152,19 @@ private fun ErrorMessage(message: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EmptyMessage(modifier: Modifier = Modifier) {
+private fun EmptyMessage(onAddCard: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text("No cards yet. Add one from a template.")
+        Button(
+            onClick = onAddCard,
+            modifier = Modifier.padding(top = 16.dp)
+        ) {
+            Text("Add card")
+        }
     }
 }
 
@@ -155,7 +172,7 @@ private fun EmptyMessage(modifier: Modifier = Modifier) {
 private fun AddCardButton(onAddCard: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {

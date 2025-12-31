@@ -37,12 +37,14 @@ class CardListViewModel(
         loadCards()
     }
 
-    fun loadCards() {
-        _state.value = CardListUiState(isLoading = true)
+    fun loadCards(showLoading: Boolean = true) {
+        if (showLoading) {
+            _state.value = _state.value.copy(isLoading = true)
+        }
         viewModelScope.launch {
             runCatching { repository.getCards() }
-                .onSuccess { cards -> _state.value = CardListUiState(isLoading = false, cards = cards.map(::mapCard)) }
-                .onFailure { _state.value = CardListUiState(isLoading = false, error = it.message) }
+                .onSuccess { cards -> _state.value = _state.value.copy(isLoading = false, cards = cards.map(::mapCard)) }
+                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
         }
     }
 
@@ -59,7 +61,7 @@ class CardListViewModel(
                 } ?: return@launch
                 lastDeleted = cardWithBenefits
                 repository.removeCard(cardId)
-                loadCards()
+                loadCards(showLoading = false)
                 _state.value = _state.value.copy(snackbarMessage = "Card deleted", showUndo = true)
             }.onFailure {
                 _state.value = _state.value.copy(error = it.message)
@@ -76,7 +78,7 @@ class CardListViewModel(
                 repository.insertUsageEntries(snapshot.usageEntries.map { it.copy(id = it.id) })
                 repository.insertNotificationRules(snapshot.notificationRules.map { it.copy(id = it.id) })
                 lastDeleted = null
-                loadCards()
+                loadCards(showLoading = false)
             }.onFailure {
                 _state.value = _state.value.copy(error = it.message)
             }
