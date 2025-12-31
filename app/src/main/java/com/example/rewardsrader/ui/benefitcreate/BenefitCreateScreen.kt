@@ -99,19 +99,25 @@ fun BenefitCreateScreen(
     LaunchedEffect(showEffectivePicker, state.effectiveDate) {
         if (showEffectivePicker) {
             val millis = state.effectiveDate.toMillis()
-            effectiveDatePickerState.setSelection(millis)
+            if (millis != null) {
+                effectiveDatePickerState.selectedDateMillis = millis
+            }
         }
     }
     LaunchedEffect(showExpiryPicker, state.expiryDate) {
         if (showExpiryPicker) {
             val millis = state.expiryDate.toMillis()
-            expiryDatePickerState.setSelection(millis)
+             if (millis != null) {
+                expiryDatePickerState.selectedDateMillis = millis
+            }
         }
     }
     LaunchedEffect(showTransactionPicker, state.transactionDate) {
         if (showTransactionPicker) {
             val millis = state.transactionDate.toMillis()
-            transactionDatePickerState.setSelection(millis)
+             if (millis != null) {
+                transactionDatePickerState.selectedDateMillis = millis
+            }
         }
     }
     LaunchedEffect(state.transactions.size) {
