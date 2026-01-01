@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -35,11 +37,13 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
@@ -50,7 +54,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -64,6 +70,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -214,7 +221,12 @@ private fun DetailContent(
     onStatementDateClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by rememberSaveable(initialTab) { mutableStateOf(initialTab) }
+    val pagerState = rememberPagerState(
+        initialPage = initialTab.coerceIn(0, 3),
+        pageCount = { 4 }
+    )
+    val coroutineScope = rememberCoroutineScope()
+    val currentPage by remember { derivedStateOf { pagerState.currentPage } }
     val tabs = listOf(
         TabItem("Info", Icons.Default.Info),
         TabItem("SUB", Icons.Default.CardGiftcard),
@@ -223,12 +235,12 @@ private fun DetailContent(
     )
     var editingField by remember { mutableStateOf<CardField?>(null) }
     var editingValue by remember { mutableStateOf("") }
-    val fabAction: (() -> Unit)? = when (selectedTab) {
+    val fabAction: (() -> Unit)? = when (currentPage) {
         2 -> onAddBenefit
         3 -> onAddOffer
         else -> null
     }
-    val fabDescription = when (selectedTab) {
+    val fabDescription = when (currentPage) {
         2 -> "Add benefit"
         3 -> "Add offer"
         else -> ""
@@ -245,53 +257,55 @@ private fun DetailContent(
         16.dp
     }
 
+    val scrollState = rememberScrollState()
     Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = listBottomPadding)
+                .verticalScroll(scrollState)
+                .padding(16.dp)
+                .padding(bottom = listBottomPadding),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(140.dp)
-                        )
-                        Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                        Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
-                    }
+                            .height(140.dp)
+                    )
+                    Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                    Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
-            item {
-                TabRow(selectedTabIndex = selectedTab) {
-                    tabs.forEachIndexed { index, tab ->
-                        Tab(
-                            selected = selectedTab == index,
-                            onClick = { selectedTab = index },
-                            text = {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(tab.icon, contentDescription = tab.label)
-                                    Text(tab.label)
-                                }
+            SecondaryTabRow(selectedTabIndex = currentPage) {
+                tabs.forEachIndexed { index, tab ->
+                    Tab(
+                        selected = currentPage == index,
+                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+                        text = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(tab.icon, contentDescription = tab.label)
+                                Text(tab.label)
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
 
-            when (selectedTab) {
-                0 -> {
-                    item {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+                verticalAlignment = Alignment.Top)
+            { page ->
+                when (page) {
+                    0 -> {
                         CardInfoTab(
                             detail = detail,
                             onStartEdit = { field, value ->
@@ -303,9 +317,7 @@ private fun DetailContent(
                             onStatementDateClick = onStatementDateClick
                         )
                     }
-                }
-                1 -> {
-                    item {
+                    1 -> {
                         SignupBonusTab(
                             spending = detail.subSpending,
                             duration = detail.subDuration,
@@ -315,26 +327,34 @@ private fun DetailContent(
                             onUpdateDuration = onUpdateSubDuration
                         )
                     }
-                }
-                2 -> {
-                    items(detail.benefits, key = { it.id }) { benefit ->
-                        BenefitCard(
-                            benefit = benefit,
-                            onEdit = { onEditBenefit(benefit.id) },
-                            onDelete = { onDeleteBenefit(benefit.id) }
-                        )
+                    2 -> {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),) {
+                            detail.benefits.forEach { benefit ->
+                                BenefitCard(
+                                    benefit = benefit,
+                                    onEdit = { onEditBenefit(benefit.id) },
+                                    onDelete = { onDeleteBenefit(benefit.id) }
+                                )
+                            }
+                        }
                     }
-                }
-                3 -> {
-                    if (detail.offers.isEmpty()) {
-                        item { DetailMessage("No offers yet.") }
-                    } else {
-                        items(detail.offers, key = { it.id }) { offer ->
-                            OfferCard(
-                                offer = offer,
-                                onEdit = { onEditOffer(offer.id) },
-                                onDelete = { onDeleteOffer(offer.id) }
-                            )
+                    3 -> {
+                        if (detail.offers.isEmpty()) {
+                            DetailMessage("No offers yet.")
+                        } else {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),) {
+                                detail.offers.forEach { offer ->
+                                    OfferCard(
+                                        offer = offer,
+                                        onEdit = { onEditOffer(offer.id) },
+                                        onDelete = { onDeleteOffer(offer.id) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -602,7 +622,8 @@ private fun CardInfoTab(
     var showNotesDialog by remember { mutableStateOf(false) }
     var notesDraft by remember { mutableStateOf(detail.notes.orEmpty()) }
 
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),) {
         InfoRow(
             label = "Nickname",
             value = detail.nickname.orEmpty(),
@@ -690,7 +711,9 @@ private fun SignupBonusTab(
         mutableStateOf(if (durationUnit == DurationUnit.DAYS.label) DurationUnit.DAYS else DurationUnit.MONTHS)
     }
     var editingField by remember { mutableStateOf<BonusField?>(null) }
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)) {
         InfoRow(
             label = "Spending",
             value = if (spendingValue.isNotBlank()) "$$spendingValue" else "Tap to add",
