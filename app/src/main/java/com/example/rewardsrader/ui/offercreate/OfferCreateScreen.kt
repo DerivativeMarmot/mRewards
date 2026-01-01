@@ -2,22 +2,29 @@ package com.example.rewardsrader.ui.offercreate
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+//import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
@@ -88,7 +96,7 @@ fun OfferCreateScreen(
                 title = { Text(if (state.isEditing) "Edit Offer" else "Add Offer") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -104,12 +112,13 @@ fun OfferCreateScreen(
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                .padding(horizontal = 48.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (state.productName.isNotBlank()) {
                 Text(
-                    text = "Product: ${state.productName}",
+                    textAlign = TextAlign.Center,
+                    text = state.productName,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -119,6 +128,7 @@ fun OfferCreateScreen(
                 label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
             )
+
             OutlinedTextField(
                 value = state.note,
                 onValueChange = onNoteChange,
@@ -126,11 +136,23 @@ fun OfferCreateScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            InlineSelectionRow(
-                label = "Type",
-                value = state.type.replaceFirstChar { it.uppercase() },
-                onClick = { showTypeDialog = true }
-            )
+            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
+
+            Box {
+                OutlinedTextField(
+                    value = state.type.replaceFirstChar { it.uppercase() },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Type") },
+                    trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "Select type") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { showTypeDialog = true }
+                )
+            }
 
             if (state.type == "multiplier") {
                 OutlinedTextField(
@@ -143,11 +165,21 @@ fun OfferCreateScreen(
                 )
             }
 
-            InlineSelectionRow(
-                label = "Status",
-                value = state.status.replaceFirstChar { it.uppercase() },
-                onClick = { showStatusDialog = true }
-            )
+            Box {
+                OutlinedTextField(
+                    value = state.status.replaceFirstChar { it.uppercase() },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Status") },
+                    trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "Select status") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { showStatusDialog = true }
+                )
+            }
 
             OutlinedTextField(
                 value = state.minSpend,
@@ -159,10 +191,10 @@ fun OfferCreateScreen(
             )
             val recommendedSpend = remember(state.type, state.multiplier, state.maxCashBack) {
                 if (state.type != "multiplier") return@remember null
-                val rate = state.multiplier.toDoubleOrNull()
+                val ratePercent = state.multiplier.toDoubleOrNull()
                 val maxCash = state.maxCashBack.toDoubleOrNull()
-                if (rate == null || rate == 0.0 || maxCash == null) return@remember null
-                maxCash / ( rate / 100 )
+                if (ratePercent == null || ratePercent == 0.0 || maxCash == null) return@remember null
+                maxCash / (ratePercent / 100)
             }
             recommendedSpend?.let { spend ->
                 Text(
@@ -179,16 +211,40 @@ fun OfferCreateScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            InlineSelectionRow(
-                label = "Start date",
-                value = state.startDate.ifBlank { "Select date" },
-                onClick = { showStartPicker = true }
-            )
-            InlineSelectionRow(
-                label = "End date",
-                value = state.endDate.ifBlank { "Select date" },
-                onClick = { showEndPicker = true }
-            )
+            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
+
+            Box {
+                OutlinedTextField(
+                    value = state.startDate,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Start date") },
+                    placeholder = { Text("Select date") },
+                    trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = "Pick start date") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { showStartPicker = true }
+                )
+            }
+            Box {
+                OutlinedTextField(
+                    value = state.endDate,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("End date") },
+                    placeholder = { Text("Select date") },
+                    trailingIcon = { Icon(Icons.Default.DateRange, contentDescription = "Pick end date") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { showEndPicker = true }
+                )
+            }
 
             if (!state.error.isNullOrBlank()) {
                 Text(
@@ -260,20 +316,6 @@ fun OfferCreateScreen(
         ) {
             DatePicker(state = endDatePickerState)
         }
-    }
-}
-
-@Composable
-private fun InlineSelectionRow(label: String, value: String, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(label, modifier = Modifier.weight(1f))
-        Text(value, modifier = Modifier.padding(start = 12.dp))
     }
 }
 
