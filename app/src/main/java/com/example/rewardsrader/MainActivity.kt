@@ -9,6 +9,8 @@ import android.app.Activity
 import androidx.activity.BackEventCompat
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -86,6 +88,18 @@ class MainActivity : ComponentActivity() {
         NavHost(
             navController = navController,
             startDestination = "list",
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { it })
+            },
+            exitTransition = {
+                scaleOut(targetScale = 1.2f)
+            },
+            popEnterTransition = {
+                scaleIn(initialScale = 1.2f)
+            },
+            popExitTransition = {
+                scaleOut(targetScale = 0.8f) + fadeOut()
+            }
         )
         {
             composable("list") {
