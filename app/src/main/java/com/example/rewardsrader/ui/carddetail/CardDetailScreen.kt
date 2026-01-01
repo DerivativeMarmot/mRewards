@@ -12,36 +12,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+//import androidx.compose.foundation.lazy.stickyHeader
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CardGiftcard
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.Verified
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -55,25 +44,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.example.rewardsrader.ui.carddetail.components.BenefitCard
+import com.example.rewardsrader.ui.carddetail.components.CardField
+import com.example.rewardsrader.ui.carddetail.components.EditFieldDialog
+import com.example.rewardsrader.ui.carddetail.components.OfferCard
+import com.example.rewardsrader.ui.carddetail.components.StatusDialog
+import com.example.rewardsrader.ui.carddetail.tabs.CardInfoTab
+import com.example.rewardsrader.ui.carddetail.tabs.SignupBonusTab
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -105,11 +94,12 @@ fun CardDetailScreen(
     val openDatePickerState = androidx.compose.material3.rememberDatePickerState()
     val statementDatePickerState = androidx.compose.material3.rememberDatePickerState()
     val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = {Text("Card Detail")},
+                title = { Text("Card Detail") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -118,13 +108,11 @@ fun CardDetailScreen(
             )
         }
     ) { padding ->
-        androidx.compose.runtime.LaunchedEffect(events) {
-            events.collect { message ->
-                snackbarHostState.showSnackbar(message)
-            }
+        LaunchedEffect(events) {
+            events.collect { message -> snackbarHostState.showSnackbar(message) }
         }
         when {
-            state.isLoading -> DetailMessage("Loading…", Modifier.padding(padding))
+            state.isLoading -> DetailMessage("Loading...", Modifier.padding(padding))
             state.error != null -> DetailMessage("Error: ${state.error}", Modifier.padding(padding))
             detail == null -> DetailMessage("No details available.", Modifier.padding(padding))
             else -> DetailContent(
@@ -196,6 +184,7 @@ fun CardDetailScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetailContent(
     detail: CardDetailUi,
@@ -256,110 +245,123 @@ private fun DetailContent(
         16.dp
     }
 
-    val scrollState = rememberScrollState()
     Box(modifier = modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(16.dp)
-                .padding(bottom = listBottomPadding),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 16.dp,
+                bottom = listBottomPadding
+            )
         ) {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Spacer(
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(140.dp)
-                    )
-                    Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                    Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            TabRow(selectedTabIndex = currentPage) {
-                tabs.forEachIndexed { index, tab ->
-                    Tab(
-                        selected = currentPage == index,
-                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
-                        text = {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Icon(tab.icon, contentDescription = tab.label)
-                                Text(tab.label)
-                            }
-                        }
-                    )
-                }
-            }
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 400.dp),
-                verticalAlignment = Alignment.Top
-            ) { page ->
-                when (page) {
-                    0 -> {
-                        CardInfoTab(
-                            detail = detail,
-                            onStartEdit = { field, value ->
-                                editingField = field
-                                editingValue = value
-                            },
-                            onUpdateNotes = onUpdateNotes,
-                            onOpenDateClick = onOpenDateClick,
-                            onStatementDateClick = onStatementDateClick
-                        )
-                    }
-                    1 -> {
-                        SignupBonusTab(
-                            spending = detail.subSpending,
-                            duration = detail.subDuration,
-                            durationUnit = detail.subDurationUnit ?: "months",
-                            openDate = detail.openDate,
-                            onUpdateSpending = onUpdateSubSpending,
-                            onUpdateDuration = onUpdateSubDuration
-                        )
-                    }
-                    2 -> {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 12.dp)
-                        ) {
-                            detail.benefits.forEach { benefit ->
-                                BenefitCard(
-                                    benefit = benefit,
-                                    onEdit = { onEditBenefit(benefit.id) },
-                                    onDelete = { onDeleteBenefit(benefit.id) }
+                                .height(140.dp)
+                        )
+                        Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                        Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            }
+
+            stickyHeader {
+                TabRow(selectedTabIndex = currentPage) {
+                    tabs.forEachIndexed { index, tab ->
+                        Tab(
+                            selected = currentPage == index,
+                            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+                            text = {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Icon(tab.icon, contentDescription = tab.label)
+                                    Text(tab.label)
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            item {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 300.dp),
+                    verticalAlignment = Alignment.Top
+                ) { page ->
+                    when (page) {
+                        0 -> {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                CardInfoTab(
+                                    detail = detail,
+                                    onStartEdit = { field, value ->
+                                        editingField = field
+                                        editingValue = value
+                                    },
+                                    onUpdateNotes = onUpdateNotes,
+                                    onOpenDateClick = onOpenDateClick,
+                                    onStatementDateClick = onStatementDateClick
                                 )
                             }
                         }
-                    }
-                    3 -> {
-                        if (detail.offers.isEmpty()) {
-                            DetailMessage("No offers yet.")
-                        } else {
+                        1 -> {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 12.dp)
+                                modifier = Modifier.fillMaxWidth()
                             ) {
-                                detail.offers.forEach { offer ->
-                                    OfferCard(
-                                        offer = offer,
-                                        onEdit = { onEditOffer(offer.id) },
-                                        onDelete = { onDeleteOffer(offer.id) }
+                                SignupBonusTab(
+                                    spending = detail.subSpending,
+                                    duration = detail.subDuration,
+                                    durationUnit = detail.subDurationUnit ?: "months",
+                                    openDate = detail.openDate,
+                                    onUpdateSpending = onUpdateSubSpending,
+                                    onUpdateDuration = onUpdateSubDuration
+                                )
+                            }
+                        }
+                        2 -> {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                detail.benefits.forEach { benefit ->
+                                    BenefitCard(
+                                        benefit = benefit,
+                                        onEdit = { onEditBenefit(benefit.id) },
+                                        onDelete = { onDeleteBenefit(benefit.id) }
                                     )
+                                }
+                            }
+                        }
+                        3 -> {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                if (detail.offers.isEmpty()) {
+                                    DetailMessage("No offers yet.")
+                                } else {
+                                    detail.offers.forEach { offer ->
+                                        OfferCard(
+                                            offer = offer,
+                                            onEdit = { onEditOffer(offer.id) },
+                                            onDelete = { onDeleteOffer(offer.id) }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -421,194 +423,6 @@ private fun DetailContent(
 }
 
 @Composable
-private fun InfoRow(label: String, value: String, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium)
-        Text(value.ifBlank { "Tap to add" }, style = MaterialTheme.typography.bodyLarge)
-    }
-}
-
-@Composable
-private fun NotesRow(label: String, value: String, onValueChange: (String) -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(imageVector = Icons.Default.Edit, contentDescription = label)
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier.weight(1f),
-                decorationBox = { inner ->
-                    if (value.isBlank()) {
-                        Text("Enter notes", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    inner()
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun EditFieldDialog(
-    title: String,
-    initial: String,
-    onSave: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    var text by remember { mutableStateOf(TextFieldValue(initial)) }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(title) },
-        text = {
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier.fillMaxWidth()
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { onSave(text.text) }) {
-                Text("Save")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
-private fun StatusDialog(
-    current: String,
-    onSelect: (String) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val options = listOf("Pending", "Approved", "Denied", "Open", "Closed")
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Select status") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                options.forEach { option ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onSelect(option.lowercase()) }
-                            .padding(vertical = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        androidx.compose.material3.RadioButton(
-                            selected = option.equals(current, ignoreCase = true),
-                            onClick = { onSelect(option.lowercase()) }
-                        )
-                        Text(option, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-private enum class CardField {
-    Nickname,
-    AnnualFee,
-    LastFour,
-    Status
-}
-
-private data class TabItem(val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
-
-@Composable
-private fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onEdit() }
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                val primaryLine = listOf(benefit.amount, benefit.title.orEmpty())
-                    .filter { it.isNotBlank() }
-                    .joinToString(" – ")
-                if (primaryLine.isNotBlank()) {
-                    Text(primaryLine, fontWeight = FontWeight.SemiBold)
-                }
-                // Only show amount/rate and title
-            }
-            IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete benefit",
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun OfferCard(offer: OfferUi, onEdit: () -> Unit, onDelete: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onEdit() }
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(offer.title, fontWeight = FontWeight.SemiBold)
-                if (offer.window.isNotBlank()) {
-                    Text(offer.window, style = MaterialTheme.typography.bodyMedium)
-                }
-                offer.details?.let {
-                    Text(it, style = MaterialTheme.typography.bodyMedium)
-                }
-                Text(
-                    offer.status,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete offer",
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun DetailMessage(message: String, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -618,257 +432,6 @@ private fun DetailMessage(message: String, modifier: Modifier = Modifier) {
         Text(message)
     }
 }
-@Composable
-private fun CardInfoTab(
-    detail: CardDetailUi,
-    onStartEdit: (CardField, String) -> Unit,
-    onUpdateNotes: (String) -> Unit,
-    onOpenDateClick: () -> Unit,
-    onStatementDateClick: () -> Unit
-) {
-    var showNotesDialog by remember { mutableStateOf(false) }
-    var notesDraft by remember { mutableStateOf(detail.notes.orEmpty()) }
 
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),) {
-        InfoRow(
-            label = "Nickname",
-            value = detail.nickname.orEmpty(),
-            onClick = { onStartEdit(CardField.Nickname, detail.nickname.orEmpty()) }
-        )
-        Divider()
-        InfoRow(
-            label = "Last 4 digits",
-            value = detail.lastFour.orEmpty(),
-            onClick = { onStartEdit(CardField.LastFour, detail.lastFour.orEmpty()) }
-        )
-        Divider()
-        InfoRow(
-            label = "Status",
-            value = detail.status.replaceFirstChar { it.uppercase() },
-            onClick = { onStartEdit(CardField.Status, detail.status) }
-        )
-        Divider()
-        InfoRow(
-            label = "Annual fee",
-            value = detail.annualFee,
-            onClick = { onStartEdit(CardField.AnnualFee, detail.annualFee.removePrefix("$")) }
-        )
-        Divider()
-        InfoRow(
-            label = "Open date",
-            value = detail.openDate.orEmpty(),
-            onClick = onOpenDateClick
-        )
-        Divider()
-        InfoRow(
-            label = "Statement cut",
-            value = detail.statementCut.orEmpty(),
-            onClick = onStatementDateClick
-        )
-        Divider()
-        InfoRow(
-            label = "Notes",
-            value = detail.notes.orEmpty().ifBlank { "Tap to add" },
-            onClick = {
-                notesDraft = detail.notes.orEmpty()
-                showNotesDialog = true
-            }
-        )
-    }
+private data class TabItem(val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
 
-    if (showNotesDialog) {
-        AlertDialog(
-            onDismissRequest = { showNotesDialog = false },
-            title = { Text("Edit notes") },
-            text = {
-                OutlinedTextField(
-                    value = notesDraft,
-                    onValueChange = { notesDraft = it },
-                    label = { Text("Notes") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    onUpdateNotes(notesDraft)
-                    showNotesDialog = false
-                }) { Text("Save") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showNotesDialog = false }) { Text("Cancel") }
-            }
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun SignupBonusTab(
-    spending: String?,
-    duration: String?,
-    durationUnit: String,
-    openDate: String?,
-    onUpdateSpending: (String) -> Unit,
-    onUpdateDuration: (String, String) -> Unit
-) {
-    var spendingValue by rememberSaveable(spending) { mutableStateOf(spending.orEmpty()) }
-    var durationValue by rememberSaveable(duration) { mutableStateOf(duration.orEmpty()) }
-    var durationUnitSelection by rememberSaveable(durationUnit) {
-        mutableStateOf(if (durationUnit == DurationUnit.DAYS.label) DurationUnit.DAYS else DurationUnit.MONTHS)
-    }
-    var editingField by remember { mutableStateOf<BonusField?>(null) }
-    Column(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        InfoRow(
-            label = "Spending",
-            value = if (spendingValue.isNotBlank()) "$$spendingValue" else "Tap to add",
-            onClick = { editingField = BonusField.Spending }
-        )
-        Divider()
-        InfoRow(
-            label = "Duration",
-            value = durationValue.ifBlank { "Tap to add" }.let { if (durationValue.isNotBlank()) "$durationValue ${durationUnitSelection.label}" else it },
-            onClick = { editingField = BonusField.Duration }
-        )
-        Divider()
-        val dueDate = remember(openDate, durationValue, durationUnitSelection) {
-            calculateDueDate(openDate, durationValue, durationUnitSelection)
-        }
-        StaticInfoRow(
-            label = "Due date",
-            value = dueDate ?: "Add open date and duration"
-        )
-    }
-
-    editingField?.let { field ->
-        var draft by remember { mutableStateOf(if (field == BonusField.Spending) spendingValue else durationValue) }
-        val focusRequester = remember { FocusRequester() }
-        var unitSelection by remember { mutableStateOf(durationUnitSelection) }
-        AlertDialog(
-            onDismissRequest = { editingField = null },
-            title = { Text(if (field == BonusField.Spending) "Edit spending" else "Edit duration") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (field == BonusField.Duration) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                value = draft,
-                                onValueChange = { draft = it },
-                                label = { Text("Value") },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .focusRequester(focusRequester)
-                            )
-                            var expanded by remember { mutableStateOf(false) }
-                            Box(modifier = Modifier.weight(1f)) {
-                                OutlinedTextField(
-                                    value = unitSelection.label,
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    label = { Text("Unit") },
-                                    trailingIcon = {
-                                        IconButton(onClick = { expanded = !expanded }) {
-                                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Select unit")
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                                DropdownMenu(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false }
-                                ) {
-                                    DurationUnit.values().forEach { unit ->
-                                        DropdownMenuItem(
-                                            text = { Text(unit.label) },
-                                            onClick = {
-                                                unitSelection = unit
-                                                expanded = false
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        OutlinedTextField(
-                            value = draft,
-                            onValueChange = { draft = it },
-                            label = { Text("Value") },
-                            leadingIcon = { Text("$") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .focusRequester(focusRequester)
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    if (field == BonusField.Spending) {
-                        spendingValue = draft
-                        onUpdateSpending(draft)
-                    } else {
-                        durationValue = draft
-                        durationUnitSelection = unitSelection
-                        onUpdateDuration(draft, unitSelection.label)
-                    }
-                    editingField = null
-                }) { Text("Save") }
-            },
-            dismissButton = {
-                TextButton(onClick = { editingField = null }) { Text("Cancel") }
-            }
-        )
-        LaunchedEffect(field) {
-            focusRequester.requestFocus()
-        }
-    }
-}
-
-private enum class BonusField { Spending, Duration }
-private enum class DurationUnit(val label: String) { MONTHS("months"), DAYS("days") }
-
-private fun calculateDueDate(openDate: String?, duration: String, unit: DurationUnit): String? {
-    if (openDate.isNullOrBlank() || duration.isBlank()) return null
-    val startDate = runCatching {
-        LocalDate.parse(openDate, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
-    }.getOrNull() ?: return null
-    val amount = duration.toLongOrNull() ?: return null
-    val due = when (unit) {
-        DurationUnit.MONTHS -> startDate.plusMonths(amount)
-        DurationUnit.DAYS -> startDate.plusDays(amount)
-    }
-    return "%02d/%02d/%d".format(due.monthValue, due.dayOfMonth, due.year)
-}
-
-@Composable
-private fun BenefitsTab(
-    detail: CardDetailUi,
-    onAddBenefit: () -> Unit,
-    onEditBenefit: (Long) -> Unit,
-    onDeleteBenefit: (Long) -> Unit
-) {
-    Box(modifier = Modifier.fillMaxWidth()) { }
-}
-
-@Composable
-private fun StaticInfoRow(label: String, value: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyMedium)
-        Text(value, style = MaterialTheme.typography.bodyLarge)
-    }
-}
