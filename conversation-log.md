@@ -436,3 +436,44 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 
 2025-12-28 15:20:00 UTC User: duration modal value/unit same row dropdown; build fixes.  
 2025-12-28 15:20:05 UTC Assistant: Duration dialog uses value + unit dropdown with ArrowDropDown; build passed.
+
+[2025-12-31 00:00] User: read docs
+[2025-12-31 00:01] Assistant: read product_functionality.md and architecture.md
+[2025-12-31 00:02] User: read all docs in docs/
+[2025-12-31 00:03] Assistant: read config_schema.md, feature_implementation.md, implementation_plan.md, progress.md, sample_card_config.json
+[2025-12-31 00:04] User: FAB overlapped snackbar; move plus sign up when snackbar shows
+[2025-12-31 00:05] Assistant: adjusted FAB padding with animated offset in card detail screen
+[2025-12-31 00:06] User: update feature_implementation.md with offer requirements
+[2025-12-31 00:07] Assistant: added offers section to feature_implementation.md
+[2025-12-31 00:08] User: start implementing Offer features except reminders
+[2025-12-31 00:09] Assistant: added Offer entity/DAO/migration v6->v7, repository hooks, Offer create/edit UI, navigation wiring, offers tab with swipe FAB, tests updated
+[2025-12-31 00:10] User: add multiplier field shows % trailing
+[2025-12-31 00:11] Assistant: added multiplierRate to offers, migration v7, multiplier input, mapped to detail
+[2025-12-31 00:12] User: add read-only recommended spending (max cash back / multiplier)
+[2025-12-31 00:13] Assistant: added recommended spend hint under min spend
+[2025-12-31 00:14] User: update UI for Type/Status/start/end to bordered inputs
+[2025-12-31 00:15] Assistant: converted to outlined fields with overlay click targets
+[2025-12-31 00:16] User: clicks not opening modals
+[2025-12-31 00:17] Assistant: fixed overlay to matchParentSize overlays
+[2025-12-31 00:18] User: date picker off by one day
+[2025-12-31 00:19] Assistant: switched offer date conversions to UTC
+[2025-12-31 00:20] User: keyboard pushes top bar
+[2025-12-31 00:21] Assistant: added imePadding and safeDrawing insets in offer form
+[2025-12-31 00:22] User: make card detail tabs swipeable
+[2025-12-31 00:23] Assistant: added HorizontalPager, foundation dependency, synced FAB to page
+[2025-12-31 00:24] User: tab content jump to center during swipe
+[2025-12-31 00:25] Assistant: adjusted pager min height and layout
+[2025-12-31 00:26] User: tabs swipe only on content area
+[2025-12-31 00:27] Assistant: set pager min height for swipe in blank areas
+[2025-12-31 00:28] User: tabs move when content scrolls; make sticky
+[2025-12-31 00:29] Assistant: restructured card detail with LazyColumn + sticky TabRow, split components/tabs
+[2025-12-31 00:30] User: BluetoothActivityEnergyInfo error
+[2025-12-31 00:31] Assistant: explained system-level Bluetooth energy info failure
+[2025-12-31 00:32] User: Crash: nested scroll infinite constraint
+[2025-12-31 00:33] Assistant: removed nested verticalScroll in pager pages; FAB padding fixed; noted gradlew missing locally
+[2025-12-31 00:34] User: log work to progress.md and architecture.md
+[2025-12-31 00:35] Assistant: updated progress and architecture docs with offers/restructure entries
+[2025-12-31 00:36] User: log full conversation into conversation-log.md
+[2025-12-31 00:37] Assistant: wrote this log
+[2025-12-31 00:38] User: append with timestamps instead of override
+[2025-12-31 00:39] Assistant: appended log with timestamps

@@ -111,3 +111,8 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Maps/saves SUB fields; benefit mapping simplified to amount/rate + title; updates detail state on SUB changes.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Benefits tab uses FAB; transaction list shows edit/delete/show-more and progress bar; SUB tab mirrors info rows with numeric dialogs and months/days dropdown unit.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires transaction callbacks and SUB update callbacks; DB migrations registered.
+
+## 2026-01-01 – Offers & card detail restructure
+- Data: Added `OfferEntity`, `OfferDao`, migration `MIGRATION_6_7`, DB bumped to v7, repository hooks for get/add/update/delete offers, and wiring in `AppContainer`.
+- UI: Offer create/edit flow (`ui/offercreate/*`) with multiplier field, min/max cash back, status, dates, recommended spend hint; navigation wired in `MainActivity`.
+- Card detail: split shared UI into components (`ui/carddetail/components/*`) and tabs (`ui/carddetail/tabs/*`); `CardDetailScreen.kt` now uses `LazyColumn` with sticky `TabRow` + `HorizontalPager` (min height to keep swipe active) to avoid nested scroll crashes and keep FAB per tab; offers tab lists add/edit/delete items.

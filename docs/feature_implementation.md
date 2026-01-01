@@ -19,8 +19,8 @@
 - [ ] Status display: Show benefit status (active/expired/paused).
 
 ## Offers
-- [ ] Offer management: Free-form per user with its own Room entity; add/update from a dedicated screen; delete from the offer item.
-- [ ] Offer fields: 
+- [x] Offer management: Free-form per user with its own Room entity; add/update from a dedicated screen; delete from the offer item.
+- [x] Offer fields: 
   - Title (required) (string)
   - note (string),
   - start date, 
@@ -29,7 +29,7 @@
   - minimum spending (decimal, up to 2 decimals) , 
   - maximum cash back (decimal, up to 2 decimals), 
   - status (active/expired/used) (enum).
-- [ ] UI patterns: Separate offer screen that reuses existing modal patterns, enforces required validation, and clears the form after save.
+- [x] UI patterns: Separate offer screen that reuses existing modal patterns, enforces required validation, and clears the form after save.
 - [ ] Reminder support: Add reminders for offers in a later step.
 
 

@@ -91,3 +91,9 @@
 - Benefit items simplified to show amount/rate + title only.
 - Added SUB spending/duration fields (months/days) with dropdown unit selector, dollar prefix, numeric keyboard; values saved on card and mirrored in UI tabs.
 - Database bumped to v5 with migration for SUB fields; AppContainer wired migrations; benefit entity stores transactions JSON.
+
+## 2026-01-01 – Offer features and card detail restructuring
+- Added offers data model with Room entity/DAO, migration to DB v7, and repository methods; wired into AppDatabase/AppContainer.
+- Implemented offer create/edit flow with validation (credit/multiplier, min/max, dates, status), multiplier field, recommended spend hint, and form reset; added dedicated Compose screen/viewmodel/state.
+- Integrated offers into card detail: tab shows offers with add/edit/delete, FAB switches per tab, pager tabs swipeable; date UTC handling fixed.
+- Refactored card detail UI into sticky TabRow with HorizontalPager (min height to keep swipe active), removing nested scroll crashes; split shared components/tabs into separate files for clarity.
