@@ -47,6 +47,8 @@ import com.example.rewardsrader.ui.cardcreate.CardCreateScreen
 import com.example.rewardsrader.ui.cardcreate.CardCreateViewModel
 import com.example.rewardsrader.ui.cardlist.CardListScreen
 import com.example.rewardsrader.ui.cardlist.CardListViewModel
+import com.example.rewardsrader.ui.offercreate.OfferCreateScreen
+import com.example.rewardsrader.ui.offercreate.OfferCreateViewModel
 import com.example.rewardsrader.ui.theme.RewardsRaderTheme
 import kotlinx.coroutines.CancellationException
 
@@ -77,6 +79,9 @@ class MainActivity : ComponentActivity() {
         }
         val benefitCreateViewModel: BenefitCreateViewModel by viewModels {
             BenefitCreateViewModel.factory(appContainer.cardRepository)
+        }
+        val offerCreateViewModel: OfferCreateViewModel by viewModels {
+            OfferCreateViewModel.factory(appContainer.cardRepository)
         }
         val cardCreateViewModel: CardCreateViewModel by viewModels {
             CardCreateViewModel.factory(appContainer.cardConfigProvider, appContainer.cardTemplateImporter)
@@ -141,6 +146,18 @@ class MainActivity : ComponentActivity() {
                     },
                     onDeleteBenefit = { benefitId ->
                         cardDetailViewModel.deleteBenefit(benefitId)
+                    },
+                    onAddOffer = { id, productName ->
+                        offerCreateViewModel.init(id, productName)
+                        navController.navigate("offer/$id/add")
+                    },
+                    onEditOffer = { offerId ->
+                        val detail = cardDetailViewModel.state.value.detail ?: return@CardDetailScreen
+                        offerCreateViewModel.startEdit(offerId, detail.productName)
+                        navController.navigate("offer/${detail.id}/edit/$offerId")
+                    },
+                    onDeleteOffer = { offerId ->
+                        cardDetailViewModel.deleteOffer(offerId)
                     },
                     onUpdateNickname = { cardDetailViewModel.updateNickname(it) },
                     onUpdateAnnualFee = { cardDetailViewModel.updateAnnualFee(it) },
@@ -248,6 +265,59 @@ class MainActivity : ComponentActivity() {
                     onEditTransaction = { benefitCreateViewModel.startEditTransaction(it) },
                     onDeleteTransaction = { benefitCreateViewModel.deleteTransaction(it) },
                     onProgressChange = { benefitCreateViewModel.setProgress(it) }
+                )
+            }
+
+            composable(
+                "offer/{cardId}/add",
+                arguments = listOf(navArgument("cardId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                OfferCreateScreen(
+                    stateFlow = offerCreateViewModel.state,
+                    onBack = { navController.popBackStack() },
+                    onSave = {
+                        offerCreateViewModel.save { saved ->
+                            cardDetailViewModel.upsertOffer(saved)
+                            cardDetailViewModel.notifyOfferSaved(false)
+                            navController.popBackStack()
+                        }
+                    },
+                    onTitleChange = { offerCreateViewModel.setTitle(it) },
+                    onNoteChange = { offerCreateViewModel.setNote(it) },
+                    onTypeChange = { offerCreateViewModel.setType(it) },
+                    onStatusChange = { offerCreateViewModel.setStatus(it) },
+                    onMinSpendChange = { offerCreateViewModel.setMinSpend(it) },
+                    onMaxCashBackChange = { offerCreateViewModel.setMaxCashBack(it) },
+                    onStartDateChange = { offerCreateViewModel.setStartDate(it) },
+                    onEndDateChange = { offerCreateViewModel.setEndDate(it) }
+                )
+            }
+
+            composable(
+                "offer/{cardId}/edit/{offerId}",
+                arguments = listOf(
+                    navArgument("cardId") { type = NavType.LongType },
+                    navArgument("offerId") { type = NavType.LongType }
+                )
+            ) { backStackEntry ->
+                OfferCreateScreen(
+                    stateFlow = offerCreateViewModel.state,
+                    onBack = { navController.popBackStack() },
+                    onSave = {
+                        offerCreateViewModel.save { saved ->
+                            cardDetailViewModel.upsertOffer(saved)
+                            cardDetailViewModel.notifyOfferSaved(true)
+                            navController.popBackStack()
+                        }
+                    },
+                    onTitleChange = { offerCreateViewModel.setTitle(it) },
+                    onNoteChange = { offerCreateViewModel.setNote(it) },
+                    onTypeChange = { offerCreateViewModel.setType(it) },
+                    onStatusChange = { offerCreateViewModel.setStatus(it) },
+                    onMinSpendChange = { offerCreateViewModel.setMinSpend(it) },
+                    onMaxCashBackChange = { offerCreateViewModel.setMaxCashBack(it) },
+                    onStartDateChange = { offerCreateViewModel.setStartDate(it) },
+                    onEndDateChange = { offerCreateViewModel.setEndDate(it) }
                 )
             }
         }

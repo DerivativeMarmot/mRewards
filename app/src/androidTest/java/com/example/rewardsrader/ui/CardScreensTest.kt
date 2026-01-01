@@ -9,6 +9,7 @@ import com.example.rewardsrader.ui.carddetail.CardDetailState
 import com.example.rewardsrader.ui.carddetail.CardDetailUi
 import com.example.rewardsrader.ui.carddetail.BenefitUi
 import com.example.rewardsrader.ui.carddetail.ApplicationUi
+import com.example.rewardsrader.ui.carddetail.OfferUi
 import com.example.rewardsrader.ui.cardlist.CardListScreen
 import com.example.rewardsrader.ui.cardlist.CardListUiState
 import com.example.rewardsrader.ui.cardlist.CardSummaryUi
@@ -59,12 +60,17 @@ class CardScreensTest {
                     productName = "Example Cash Preferred",
                     issuer = "Example Bank",
                     network = "Visa",
+                    nickname = null,
+                    lastFour = null,
                     status = "approved",
                     annualFee = "$95.0",
                     openDate = "01/05/2025 09:00",
                     statementCut = "01/15/2025 09:00",
                     welcomeOfferProgress = "75%",
                     notes = "",
+                    subSpending = null,
+                    subDuration = null,
+                    subDurationUnit = "months",
                     applications = listOf(
                         ApplicationUi(
                             status = "approved",
@@ -83,6 +89,16 @@ class CardScreensTest {
                             expiry = "12/31/2025 11:59",
                             notes = "Enroll each calendar year; credit resets monthly."
                         )
+                    ),
+                    offers = listOf(
+                        OfferUi(
+                            id = 1,
+                            title = "Spend bonus",
+                            status = "Active",
+                            window = "01/01/2025 - 02/01/2025",
+                            details = "Min $500 • Max $50",
+                            note = "Grocery only"
+                        )
                     )
                 ),
                 error = null
@@ -97,6 +113,9 @@ class CardScreensTest {
                 onAddBenefit = { _, _ -> },
                 onEditBenefit = {},
                 onDeleteBenefit = {},
+                onAddOffer = { _, _ -> },
+                onEditOffer = {},
+                onDeleteOffer = {},
                 onUpdateNickname = {},
                 onUpdateAnnualFee = {},
                 onUpdateLastFour = {},

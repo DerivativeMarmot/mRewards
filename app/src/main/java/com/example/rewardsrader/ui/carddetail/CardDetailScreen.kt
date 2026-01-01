@@ -79,6 +79,9 @@ fun CardDetailScreen(
     onAddBenefit: (Long, String) -> Unit,
     onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit,
+    onAddOffer: (Long, String) -> Unit,
+    onEditOffer: (Long) -> Unit,
+    onDeleteOffer: (Long) -> Unit,
     onUpdateNickname: (String) -> Unit,
     onUpdateAnnualFee: (String) -> Unit,
     onUpdateLastFour: (String) -> Unit,
@@ -125,6 +128,9 @@ fun CardDetailScreen(
                 onAddBenefit = { onAddBenefit(detail.id, detail.productName) },
                 onEditBenefit = onEditBenefit,
                 onDeleteBenefit = onDeleteBenefit,
+                onAddOffer = { onAddOffer(detail.id, detail.productName) },
+                onEditOffer = onEditOffer,
+                onDeleteOffer = onDeleteOffer,
                 onUpdateNickname = onUpdateNickname,
                 onUpdateAnnualFee = onUpdateAnnualFee,
                 onUpdateLastFour = onUpdateLastFour,
@@ -192,6 +198,9 @@ private fun DetailContent(
     onAddBenefit: () -> Unit,
     onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit,
+    onAddOffer: () -> Unit,
+    onEditOffer: (Long) -> Unit,
+    onDeleteOffer: (Long) -> Unit,
     onUpdateNickname: (String) -> Unit,
     onUpdateAnnualFee: (String) -> Unit,
     onUpdateLastFour: (String) -> Unit,
@@ -214,7 +223,17 @@ private fun DetailContent(
     )
     var editingField by remember { mutableStateOf<CardField?>(null) }
     var editingValue by remember { mutableStateOf("") }
-    val showFab = selectedTab == 2
+    val fabAction: (() -> Unit)? = when (selectedTab) {
+        2 -> onAddBenefit
+        3 -> onAddOffer
+        else -> null
+    }
+    val fabDescription = when (selectedTab) {
+        2 -> "Add benefit"
+        3 -> "Add offer"
+        else -> ""
+    }
+    val showFab = fabAction != null
     val isSnackbarVisible = snackbarHostState.currentSnackbarData != null
     val fabBottomPadding by animateDpAsState(
         targetValue = if (isSnackbarVisible) 80.dp else 16.dp,
@@ -307,19 +326,29 @@ private fun DetailContent(
                     }
                 }
                 3 -> {
-                    item { OffersTab() }
+                    if (detail.offers.isEmpty()) {
+                        item { DetailMessage("No offers yet.") }
+                    } else {
+                        items(detail.offers, key = { it.id }) { offer ->
+                            OfferCard(
+                                offer = offer,
+                                onEdit = { onEditOffer(offer.id) },
+                                onDelete = { onDeleteOffer(offer.id) }
+                            )
+                        }
+                    }
                 }
             }
         }
 
         if (showFab) {
             FloatingActionButton(
-                onClick = onAddBenefit,
+                onClick = { fabAction?.invoke() },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = fabBottomPadding)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add benefit")
+                Icon(Icons.Default.Add, contentDescription = fabDescription.ifBlank { "Add" })
             }
         }
     }
@@ -509,6 +538,45 @@ private fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> 
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = "Delete benefit",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun OfferCard(offer: OfferUi, onEdit: () -> Unit, onDelete: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onEdit() }
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(offer.title, fontWeight = FontWeight.SemiBold)
+                if (offer.window.isNotBlank()) {
+                    Text(offer.window, style = MaterialTheme.typography.bodyMedium)
+                }
+                offer.details?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium)
+                }
+                offer.note?.takeIf { it.isNotBlank() }?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall)
+                }
+                Text(
+                    offer.status,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            IconButton(onClick = onDelete) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Delete offer",
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -752,11 +820,6 @@ private fun calculateDueDate(openDate: String?, duration: String, unit: Duration
         DurationUnit.DAYS -> startDate.plusDays(amount)
     }
     return "%02d/%02d/%d".format(due.monthValue, due.dayOfMonth, due.year)
-}
-
-@Composable
-private fun OffersTab() {
-    DetailMessage("No offers yet.")
 }
 
 @Composable

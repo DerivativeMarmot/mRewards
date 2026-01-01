@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.example.rewardsrader.data.local.AppDatabase
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
+import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -38,7 +39,8 @@ class CardRepositoryTest {
             db.benefitDao(),
             db.applicationDao(),
             db.usageEntryDao(),
-            db.notificationRuleDao()
+            db.notificationRuleDao(),
+            db.offerDao()
         )
     }
 
@@ -118,6 +120,32 @@ class CardRepositoryTest {
         assertEquals("Updated Nick", fetched?.nickname)
         assertEquals("9999", fetched?.lastFour)
         assertEquals("done", fetched?.welcomeOfferProgress)
+
+        val offerId = repository.addOffer(
+            OfferEntity(
+                cardId = cardId,
+                title = "Groceries Back",
+                note = "Stack with grocery portal",
+                startDateUtc = "01/01/2025",
+                endDateUtc = "03/01/2025",
+                type = "credit",
+                minSpendUsd = 500.0,
+                maxCashBackUsd = 50.0,
+                status = "active"
+            )
+        )
+        val offers = repository.getOffersForCard(cardId)
+        assertEquals(1, offers.size)
+        assertEquals(offerId, offers.first().id)
+
+        val updatedOffer = offers.first().copy(status = "used", title = "Updated")
+        repository.updateOffer(updatedOffer)
+        val fetchedOffer = repository.getOffer(offerId)
+        assertEquals("used", fetchedOffer?.status)
+        assertEquals("Updated", fetchedOffer?.title)
+
+        repository.deleteOffer(offerId)
+        assertTrue(repository.getOffersForCard(cardId).isEmpty())
 
         repository.removeCard(cardId)
         val afterDelete = repository.getCardsWithBenefits()

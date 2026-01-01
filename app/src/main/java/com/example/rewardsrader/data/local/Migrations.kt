@@ -34,3 +34,27 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
         database.execSQL("ALTER TABLE cards ADD COLUMN subDurationUnit TEXT")
     }
 }
+
+// Migration 5->6 adds offers table.
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS offers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                cardId INTEGER NOT NULL,
+                title TEXT NOT NULL,
+                note TEXT,
+                startDateUtc TEXT,
+                endDateUtc TEXT,
+                type TEXT NOT NULL,
+                minSpendUsd REAL,
+                maxCashBackUsd REAL,
+                status TEXT NOT NULL DEFAULT 'active',
+                FOREIGN KEY(cardId) REFERENCES cards(id) ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_offers_cardId ON offers(cardId)")
+    }
+}

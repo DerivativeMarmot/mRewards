@@ -5,11 +5,13 @@ import androidx.room.RoomDatabase
 import com.example.rewardsrader.data.local.dao.ApplicationDao
 import com.example.rewardsrader.data.local.dao.BenefitDao
 import com.example.rewardsrader.data.local.dao.CardDao
+import com.example.rewardsrader.data.local.dao.OfferDao
 import com.example.rewardsrader.data.local.dao.NotificationRuleDao
 import com.example.rewardsrader.data.local.dao.UsageEntryDao
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
+import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.entity.NotificationRuleEntity
 import com.example.rewardsrader.data.local.entity.UsageEntryEntity
 
@@ -19,9 +21,10 @@ import com.example.rewardsrader.data.local.entity.UsageEntryEntity
         ApplicationEntity::class,
         BenefitEntity::class,
         UsageEntryEntity::class,
-        NotificationRuleEntity::class
+        NotificationRuleEntity::class,
+        OfferEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -30,4 +33,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun benefitDao(): BenefitDao
     abstract fun usageEntryDao(): UsageEntryDao
     abstract fun notificationRuleDao(): NotificationRuleDao
+    abstract fun offerDao(): OfferDao
 }

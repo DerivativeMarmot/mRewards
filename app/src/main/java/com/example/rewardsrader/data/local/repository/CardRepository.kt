@@ -3,6 +3,7 @@ package com.example.rewardsrader.data.local.repository
 import com.example.rewardsrader.data.local.dao.ApplicationDao
 import com.example.rewardsrader.data.local.dao.BenefitDao
 import com.example.rewardsrader.data.local.dao.CardDao
+import com.example.rewardsrader.data.local.dao.OfferDao
 import com.example.rewardsrader.data.local.dao.NotificationRuleDao
 import com.example.rewardsrader.data.local.dao.UsageEntryDao
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
@@ -10,6 +11,7 @@ import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardWithBenefits
 import com.example.rewardsrader.data.local.entity.NotificationRuleEntity
+import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.entity.UsageEntryEntity
 
 class CardRepository(
@@ -17,7 +19,8 @@ class CardRepository(
     private val benefitDao: BenefitDao,
     private val applicationDao: ApplicationDao,
     private val usageEntryDao: UsageEntryDao,
-    private val notificationRuleDao: NotificationRuleDao
+    private val notificationRuleDao: NotificationRuleDao,
+    private val offerDao: OfferDao
 ) {
     suspend fun addCard(card: CardEntity, benefits: List<BenefitEntity>): Long {
         val cardId = cardDao.insert(card)
@@ -43,6 +46,8 @@ class CardRepository(
     suspend fun getCards(): List<CardEntity> = cardDao.getAll()
 
     suspend fun getCardsWithBenefits(): List<CardWithBenefits> = cardDao.getAllWithBenefits()
+
+    suspend fun getCardWithBenefits(cardId: Long): CardWithBenefits? = cardDao.getWithBenefits(cardId)
 
     suspend fun removeCard(cardId: Long) {
         cardDao.deleteById(cardId)
@@ -87,4 +92,14 @@ class CardRepository(
     suspend fun insertApplications(applications: List<ApplicationEntity>) {
         if (applications.isNotEmpty()) applicationDao.insertAll(applications)
     }
+
+    suspend fun getOffersForCard(cardId: Long): List<OfferEntity> = offerDao.getForCard(cardId)
+
+    suspend fun addOffer(offer: OfferEntity): Long = offerDao.insert(offer)
+
+    suspend fun getOffer(offerId: Long): OfferEntity? = offerDao.getById(offerId)
+
+    suspend fun updateOffer(offer: OfferEntity) = offerDao.update(offer)
+
+    suspend fun deleteOffer(offerId: Long) = offerDao.deleteById(offerId)
 }

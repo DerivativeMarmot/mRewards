@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
+import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,15 @@ data class BenefitUi(
     val notes: String?
 )
 
+data class OfferUi(
+    val id: Long,
+    val title: String,
+    val status: String,
+    val window: String,
+    val details: String?,
+    val note: String?
+)
+
 data class CardDetailUi(
     val id: Long,
     val productName: String,
@@ -49,7 +59,8 @@ data class CardDetailUi(
     val subDuration: String?,
     val subDurationUnit: String?,
     val applications: List<ApplicationUi>,
-    val benefits: List<BenefitUi>
+    val benefits: List<BenefitUi>,
+    val offers: List<OfferUi>
 )
 
 data class CardDetailState(
@@ -76,15 +87,21 @@ class CardDetailViewModel(
         _state.value = CardDetailState(isLoading = true)
         viewModelScope.launch {
             runCatching {
-                val cards = repository.getCardsWithBenefits().firstOrNull { it.card.id == cardId }
+                val cardWithBenefits = repository.getCardWithBenefits(cardId)
                     ?: throw IllegalArgumentException("Card not found")
                 val applications = repository.getApplicationsForCard(cardId)
-                cards to applications
-            }.onSuccess { (cardWithBenefits, applications) ->
+                val offers = repository.getOffersForCard(cardId)
+                Triple(cardWithBenefits, applications, offers)
+            }.onSuccess { (cardWithBenefits, applications, offers) ->
                 currentCard = cardWithBenefits.card
                 _state.value = CardDetailState(
                     isLoading = false,
-                    detail = mapDetail(cardWithBenefits.card, applications, cardWithBenefits.benefits)
+                    detail = mapDetail(
+                        cardWithBenefits.card,
+                        applications,
+                        cardWithBenefits.benefits,
+                        offers
+                    )
                 )
             }.onFailure {
                 _state.value = CardDetailState(isLoading = false, error = it.message)
@@ -102,6 +119,19 @@ class CardDetailViewModel(
             }.onFailure {
                 _state.value = _state.value.copy(error = it.message)
             }
+        }
+    }
+
+    fun deleteOffer(offerId: Long) {
+        viewModelScope.launch {
+            runCatching { repository.deleteOffer(offerId) }
+                .onSuccess {
+                    removeOffer(offerId)
+                    _events.emit("Offer removed")
+                }
+                .onFailure {
+                    _state.value = _state.value.copy(error = it.message)
+                }
         }
     }
 
@@ -165,7 +195,8 @@ class CardDetailViewModel(
     private fun mapDetail(
         card: CardEntity,
         applications: List<ApplicationEntity>,
-        benefits: List<BenefitEntity>
+        benefits: List<BenefitEntity>,
+        offers: List<OfferEntity>
     ): CardDetailUi {
         return CardDetailUi(
             id = card.id,
@@ -191,7 +222,8 @@ class CardDetailViewModel(
                     bureau = it.creditBureau
                 )
             },
-            benefits = benefits.map { mapBenefit(it) }
+            benefits = benefits.map { mapBenefit(it) },
+            offers = offers.map { mapOffer(it) }
         )
     }
 
@@ -227,6 +259,34 @@ class CardDetailViewModel(
         )
     }
 
+    private fun mapOffer(offer: OfferEntity): OfferUi {
+        val window = when {
+            !offer.startDateUtc.isNullOrBlank() && !offer.endDateUtc.isNullOrBlank() ->
+                "${offer.startDateUtc} - ${offer.endDateUtc}"
+            !offer.startDateUtc.isNullOrBlank() -> "From ${offer.startDateUtc}"
+            !offer.endDateUtc.isNullOrBlank() -> "Until ${offer.endDateUtc}"
+            else -> ""
+        }
+        val detailsParts = mutableListOf<String>()
+        offer.minSpendUsd?.let { detailsParts.add("Min $${trimAmount(it)}") }
+        offer.maxCashBackUsd?.let { detailsParts.add("Max $${trimAmount(it)}") }
+        val typeLabel = offer.type.replaceFirstChar { it.uppercase() }
+        if (typeLabel.isNotBlank()) detailsParts.add(typeLabel)
+        val details = detailsParts.joinToString(" • ").ifBlank { null }
+        return OfferUi(
+            id = offer.id,
+            title = offer.title,
+            status = offer.status.replaceFirstChar { it.uppercase() },
+            window = window,
+            details = details,
+            note = offer.note
+        )
+    }
+
+    private fun trimAmount(value: Double): String {
+        return if (value % 1.0 == 0.0) value.toInt().toString() else value.toString()
+    }
+
     fun upsertBenefit(benefit: BenefitEntity) {
         val detail = _state.value.detail ?: return
         val updatedList = detail.benefits.toMutableList()
@@ -250,6 +310,31 @@ class CardDetailViewModel(
         val detail = _state.value.detail ?: return
         val updated = detail.benefits.filterNot { it.id == benefitId }
         _state.value = _state.value.copy(detail = detail.copy(benefits = updated))
+    }
+
+    fun upsertOffer(offer: OfferEntity) {
+        val detail = _state.value.detail ?: return
+        val updatedList = detail.offers.toMutableList()
+        val index = updatedList.indexOfFirst { it.id == offer.id }
+        val mapped = mapOffer(offer)
+        if (index >= 0) {
+            updatedList[index] = mapped
+        } else {
+            updatedList.add(mapped)
+        }
+        _state.value = _state.value.copy(detail = detail.copy(offers = updatedList))
+    }
+
+    fun notifyOfferSaved(isEdit: Boolean) {
+        viewModelScope.launch {
+            _events.emit(if (isEdit) "Offer updated" else "Offer added")
+        }
+    }
+
+    fun removeOffer(offerId: Long) {
+        val detail = _state.value.detail ?: return
+        val updated = detail.offers.filterNot { it.id == offerId }
+        _state.value = _state.value.copy(detail = detail.copy(offers = updated))
     }
 
     companion object {

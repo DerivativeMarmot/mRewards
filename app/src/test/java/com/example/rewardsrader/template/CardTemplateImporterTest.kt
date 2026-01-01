@@ -40,7 +40,8 @@ class CardTemplateImporterTest {
             db.benefitDao(),
             db.applicationDao(),
             db.usageEntryDao(),
-            db.notificationRuleDao()
+            db.notificationRuleDao(),
+            db.offerDao()
         )
         importer = CardTemplateImporter(repository)
     }
