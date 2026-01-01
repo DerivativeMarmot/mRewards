@@ -92,7 +92,7 @@ class MainActivity : ComponentActivity() {
                 slideInHorizontally(initialOffsetX = { it })
             },
             exitTransition = {
-                scaleOut(targetScale = 1.2f)
+                slideOutHorizontally (targetOffsetX = { -it })
             },
             popEnterTransition = {
                 scaleIn(initialScale = 1.2f)
