@@ -5,12 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -43,7 +43,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
@@ -284,7 +283,7 @@ private fun DetailContent(
                 }
             }
 
-            SecondaryTabRow(selectedTabIndex = currentPage) {
+            TabRow(selectedTabIndex = currentPage) {
                 tabs.forEachIndexed { index, tab ->
                     Tab(
                         selected = currentPage == index,
@@ -301,9 +300,11 @@ private fun DetailContent(
 
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.Top)
-            { page ->
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 400.dp),
+                verticalAlignment = Alignment.Top
+            ) { page ->
                 when (page) {
                     0 -> {
                         CardInfoTab(
@@ -330,7 +331,10 @@ private fun DetailContent(
                     2 -> {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),) {
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp)
+                        ) {
                             detail.benefits.forEach { benefit ->
                                 BenefitCard(
                                     benefit = benefit,
@@ -346,7 +350,10 @@ private fun DetailContent(
                         } else {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),) {
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 12.dp)
+                            ) {
                                 detail.offers.forEach { offer ->
                                     OfferCard(
                                         offer = offer,
