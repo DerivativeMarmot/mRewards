@@ -564,9 +564,6 @@ private fun OfferCard(offer: OfferUi, onEdit: () -> Unit, onDelete: () -> Unit) 
                 offer.details?.let {
                     Text(it, style = MaterialTheme.typography.bodyMedium)
                 }
-                offer.note?.takeIf { it.isNotBlank() }?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall)
-                }
                 Text(
                     offer.status,
                     style = MaterialTheme.typography.labelMedium,

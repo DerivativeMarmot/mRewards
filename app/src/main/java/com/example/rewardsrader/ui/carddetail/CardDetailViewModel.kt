@@ -269,10 +269,8 @@ class CardDetailViewModel(
         }
         val detailsParts = mutableListOf<String>()
         offer.multiplierRate?.let { detailsParts.add("${trimAmount(it)}%") }
-        offer.minSpendUsd?.let { detailsParts.add("Min $${trimAmount(it)}") }
-        offer.maxCashBackUsd?.let { detailsParts.add("Max $${trimAmount(it)}") }
-        val typeLabel = offer.type.replaceFirstChar { it.uppercase() }
-        if (typeLabel.isNotBlank()) detailsParts.add(typeLabel)
+        offer.minSpendUsd?.let { detailsParts.add("Min MS $${trimAmount(it)}") }
+        offer.maxCashBackUsd?.let { detailsParts.add("Max CB $${trimAmount(it)}") }
         val details = detailsParts.joinToString(" • ").ifBlank { null }
         return OfferUi(
             id = offer.id,

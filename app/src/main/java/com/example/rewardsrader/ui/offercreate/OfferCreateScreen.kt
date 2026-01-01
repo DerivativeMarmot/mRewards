@@ -157,6 +157,19 @@ fun OfferCreateScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+            val recommendedSpend = remember(state.type, state.multiplier, state.maxCashBack) {
+                if (state.type != "multiplier") return@remember null
+                val rate = state.multiplier.toDoubleOrNull()
+                val maxCash = state.maxCashBack.toDoubleOrNull()
+                if (rate == null || rate == 0.0 || maxCash == null) return@remember null
+                maxCash / ( rate / 100 )
+            }
+            recommendedSpend?.let { spend ->
+                Text(
+                    text = "Recommended spending: $${formatAmount(spend)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
             OutlinedTextField(
                 value = state.maxCashBack,
                 onValueChange = onMaxCashBackChange,
@@ -318,4 +331,12 @@ private fun Long?.toDateString(): String? {
     this ?: return null
     val date = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
     return offerDateFormatter.format(date)
+}
+
+private fun formatAmount(value: Double): String {
+    return if (value % 1.0 == 0.0) {
+        value.toInt().toString()
+    } else {
+        String.format("%.2f", value)
+    }
 }
