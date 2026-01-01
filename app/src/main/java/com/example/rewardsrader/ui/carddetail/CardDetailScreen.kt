@@ -1,8 +1,10 @@
 package com.example.rewardsrader.ui.carddetail
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,43 +14,39 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.CardGiftcard
-import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.LocalOffer
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -61,15 +59,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
-import java.time.ZoneId
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,10 +100,10 @@ fun CardDetailScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = {},
+                title = {Text("Card Detail")},
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -124,6 +121,7 @@ fun CardDetailScreen(
             else -> DetailContent(
                 detail = detail,
                 initialTab = initialTab,
+                snackbarHostState = snackbarHostState,
                 onAddBenefit = { onAddBenefit(detail.id, detail.productName) },
                 onEditBenefit = onEditBenefit,
                 onDeleteBenefit = onDeleteBenefit,
@@ -190,6 +188,7 @@ fun CardDetailScreen(
 private fun DetailContent(
     detail: CardDetailUi,
     initialTab: Int,
+    snackbarHostState: SnackbarHostState,
     onAddBenefit: () -> Unit,
     onEditBenefit: (Long) -> Unit,
     onDeleteBenefit: (Long) -> Unit,
@@ -216,6 +215,16 @@ private fun DetailContent(
     var editingField by remember { mutableStateOf<CardField?>(null) }
     var editingValue by remember { mutableStateOf("") }
     val showFab = selectedTab == 2
+    val isSnackbarVisible = snackbarHostState.currentSnackbarData != null
+    val fabBottomPadding by animateDpAsState(
+        targetValue = if (isSnackbarVisible) 80.dp else 16.dp,
+        label = "fabBottomPadding"
+    )
+    val listBottomPadding = if (showFab) {
+        96.dp + if (isSnackbarVisible) 48.dp else 0.dp
+    } else {
+        16.dp
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -223,7 +232,7 @@ private fun DetailContent(
                 .fillMaxSize()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = if (showFab) 96.dp else 16.dp)
+            contentPadding = PaddingValues(bottom = listBottomPadding)
         ) {
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
@@ -308,7 +317,7 @@ private fun DetailContent(
                 onClick = onAddBenefit,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp)
+                    .padding(end = 16.dp, bottom = fabBottomPadding)
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add benefit")
             }
