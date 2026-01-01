@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.activity.compose.PredictiveBackHandler
 import android.app.Activity
 import androidx.activity.BackEventCompat
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -58,7 +59,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge()
         setContent {
             RewardsRaderTheme {
                 NavigationApp()
