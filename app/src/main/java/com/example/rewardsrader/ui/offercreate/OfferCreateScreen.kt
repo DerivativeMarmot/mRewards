@@ -54,6 +54,7 @@ fun OfferCreateScreen(
     onTitleChange: (String) -> Unit,
     onNoteChange: (String) -> Unit,
     onTypeChange: (String) -> Unit,
+    onMultiplierChange: (String) -> Unit,
     onStatusChange: (String) -> Unit,
     onMinSpendChange: (String) -> Unit,
     onMaxCashBackChange: (String) -> Unit,
@@ -130,6 +131,17 @@ fun OfferCreateScreen(
                 value = state.type.replaceFirstChar { it.uppercase() },
                 onClick = { showTypeDialog = true }
             )
+
+            if (state.type == "multiplier") {
+                OutlinedTextField(
+                    value = state.multiplier,
+                    onValueChange = onMultiplierChange,
+                    label = { Text("Multiplier") },
+                    trailingIcon = { Text("%") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             InlineSelectionRow(
                 label = "Status",

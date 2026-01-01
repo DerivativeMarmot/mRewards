@@ -25,6 +25,7 @@ data class OfferEntity(
     val startDateUtc: String? = null,
     val endDateUtc: String? = null,
     val type: String,
+    val multiplierRate: Double? = null,
     val minSpendUsd: Double? = null,
     val maxCashBackUsd: Double? = null,
     val status: String = "active"

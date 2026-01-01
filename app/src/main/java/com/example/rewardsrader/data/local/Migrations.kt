@@ -58,3 +58,10 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         database.execSQL("CREATE INDEX IF NOT EXISTS index_offers_cardId ON offers(cardId)")
     }
 }
+
+// Migration 6->7 adds multiplierRate to offers.
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE offers ADD COLUMN multiplierRate REAL")
+    }
+}

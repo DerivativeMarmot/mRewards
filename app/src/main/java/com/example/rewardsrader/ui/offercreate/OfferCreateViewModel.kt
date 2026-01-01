@@ -33,6 +33,7 @@ class OfferCreateViewModel(
                         title = offer.title,
                         note = offer.note.orEmpty(),
                         type = offer.type,
+                        multiplier = offer.multiplierRate?.toString().orEmpty(),
                         minSpend = offer.minSpendUsd?.toString().orEmpty(),
                         maxCashBack = offer.maxCashBackUsd?.toString().orEmpty(),
                         startDate = offer.startDateUtc.orEmpty(),
@@ -51,6 +52,7 @@ class OfferCreateViewModel(
     fun setNote(value: String) { _state.value = _state.value.copy(note = value) }
     fun setType(value: String) { _state.value = _state.value.copy(type = value) }
     fun setStatus(value: String) { _state.value = _state.value.copy(status = value) }
+    fun setMultiplier(value: String) { _state.value = _state.value.copy(multiplier = value.trimToScale(2)) }
     fun setMinSpend(value: String) { _state.value = _state.value.copy(minSpend = value.trimToScale(2)) }
     fun setMaxCashBack(value: String) { _state.value = _state.value.copy(maxCashBack = value.trimToScale(2)) }
     fun setStartDate(value: String) { _state.value = _state.value.copy(startDate = value) }
@@ -64,6 +66,7 @@ class OfferCreateViewModel(
         }
 
         val isEditing = _state.value.isEditing && _state.value.offerId != null
+        val multiplierRate = _state.value.multiplier.toDoubleOrNull()
         val minSpend = _state.value.minSpend.toDoubleOrNull()
         val maxCash = _state.value.maxCashBack.toDoubleOrNull()
         val offer = OfferEntity(
@@ -74,6 +77,7 @@ class OfferCreateViewModel(
             startDateUtc = _state.value.startDate.ifBlank { null },
             endDateUtc = _state.value.endDate.ifBlank { null },
             type = _state.value.type,
+            multiplierRate = if (_state.value.type == "multiplier") multiplierRate else null,
             minSpendUsd = minSpend,
             maxCashBackUsd = maxCash,
             status = _state.value.status
@@ -110,6 +114,9 @@ class OfferCreateViewModel(
         if (title.isBlank()) return "Title is required"
         if (_state.value.type !in validTypes) return "Select a type"
         if (_state.value.status !in validStatuses) return "Select a status"
+        if (_state.value.type == "multiplier" && _state.value.multiplier.isNotBlank() && _state.value.multiplier.toDoubleOrNull() == null) {
+            return "Multiplier must be a number"
+        }
         if (_state.value.minSpend.isNotBlank() && _state.value.minSpend.toDoubleOrNull() == null) {
             return "Minimum spending must be a number"
         }

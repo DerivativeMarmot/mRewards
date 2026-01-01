@@ -7,6 +7,7 @@ data class OfferCreateState(
     val title: String = "",
     val note: String = "",
     val type: String = "credit", // credit | multiplier
+    val multiplier: String = "",
     val minSpend: String = "",
     val maxCashBack: String = "",
     val startDate: String = "",
