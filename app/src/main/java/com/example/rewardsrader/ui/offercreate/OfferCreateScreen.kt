@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -363,7 +364,7 @@ private fun String.toMillis(): Long? {
     if (isBlank()) return null
     return runCatching {
         LocalDate.parse(this, offerDateFormatter)
-            .atStartOfDay(ZoneId.systemDefault())
+            .atStartOfDay(ZoneOffset.UTC)
             .toInstant()
             .toEpochMilli()
     }.getOrNull()
@@ -371,7 +372,7 @@ private fun String.toMillis(): Long? {
 
 private fun Long?.toDateString(): String? {
     this ?: return null
-    val date = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+    val date = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
     return offerDateFormatter.format(date)
 }
 
