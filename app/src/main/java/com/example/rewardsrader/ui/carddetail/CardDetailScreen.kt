@@ -336,7 +336,7 @@ private fun DetailContent(
                         2 -> {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
                             ) {
                                 detail.benefits.forEach { benefit ->
                                     BenefitCard(
@@ -350,7 +350,7 @@ private fun DetailContent(
                         3 -> {
                             Column(
                                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
                             ) {
                                 if (detail.offers.isEmpty()) {
                                     DetailMessage("No offers yet.")

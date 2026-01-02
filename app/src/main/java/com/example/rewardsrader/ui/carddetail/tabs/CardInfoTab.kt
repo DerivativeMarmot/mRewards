@@ -32,7 +32,8 @@ fun CardInfoTab(
     var showNotesDialog by remember { mutableStateOf(false) }
     var notesDraft by remember { mutableStateOf(detail.notes.orEmpty()) }
 
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
         InfoRow(
             label = "Nickname",
             value = detail.nickname.orEmpty(),
