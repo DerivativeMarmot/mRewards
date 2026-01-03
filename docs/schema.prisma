@@ -1,0 +1,159 @@
+// This schema is auto-generated based on the Room entities in the project.
+// It reflects the data model used in the application's local database.
+
+datasource db {
+  provider = "sqlite" // Room uses SQLite
+  url      = "file:./app_database.db"
+}
+
+generator client {
+  provider = "prisma-client-js" // Placeholder; not actually used in Android
+}
+
+model Card {
+  id                   String               @id @default(cuid()) // NoSQL-style Object ID
+  issuer               String
+  nickname             String?
+  productName          String               @map("product_name")
+  network              CardNetwork          @default(Visa)
+  annualFeeUsd         Float                @map("annual_fee_usd")
+  lastFour             String?              @map("last_four")
+  openDateUtc          String?              @map("open_date_utc")
+  closeDateUtc         String?              @map("close_date_utc")
+  statementCutUtc      String?              @map("statement_cut_utc")
+  welcomeOfferProgress String?              @map("welcome_offer_progress")
+  status               CardStaus            @default(Active)
+  notes                String?
+  subSpendingUsd       Float?               @map("sub_spending_usd")
+  subDuration          Int?                 @map("sub_duration")
+  subDurationUnit      CardSubDurationUnit? @map("sub_duration_unit")
+
+  // Relations
+  benefits     Benefit[]
+  offers       Offer[]
+  applications Application[]
+
+  @@map("cards")
+}
+
+model Benefit {
+  id                 String            @id @default(cuid()) @map("_id")
+  cardId             String            @map("card_id")
+  type               String
+  amountUsd          Float?            @map("amount_usd")
+  capUsd             Float?            @map("cap_usd")
+  cadence            String
+  category           BenefitCategory[]
+  merchant           String?
+  enrollmentRequired Boolean           @map("enrollment_required")
+  startDateUtc       String            @map("start_date_utc")
+  endDateUtc         String?           @map("end_date_utc")
+  terms              String?
+  dataSource         String?           @map("data_source")
+  notes              String?
+  transactionsJson   String?           @map("transactions_json")
+
+  // Relations
+  card              Card               @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  usageEntries      UsageEntry[]
+  notificationRules NotificationRule[]
+
+  @@index([cardId])
+  @@map("benefits")
+}
+
+model Offer {
+  id             String  @id @default(cuid())
+  cardId         String  @map("card_id")
+  title          String
+  note           String?
+  startDateUtc   String? @map("start_date_utc")
+  endDateUtc     String? @map("end_date_utc")
+  type           String
+  multiplierRate Float?  @map("multiplier_rate")
+  minSpendUsd    Float?  @map("min_spend_usd")
+  maxCashBackUsd Float?  @map("max_cash_back_usd")
+  status         String  @default("active")
+
+  // Relations
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("offers")
+}
+
+model Application {
+  id                   String  @id @default(cuid())
+  cardId               String  @map("card_id")
+  applicationDateUtc   String? @map("application_date_utc")
+  decisionDateUtc      String? @map("decision_date_utc")
+  status               String
+  creditBureau         String? @map("credit_bureau")
+  reconsiderationNotes String? @map("reconsideration_notes")
+  welcomeOfferTerms    String? @map("welcome_offer_terms")
+
+  // Relations
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([cardId])
+  @@map("applications")
+}
+
+model UsageEntry {
+  id        String @id @default(cuid())
+  benefitId String @map("benefit_id")
+  dateUtc   String @map("date_utc")
+  amountUsd Float? @map("amount_usd")
+
+  // Relations
+  benefit Benefit @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+
+  @@index([benefitId])
+  @@map("usage_entries")
+}
+
+model NotificationRule {
+  id        String  @id @default(cuid())
+  benefitId String  @map("benefit_id")
+  trigger   String
+  channel   String
+  enabled   Boolean
+
+  // Relations
+  benefit Benefit @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+
+  @@index([benefitId])
+  @@map("notification_rules")
+}
+
+enum CardNetwork {
+  Visa
+  Mastercard
+  Discover
+  Amex
+}
+
+enum CardStaus {
+  Active
+  Closed
+  Pending
+}
+
+enum CardSubDurationUnit {
+  Day
+  Month
+}
+
+enum BenefitCategory {
+  Dining
+  OnlineShopping
+  Grocery
+  Restaurant
+  DrugStore
+  Travel
+  Gas
+  EVCharging
+  Streaming
+  Transit
+  Utilities
+}
