@@ -10,13 +10,45 @@ generator client {
   provider = "prisma-client-js" // Placeholder; not actually used in Android
 }
 
+model Issuer {
+  id   String @id @default(cuid()) // NoSQL-style Object ID
+  name String
+
+  cards Card[]
+
+  @@map("issuers")
+}
+
 model Card {
+  id          String      @id @default(cuid()) // NoSQL-style Object ID
+  issuerId    String      @map("issuer_id")
+  productName String      @map("product_name")
+  cardFace    CardFace[]
+  network     CardNetwork @default(Visa)
+  annualFee   Float       @map("annual_fee")
+  userCard UserCard[]
+
+  // Relations
+  benefits     Benefit[]
+
+  issuer Issuer @relation(fields: [issuerId], references: [id], onDelete: Cascade)
+
+  @@index([issuerId])
+  @@map("cards")
+}
+
+model CardFace {
+  id  String @id @default(cuid()) // NoSQL-style Object ID
+  url String
+
+  card   Card?   @relation(fields: [cardId], references: [id])
+  cardId String?
+}
+
+model UserCard {
   id                   String               @id @default(cuid()) // NoSQL-style Object ID
-  issuer               String
   nickname             String?
-  productName          String               @map("product_name")
-  network              CardNetwork          @default(Visa)
-  annualFeeUsd         Float                @map("annual_fee_usd")
+  annualFee            Float                @map("annual_fee")
   lastFour             String?              @map("last_four")
   openDateUtc          String?              @map("open_date_utc")
   closeDateUtc         String?              @map("close_date_utc")
@@ -24,42 +56,49 @@ model Card {
   welcomeOfferProgress String?              @map("welcome_offer_progress")
   status               CardStaus            @default(Active)
   notes                String?
-  subSpendingUsd       Float?               @map("sub_spending_usd")
+  subSpending          Float?               @map("sub_spending")
   subDuration          Int?                 @map("sub_duration")
   subDurationUnit      CardSubDurationUnit? @map("sub_duration_unit")
-
-  // Relations
+  
   benefits     Benefit[]
   offers       Offer[]
   applications Application[]
-
-  @@map("cards")
 }
 
 model Benefit {
   id                 String            @id @default(cuid()) @map("_id")
   cardId             String            @map("card_id")
-  type               String
-  amountUsd          Float?            @map("amount_usd")
-  capUsd             Float?            @map("cap_usd")
-  cadence            String
+  type               BenefitType       @default(Credit)
+  amount             Float?            @map("amount")
+  cap                Float?            @map("cap")
+  frequency          BenefitFrequency
   category           BenefitCategory[]
   merchant           String?
   enrollmentRequired Boolean           @map("enrollment_required")
   startDateUtc       String            @map("start_date_utc")
   endDateUtc         String?           @map("end_date_utc")
-  terms              String?
-  dataSource         String?           @map("data_source")
   notes              String?
-  transactionsJson   String?           @map("transactions_json")
+  transactions       Transaction[]
 
   // Relations
-  card              Card               @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  usageEntries      UsageEntry[]
+  card              Card               @relation(fields: [cardId], references: [id])
   notificationRules NotificationRule[]
 
   @@index([cardId])
   @@map("benefits")
+}
+
+model Transaction {
+  id        String  @id @default(cuid()) @map("_id")
+  benefitId String? @map("benefit_id")
+  notes     String?
+  dateUtc   String?
+  amount    Float
+
+  benefit Benefit? @relation(fields: [benefitId], references: [id])
+
+  @@index([benefitId])
+  @@map("transactions")
 }
 
 model Offer {
@@ -71,8 +110,8 @@ model Offer {
   endDateUtc     String? @map("end_date_utc")
   type           String
   multiplierRate Float?  @map("multiplier_rate")
-  minSpendUsd    Float?  @map("min_spend_usd")
-  maxCashBackUsd Float?  @map("max_cash_back_usd")
+  minSpend       Float?  @map("min_spend")
+  maxCashBack    Float?  @map("max_cash_back")
   status         String  @default("active")
 
   // Relations
@@ -97,19 +136,6 @@ model Application {
 
   @@index([cardId])
   @@map("applications")
-}
-
-model UsageEntry {
-  id        String @id @default(cuid())
-  benefitId String @map("benefit_id")
-  dateUtc   String @map("date_utc")
-  amountUsd Float? @map("amount_usd")
-
-  // Relations
-  benefit Benefit @relation(fields: [benefitId], references: [id], onDelete: Cascade)
-
-  @@index([benefitId])
-  @@map("usage_entries")
 }
 
 model NotificationRule {
@@ -156,4 +182,16 @@ enum BenefitCategory {
   Streaming
   Transit
   Utilities
+}
+
+enum BenefitFrequency {
+  Monthly
+  Quarterly
+  SemiAnnually
+  Annually
+}
+
+enum BenefitType {
+  Credit
+  Multiplier
 }
