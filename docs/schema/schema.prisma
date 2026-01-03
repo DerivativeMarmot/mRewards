@@ -11,8 +11,9 @@ generator client {
 }
 
 model Issuer {
-  id   String @id @default(cuid()) // NoSQL-style Object ID
-  name String
+  id    String @id // Stable ID from seed/JSON (e.g., "chase", "amex")
+  name  String
+  slug  String @unique
 
   cards Card[]
 
@@ -20,7 +21,8 @@ model Issuer {
 }
 
 model Card {
-  id          String      @id @default(cuid()) // NoSQL-style Object ID
+  id          String      @id // Stable ID from seed/JSON (e.g., "chase_sapphire_preferred")
+  slug        String      @unique
   issuerId    String      @map("issuer_id")
   productName String      @map("product_name")
   cardFace    CardFace[]
@@ -197,6 +199,7 @@ enum BenefitCategory {
   Streaming
   Transit
   Utilities
+  Others
 }
 
 enum BenefitFrequency {
