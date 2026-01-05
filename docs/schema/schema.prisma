@@ -11,9 +11,8 @@ generator client {
 }
 
 model Issuer {
-  id    String @id // Stable ID from seed/JSON (e.g., "chase", "amex")
-  name  String
-  slug  String @unique
+  id   String @id
+  name String
 
   cards Card[]
 
@@ -21,14 +20,15 @@ model Issuer {
 }
 
 model Card {
-  id          String      @id // Stable ID from seed/JSON (e.g., "chase_sapphire_preferred")
-  slug        String      @unique
-  issuerId    String      @map("issuer_id")
-  productName String      @map("product_name")
-  cardFace    CardFace[]
-  network     CardNetwork @default(Visa)
-  annualFee   Float       @map("annual_fee")
-  profileCards ProfileCard[]
+  id                       String        @id 
+  issuerId                 String        @map("issuer_id")
+  productName              String        @map("product_name")
+  faces                    CardFace[]
+  network                  CardNetwork   @default(Visa)
+  annualFee                Float         @map("annual_fee")
+  profileCards             ProfileCard[]
+  foreignFeeTransactionFee Float         @default(0.00) @map("foreign_fee_transaction_fee")
+  cardBenefits             CardBenefit[]
 
   issuer Issuer @relation(fields: [issuerId], references: [id], onDelete: Cascade)
 
@@ -37,15 +37,17 @@ model Card {
 }
 
 model CardFace {
-  id  String @id @default(cuid()) // NoSQL-style Object ID
-  url String
+  id        String  @id
+  remoteUrl  String
+  localPath String?
+  isDefault Boolean @default(false)
 
   card   Card?   @relation(fields: [cardId], references: [id])
   cardId String?
 }
 
 model ProfileCard {
-  id                   String               @id @default(cuid()) // NoSQL-style Object ID
+  id                   String               @id @default(cuid())
   profileId            String               @map("profile_id")
   templateCardId       String?              @map("template_card_id")
   nickname             String?
@@ -60,8 +62,8 @@ model ProfileCard {
   subSpending          Float?               @map("sub_spending")
   subDuration          Int?                 @map("sub_duration")
   subDurationUnit      CardSubDurationUnit? @map("sub_duration_unit")
-  
-  benefits     Benefit[]
+
+  benefitsLink ProfileCardBenefit[]
   offers       Offer[]
   applications Application[]
 
@@ -75,13 +77,11 @@ model ProfileCard {
 
 model Benefit {
   id                 String            @id @default(cuid()) @map("_id")
-  profileCardId      String            @map("profile_card_id")
   type               BenefitType       @default(Credit)
   amount             Float?            @map("amount")
   cap                Float?            @map("cap")
   frequency          BenefitFrequency
   category           BenefitCategory[]
-  merchant           String?
   enrollmentRequired Boolean           @map("enrollment_required")
   startDateUtc       String            @map("start_date_utc")
   endDateUtc         String?           @map("end_date_utc")
@@ -89,10 +89,10 @@ model Benefit {
   transactions       Transaction[]
 
   // Relations
-  profileCard       ProfileCard        @relation(fields: [profileCardId], references: [id], onDelete: Cascade)
   notificationRules NotificationRule[]
+  cardBenefits         CardBenefit[]
+  profileCardBenefits  ProfileCardBenefit[]
 
-  @@index([profileCardId])
   @@map("benefits")
 }
 
@@ -179,12 +179,36 @@ enum CardSubDurationUnit {
 }
 
 model Profile {
-  id      String       @id @default(cuid())
-  userId  String?
-  name    String
-  cards   ProfileCard[]
+  id     String        @id @default(cuid())
+  userId String?
+  name   String
+  cards  ProfileCard[]
 
   @@map("profiles")
+}
+
+model CardBenefit {
+  cardId    String @map("card_id")
+  benefitId String @map("benefit_id")
+
+  card    Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  benefit Benefit @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+
+  @@id([cardId, benefitId])
+  @@index([benefitId])
+  @@map("card_benefits")
+}
+
+model ProfileCardBenefit {
+  profileCardId String @map("profile_card_id")
+  benefitId     String @map("benefit_id")
+
+  profileCard ProfileCard @relation(fields: [profileCardId], references: [id], onDelete: Cascade)
+  benefit     Benefit     @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+
+  @@id([profileCardId, benefitId])
+  @@index([benefitId])
+  @@map("profile_card_benefits")
 }
 
 enum BenefitCategory {
@@ -207,6 +231,7 @@ enum BenefitFrequency {
   Quarterly
   SemiAnnually
   Annually
+  EveryAnniversary
 }
 
 enum BenefitType {
