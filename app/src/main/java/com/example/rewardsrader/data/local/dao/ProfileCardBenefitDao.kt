@@ -16,4 +16,7 @@ interface ProfileCardBenefitDao {
 
     @Query("SELECT * FROM profile_card_benefits WHERE profileCardId = :profileCardId")
     suspend fun getForProfileCard(profileCardId: String): List<ProfileCardBenefitEntity>
+
+    @Query("DELETE FROM profile_card_benefits WHERE id = :linkId")
+    suspend fun deleteById(linkId: String)
 }

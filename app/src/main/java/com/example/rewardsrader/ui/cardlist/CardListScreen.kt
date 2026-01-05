@@ -20,9 +20,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,25 +38,18 @@ import kotlinx.coroutines.flow.StateFlow
 @Composable
 fun CardListScreen(
     stateFlow: StateFlow<CardListUiState>,
-    onSelectCard: (Long) -> Unit,
+    onSelectCard: (String) -> Unit,
     onAddCard: () -> Unit,
-    onDeleteCard: (Long) -> Unit,
-    onUndoDelete: () -> Unit,
+    onDeleteCard: (String) -> Unit,
     onSnackbarShown: () -> Unit
     ) {
     val state by stateFlow.collectAsState()
     val error = state.error
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(state.snackbarMessage, state.showUndo) {
+    LaunchedEffect(state.snackbarMessage) {
         val message = state.snackbarMessage ?: return@LaunchedEffect
-        val result = snackbarHostState.showSnackbar(
-            message = message,
-            actionLabel = if (state.showUndo) "Undo" else null
-        )
-        if (result == SnackbarResult.ActionPerformed && state.showUndo) {
-            onUndoDelete()
-        }
+        snackbarHostState.showSnackbar(message = message)
         onSnackbarShown()
     }
 
@@ -67,8 +60,6 @@ fun CardListScreen(
         when {
             state.isLoading -> LoadingMessage(modifier = Modifier.padding(padding))
             error != null -> ErrorMessage(error, Modifier.padding(padding))
-            // Removed state.cards.isEmpty() -> EmptyMessage, letting CardListContent handle empty list + button.
-            // This ensures the button is always visible.
             else -> CardListContent(
                 cards = state.cards,
                 onSelectCard = onSelectCard,
@@ -83,8 +74,8 @@ fun CardListScreen(
 @Composable
 private fun CardListContent(
     cards: List<CardSummaryUi>,
-    onSelectCard: (Long) -> Unit,
-    onDeleteCard: (Long) -> Unit,
+    onSelectCard: (String) -> Unit,
+    onDeleteCard: (String) -> Unit,
     onAddCard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -137,7 +128,7 @@ private fun LoadingMessage(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Loadingâ€¦")
+        Text("Loading¡­")
     }
 }
 

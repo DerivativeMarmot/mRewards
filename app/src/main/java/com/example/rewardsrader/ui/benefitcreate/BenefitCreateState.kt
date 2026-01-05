@@ -1,8 +1,8 @@
 package com.example.rewardsrader.ui.benefitcreate
 
 data class BenefitCreateState(
-    val benefitId: Long? = null,
-    val cardId: Long = 0L,
+    val benefitId: String? = null,
+    val cardId: String = "",
     val productName: String = "",
     val issuer: String = "",
     val title: String = "",

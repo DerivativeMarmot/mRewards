@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.lazy.stickyHeader
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -71,12 +70,12 @@ fun CardDetailScreen(
     events: kotlinx.coroutines.flow.SharedFlow<String>,
     initialTab: Int = 0,
     onBack: () -> Unit,
-    onAddBenefit: (Long, String) -> Unit,
-    onEditBenefit: (Long) -> Unit,
-    onDeleteBenefit: (Long) -> Unit,
-    onAddOffer: (Long, String) -> Unit,
-    onEditOffer: (Long) -> Unit,
-    onDeleteOffer: (Long) -> Unit,
+    onAddBenefit: (String, String) -> Unit,
+    onEditBenefit: (String) -> Unit,
+    onDeleteBenefit: (String) -> Unit,
+    onAddOffer: (String, String) -> Unit,
+    onEditOffer: (String) -> Unit,
+    onDeleteOffer: (String) -> Unit,
     onUpdateNickname: (String) -> Unit,
     onUpdateAnnualFee: (String) -> Unit,
     onUpdateLastFour: (String) -> Unit,
@@ -113,7 +112,7 @@ fun CardDetailScreen(
         }
         when {
             state.isLoading -> DetailMessage("Loading...", Modifier.padding(padding))
-            state.error != null -> DetailMessage("Error: ${state.error}", Modifier.padding(padding))
+            state.error != null -> DetailMessage("Error: ${'$'}{state.error}", Modifier.padding(padding))
             detail == null -> DetailMessage("No details available.", Modifier.padding(padding))
             else -> DetailContent(
                 detail = detail,
@@ -191,11 +190,11 @@ private fun DetailContent(
     initialTab: Int,
     snackbarHostState: SnackbarHostState,
     onAddBenefit: () -> Unit,
-    onEditBenefit: (Long) -> Unit,
-    onDeleteBenefit: (Long) -> Unit,
+    onEditBenefit: (String) -> Unit,
+    onDeleteBenefit: (String) -> Unit,
     onAddOffer: () -> Unit,
-    onEditOffer: (Long) -> Unit,
-    onDeleteOffer: (Long) -> Unit,
+    onEditOffer: (String) -> Unit,
+    onDeleteOffer: (String) -> Unit,
     onUpdateNickname: (String) -> Unit,
     onUpdateAnnualFee: (String) -> Unit,
     onUpdateLastFour: (String) -> Unit,
@@ -275,7 +274,7 @@ private fun DetailContent(
                 }
             }
 
-            stickyHeader {
+            item {
                 TabRow(selectedTabIndex = currentPage) {
                     tabs.forEachIndexed { index, tab ->
                         Tab(
@@ -434,4 +433,3 @@ private fun DetailMessage(message: String, modifier: Modifier = Modifier) {
 }
 
 private data class TabItem(val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector)
-

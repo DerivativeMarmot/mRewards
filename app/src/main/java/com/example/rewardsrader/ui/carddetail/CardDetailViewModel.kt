@@ -5,8 +5,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
-import com.example.rewardsrader.data.local.entity.CardEntity
+import com.example.rewardsrader.data.local.entity.BenefitType
+import com.example.rewardsrader.data.local.entity.CardStatus
+import com.example.rewardsrader.data.local.entity.CardSubDurationUnit
 import com.example.rewardsrader.data.local.entity.OfferEntity
+import com.example.rewardsrader.data.local.entity.ProfileCardEntity
+import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +20,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-data class ApplicationUi(
+// UI-friendly models
+ data class ApplicationUi(
     val status: String,
     val applicationDateUtc: String?,
     val decisionDateUtc: String?,
@@ -24,7 +29,7 @@ data class ApplicationUi(
 )
 
 data class BenefitUi(
-    val id: Long,
+    val id: String,
     val title: String?,
     val type: String,
     val amount: String,
@@ -34,7 +39,7 @@ data class BenefitUi(
 )
 
 data class OfferUi(
-    val id: Long,
+    val id: String,
     val title: String,
     val status: String,
     val window: String,
@@ -43,7 +48,7 @@ data class OfferUi(
 )
 
 data class CardDetailUi(
-    val id: Long,
+    val id: String,
     val productName: String,
     val issuer: String,
     val network: String,
@@ -77,30 +82,33 @@ class CardDetailViewModel(
     val state: StateFlow<CardDetailState> = _state.asStateFlow()
     private val _events = MutableSharedFlow<String>()
     val events: SharedFlow<String> = _events.asSharedFlow()
-    private var currentCardId: Long? = null
-    private var currentCard: CardEntity? = null
+    private var currentCardId: String? = null
+    private var currentCard: ProfileCardEntity? = null
+    private var templateAnnualFee: Double = 0.0
+    private var templateIssuer: String = ""
+    private var templateNetwork: String = ""
 
-    fun load(cardId: Long) {
+    fun load(cardId: String) {
         if (currentCardId == cardId && _state.value.detail != null) return
 
         currentCardId = cardId
         _state.value = CardDetailState(isLoading = true)
         viewModelScope.launch {
             runCatching {
-                val cardWithBenefits = repository.getCardWithBenefits(cardId)
+                repository.getProfileCardWithRelations(cardId)
                     ?: throw IllegalArgumentException("Card not found")
-                val applications = repository.getApplicationsForCard(cardId)
-                val offers = repository.getOffersForCard(cardId)
-                Triple(cardWithBenefits, applications, offers)
-            }.onSuccess { (cardWithBenefits, applications, offers) ->
-                currentCard = cardWithBenefits.card
+            }.onSuccess { relations ->
+                currentCard = relations.profileCard
+                templateAnnualFee = relations.templateCard?.annualFee ?: 0.0
+                templateIssuer = relations.templateCard?.issuerId.orEmpty()
+                templateNetwork = relations.templateCard?.network?.name ?: ""
                 _state.value = CardDetailState(
                     isLoading = false,
                     detail = mapDetail(
-                        cardWithBenefits.card,
-                        applications,
-                        cardWithBenefits.benefits,
-                        offers
+                        relations,
+                        relations.applications,
+                        relations.benefits,
+                        relations.offers
                     )
                 )
             }.onFailure {
@@ -109,64 +117,60 @@ class CardDetailViewModel(
         }
     }
 
-    fun deleteBenefit(benefitId: Long) {
+    fun deleteBenefit(benefitId: String) {
         viewModelScope.launch {
-            runCatching {
-                repository.deleteBenefit(benefitId)
-            }.onSuccess {
-                removeBenefit(benefitId)
-                _events.emit("Benefit removed")
-            }.onFailure {
-                _state.value = _state.value.copy(error = it.message)
-            }
+            runCatching { repository.deleteBenefit(benefitId) }
+                .onSuccess {
+                    removeBenefit(benefitId)
+                    _events.emit("Benefit removed")
+                }
+                .onFailure { _state.value = _state.value.copy(error = it.message) }
         }
     }
 
-    fun deleteOffer(offerId: Long) {
+    fun deleteOffer(offerId: String) {
         viewModelScope.launch {
             runCatching { repository.deleteOffer(offerId) }
                 .onSuccess {
                     removeOffer(offerId)
                     _events.emit("Offer removed")
                 }
-                .onFailure {
-                    _state.value = _state.value.copy(error = it.message)
-                }
+                .onFailure { _state.value = _state.value.copy(error = it.message) }
         }
     }
 
     fun updateNickname(value: String) = updateCard { it.copy(nickname = value.ifBlank { null }) }
 
-    fun updateAnnualFee(value: String) = updateCard {
-        val fee = value.toDoubleOrNull() ?: it.annualFeeUsd
-        it.copy(annualFeeUsd = fee)
-    }
-
     fun updateLastFour(value: String) = updateCard { it.copy(lastFour = value.take(4).ifBlank { null }) }
 
     fun updateOpenDate(value: String) = updateCard { it.copy(openDateUtc = value.ifBlank { null }) }
 
+    fun updateAnnualFee(value: String) {
+        // Annual fee comes from template; no-op placeholder for legacy UI wiring.
+    }
+
     fun updateStatementCut(value: String) = updateCard { it.copy(statementCutUtc = value.ifBlank { null }) }
 
-    fun updateStatus(value: String) = updateCard { it.copy(status = value.ifBlank { it.status }) }
+    fun updateStatus(value: String) = updateCard { it.copy(status = value.toCardStatus()) }
 
     fun updateNotes(value: String) = updateCard { it.copy(notes = value.ifBlank { null }) }
+
     fun updateSubSpending(value: String) = updateCard {
         val parsed = value.toDoubleOrNull()
-        it.copy(subSpendingUsd = parsed)
+        it.copy(subSpending = parsed)
     }
 
     fun updateSubDuration(value: String, unit: String) = updateCard {
         val parsed = value.toIntOrNull()
-        it.copy(subDuration = parsed, subDurationUnit = unit)
+        it.copy(subDuration = parsed, subDurationUnit = unit.toCardSubDurationUnit())
     }
 
-    private fun updateCard(update: (CardEntity) -> CardEntity) {
+    private fun updateCard(update: (ProfileCardEntity) -> ProfileCardEntity) {
         val card = currentCard ?: return
         viewModelScope.launch {
             runCatching {
                 val updated = update(card)
-                repository.updateCard(updated)
+                repository.updateProfileCard(updated)
                 currentCard = updated
                 val currentDetail = _state.value.detail
                 if (currentDetail != null) {
@@ -174,15 +178,15 @@ class CardDetailViewModel(
                         detail = currentDetail.copy(
                             nickname = updated.nickname,
                             lastFour = updated.lastFour,
-                            status = updated.status,
-                            annualFee = "$${updated.annualFeeUsd}",
+                            status = updated.status.name,
+                            annualFee = "$$templateAnnualFee",
                             openDate = updated.openDateUtc,
                             statementCut = updated.statementCutUtc,
                             welcomeOfferProgress = updated.welcomeOfferProgress,
                             notes = updated.notes,
-                            subSpending = updated.subSpendingUsd?.toString(),
+                            subSpending = updated.subSpending?.toString(),
                             subDuration = updated.subDuration?.toString(),
-                            subDurationUnit = updated.subDurationUnit ?: "months"
+                            subDurationUnit = updated.subDurationUnit?.name
                         )
                     )
                 }
@@ -193,27 +197,27 @@ class CardDetailViewModel(
     }
 
     private fun mapDetail(
-        card: CardEntity,
+        card: ProfileCardWithRelations,
         applications: List<ApplicationEntity>,
         benefits: List<BenefitEntity>,
         offers: List<OfferEntity>
     ): CardDetailUi {
         return CardDetailUi(
-            id = card.id,
-            productName = card.productName,
-            issuer = card.issuer,
-            network = card.network,
-            nickname = card.nickname,
-            lastFour = card.lastFour,
-            status = card.status,
-            annualFee = "$${card.annualFeeUsd}",
-            openDate = card.openDateUtc,
-            statementCut = card.statementCutUtc,
-            welcomeOfferProgress = card.welcomeOfferProgress,
-            notes = card.notes,
-            subSpending = card.subSpendingUsd?.toString(),
-            subDuration = card.subDuration?.toString(),
-            subDurationUnit = card.subDurationUnit ?: "months",
+            id = card.profileCard.id,
+            productName = card.templateCard?.productName ?: card.profileCard.nickname.orEmpty(),
+            issuer = templateIssuer,
+            network = templateNetwork,
+            nickname = card.profileCard.nickname,
+            lastFour = card.profileCard.lastFour,
+            status = card.profileCard.status.name,
+            annualFee = "${'$'}${card.templateCard?.annualFee ?: 0.0}",
+            openDate = card.profileCard.openDateUtc,
+            statementCut = card.profileCard.statementCutUtc,
+            welcomeOfferProgress = card.profileCard.welcomeOfferProgress,
+            notes = card.profileCard.notes,
+            subSpending = card.profileCard.subSpending?.toString(),
+            subDuration = card.profileCard.subDuration?.toString(),
+            subDurationUnit = card.profileCard.subDurationUnit?.name,
             applications = applications.map {
                 ApplicationUi(
                     status = it.status,
@@ -229,18 +233,18 @@ class CardDetailViewModel(
 
     private fun buildAmount(benefit: BenefitEntity): String {
         return when (benefit.type) {
-            "multiplier" -> {
-                val rate = benefit.amountUsd?.let {
+            BenefitType.Multiplier -> {
+                val rate = benefit.amount?.let {
                     if (it % 1.0 == 0.0) "${it.toInt()}%" else "${it}%"
                 } ?: ""
                 rate.ifBlank { "" }
             }
             else -> {
                 when {
-                    benefit.amountUsd != null && benefit.capUsd != null ->
-                        "$${benefit.amountUsd} (cap $${benefit.capUsd})"
-                    benefit.amountUsd != null -> "$${benefit.amountUsd}"
-                    benefit.capUsd != null -> "Cap $${benefit.capUsd}"
+                    benefit.amount != null && benefit.cap != null ->
+                        "${'$'}${benefit.amount} (cap ${'$'}${benefit.cap})"
+                    benefit.amount != null -> "${'$'}${benefit.amount}"
+                    benefit.cap != null -> "Cap ${'$'}${benefit.cap}"
                     else -> ""
                 }
             }
@@ -251,11 +255,11 @@ class CardDetailViewModel(
         return BenefitUi(
             id = benefit.id,
             title = benefit.notes,
-            type = benefit.type,
+            type = benefit.type.name,
             amount = buildAmount(benefit),
-            cadence = benefit.cadence.replaceFirstChar { it.uppercase() },
-            expiry = benefit.expiryDateUtc,
-            notes = benefit.terms ?: benefit.notes
+            cadence = benefit.frequency.name,
+            expiry = benefit.endDateUtc,
+            notes = benefit.notes
         )
     }
 
@@ -269,9 +273,9 @@ class CardDetailViewModel(
         }
         val detailsParts = mutableListOf<String>()
         offer.multiplierRate?.let { detailsParts.add("${trimAmount(it)}%") }
-        offer.minSpendUsd?.let { detailsParts.add("Min MS $${trimAmount(it)}") }
-        offer.maxCashBackUsd?.let { detailsParts.add("Max CB $${trimAmount(it)}") }
-        val details = detailsParts.joinToString(" • ").ifBlank { null }
+        offer.minSpend?.let { detailsParts.add("Min MS $${trimAmount(it)}") }
+        offer.maxCashBack?.let { detailsParts.add("Max CB $${trimAmount(it)}") }
+        val details = detailsParts.joinToString(" \u2013").ifBlank { null }
         return OfferUi(
             id = offer.id,
             title = offer.title,
@@ -305,7 +309,7 @@ class CardDetailViewModel(
         }
     }
 
-    fun removeBenefit(benefitId: Long) {
+    fun removeBenefit(benefitId: String) {
         val detail = _state.value.detail ?: return
         val updated = detail.benefits.filterNot { it.id == benefitId }
         _state.value = _state.value.copy(detail = detail.copy(benefits = updated))
@@ -330,11 +334,17 @@ class CardDetailViewModel(
         }
     }
 
-    fun removeOffer(offerId: Long) {
+    fun removeOffer(offerId: String) {
         val detail = _state.value.detail ?: return
         val updated = detail.offers.filterNot { it.id == offerId }
         _state.value = _state.value.copy(detail = detail.copy(offers = updated))
     }
+
+    private fun String.toCardStatus(): CardStatus =
+        runCatching { CardStatus.valueOf(this) }.getOrDefault(CardStatus.Active)
+
+    private fun String.toCardSubDurationUnit(): CardSubDurationUnit? =
+        runCatching { CardSubDurationUnit.valueOf(this) }.getOrNull()
 
     companion object {
         fun factory(repository: CardRepository): ViewModelProvider.Factory {

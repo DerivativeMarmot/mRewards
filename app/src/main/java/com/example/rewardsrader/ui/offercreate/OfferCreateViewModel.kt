@@ -17,25 +17,25 @@ class OfferCreateViewModel(
     private val _state = MutableStateFlow(OfferCreateState())
     val state: StateFlow<OfferCreateState> = _state.asStateFlow()
 
-    fun init(cardId: Long, productName: String) {
+    fun init(cardId: String, productName: String) {
         _state.value = OfferCreateState(cardId = cardId, productName = productName)
     }
 
-    fun startEdit(offerId: Long, productName: String) {
+    fun startEdit(offerId: String, productName: String) {
         viewModelScope.launch {
             runCatching { repository.getOffer(offerId) }
                 .onSuccess { offer ->
                     offer ?: return@onSuccess
                     _state.value = OfferCreateState(
                         offerId = offer.id,
-                        cardId = offer.cardId,
+                        cardId = offer.profileCardId,
                         productName = productName,
                         title = offer.title,
                         note = offer.note.orEmpty(),
                         type = offer.type,
                         multiplier = offer.multiplierRate?.toString().orEmpty(),
-                        minSpend = offer.minSpendUsd?.toString().orEmpty(),
-                        maxCashBack = offer.maxCashBackUsd?.toString().orEmpty(),
+                        minSpend = offer.minSpend?.toString().orEmpty(),
+                        maxCashBack = offer.maxCashBack?.toString().orEmpty(),
                         startDate = offer.startDateUtc.orEmpty(),
                         endDate = offer.endDateUtc.orEmpty(),
                         status = offer.status,
@@ -69,17 +69,18 @@ class OfferCreateViewModel(
         val multiplierRate = _state.value.multiplier.toDoubleOrNull()
         val minSpend = _state.value.minSpend.toDoubleOrNull()
         val maxCash = _state.value.maxCashBack.toDoubleOrNull()
+        val offerId = _state.value.offerId ?: repository.newId()
         val offer = OfferEntity(
-            id = _state.value.offerId ?: 0L,
-            cardId = _state.value.cardId,
+            id = offerId,
+            profileCardId = _state.value.cardId,
             title = _state.value.title.trim(),
             note = _state.value.note.ifBlank { null },
             startDateUtc = _state.value.startDate.ifBlank { null },
             endDateUtc = _state.value.endDate.ifBlank { null },
             type = _state.value.type,
             multiplierRate = if (_state.value.type == "multiplier") multiplierRate else null,
-            minSpendUsd = minSpend,
-            maxCashBackUsd = maxCash,
+            minSpend = minSpend,
+            maxCashBack = maxCash,
             status = _state.value.status
         )
 
@@ -90,8 +91,8 @@ class OfferCreateViewModel(
                     repository.updateOffer(offer)
                     offer
                 } else {
-                    val id = repository.addOffer(offer)
-                    offer.copy(id = id)
+                    repository.addOffer(offer)
+                    offer
                 }
             }.onSuccess { saved ->
                 if (isEditing) {
@@ -132,7 +133,7 @@ class OfferCreateViewModel(
         val parts = normalized.split(".", limit = 2)
         return if (parts.size == 2) {
             val decimals = parts[1].take(scale)
-            "${parts[0]}.${decimals}"
+            "${parts[0]}.$decimals"
         } else {
             normalized
         }

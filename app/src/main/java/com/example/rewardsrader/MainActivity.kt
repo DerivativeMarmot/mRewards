@@ -3,55 +3,30 @@ package com.example.rewardsrader
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.activity.compose.PredictiveBackHandler
-import android.app.Activity
-import androidx.activity.BackEventCompat
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.rewardsrader.ui.carddetail.CardDetailScreen
-import com.example.rewardsrader.ui.carddetail.CardDetailViewModel
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateScreen
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateViewModel
 import com.example.rewardsrader.ui.cardcreate.CardCreateScreen
 import com.example.rewardsrader.ui.cardcreate.CardCreateViewModel
+import com.example.rewardsrader.ui.carddetail.CardDetailScreen
+import com.example.rewardsrader.ui.carddetail.CardDetailViewModel
 import com.example.rewardsrader.ui.cardlist.CardListScreen
 import com.example.rewardsrader.ui.cardlist.CardListViewModel
 import com.example.rewardsrader.ui.offercreate.OfferCreateScreen
 import com.example.rewardsrader.ui.offercreate.OfferCreateViewModel
 import com.example.rewardsrader.ui.theme.RewardsRaderTheme
-import kotlinx.coroutines.CancellationException
+import androidx.activity.viewModels
+import androidx.navigation.NavHostController
 
 class MainActivity : ComponentActivity() {
 
@@ -66,7 +41,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
 
     @Composable
     fun NavigationApp(navController: NavHostController = rememberNavController()) {
@@ -88,46 +62,25 @@ class MainActivity : ComponentActivity() {
             CardCreateViewModel.factory(appContainer.cardConfigProvider, appContainer.cardTemplateImporter)
         }
 
-
-        val navController = rememberNavController()
-
         NavHost(
             navController = navController,
-            startDestination = "list",
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { it })
-            },
-            exitTransition = {
-                slideOutHorizontally (targetOffsetX = { -it })
-            },
-            popEnterTransition = {
-                scaleIn(initialScale = 1.2f)
-            },
-            popExitTransition = {
-                scaleOut(targetScale = 0.8f) + fadeOut()
-            }
-        )
-        {
+            startDestination = "list"
+        ) {
             composable("list") {
                 CardListScreen(
                     stateFlow = cardListViewModel.state,
-                    onSelectCard = { id ->
-                        navController.navigate("detail/$id")
-                    },
-                    onAddCard = {
-                        navController.navigate("create")
-                    },
+                    onSelectCard = { id -> navController.navigate("detail/$id") },
+                    onAddCard = { navController.navigate("create") },
                     onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
-                    onUndoDelete = { cardListViewModel.undoDelete() },
                     onSnackbarShown = { cardListViewModel.snackbarShown() }
                 )
             }
 
             composable(
                 "detail/{cardId}",
-                arguments = listOf(navArgument("cardId") { type = NavType.LongType })
+                arguments = listOf(navArgument("cardId") { type = NavType.StringType })
             ) { backStackEntry ->
-                val cardId = backStackEntry.arguments?.getLong("cardId") ?: return@composable
+                val cardId = backStackEntry.arguments?.getString("cardId") ?: return@composable
                 cardDetailViewModel.load(cardId)
 
                 CardDetailScreen(
@@ -145,9 +98,7 @@ class MainActivity : ComponentActivity() {
                         benefitCreateViewModel.startEdit(benefitId, detail.productName, detail.issuer)
                         navController.navigate("benefit/${detail.id}/edit/$benefitId")
                     },
-                    onDeleteBenefit = { benefitId ->
-                        cardDetailViewModel.deleteBenefit(benefitId)
-                    },
+                    onDeleteBenefit = { benefitId -> cardDetailViewModel.deleteBenefit(benefitId) },
                     onAddOffer = { id, productName ->
                         offerCreateViewModel.init(id, productName)
                         navController.navigate("offer/$id/add")
@@ -157,9 +108,7 @@ class MainActivity : ComponentActivity() {
                         offerCreateViewModel.startEdit(offerId, detail.productName)
                         navController.navigate("offer/${detail.id}/edit/$offerId")
                     },
-                    onDeleteOffer = { offerId ->
-                        cardDetailViewModel.deleteOffer(offerId)
-                    },
+                    onDeleteOffer = { offerId -> cardDetailViewModel.deleteOffer(offerId) },
                     onUpdateNickname = { cardDetailViewModel.updateNickname(it) },
                     onUpdateAnnualFee = { cardDetailViewModel.updateAnnualFee(it) },
                     onUpdateLastFour = { cardDetailViewModel.updateLastFour(it) },
@@ -194,9 +143,8 @@ class MainActivity : ComponentActivity() {
 
             composable(
                 "benefit/{cardId}/add",
-                arguments = listOf(navArgument("cardId") { type = NavType.LongType })
+                arguments = listOf(navArgument("cardId") { type = NavType.StringType })
             ) { backStackEntry ->
-
                 BenefitCreateScreen(
                     stateFlow = benefitCreateViewModel.state,
                     onBack = { navController.popBackStack() },
@@ -232,11 +180,18 @@ class MainActivity : ComponentActivity() {
             composable(
                 "benefit/{cardId}/edit/{benefitId}",
                 arguments = listOf(
-                    navArgument("cardId") { type = NavType.LongType },
-                    navArgument("benefitId") { type = NavType.LongType }
+                    navArgument("cardId") { type = NavType.StringType },
+                    navArgument("benefitId") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
-
+                val cardId = backStackEntry.arguments?.getString("cardId") ?: ""
+                val benefitId = backStackEntry.arguments?.getString("benefitId") ?: ""
+                val detail = cardDetailViewModel.state.value.detail
+                if (detail != null) {
+                    benefitCreateViewModel.startEdit(benefitId, detail.productName, detail.issuer)
+                } else {
+                    benefitCreateViewModel.init(cardId, "", "")
+                }
                 BenefitCreateScreen(
                     stateFlow = benefitCreateViewModel.state,
                     onBack = { navController.popBackStack() },
@@ -271,8 +226,8 @@ class MainActivity : ComponentActivity() {
 
             composable(
                 "offer/{cardId}/add",
-                arguments = listOf(navArgument("cardId") { type = NavType.LongType })
-            ) { backStackEntry ->
+                arguments = listOf(navArgument("cardId") { type = NavType.StringType })
+            ) {
                 OfferCreateScreen(
                     stateFlow = offerCreateViewModel.state,
                     onBack = { navController.popBackStack() },
@@ -298,10 +253,15 @@ class MainActivity : ComponentActivity() {
             composable(
                 "offer/{cardId}/edit/{offerId}",
                 arguments = listOf(
-                    navArgument("cardId") { type = NavType.LongType },
-                    navArgument("offerId") { type = NavType.LongType }
+                    navArgument("cardId") { type = NavType.StringType },
+                    navArgument("offerId") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
+                val offerId = backStackEntry.arguments?.getString("offerId") ?: return@composable
+                val detail = cardDetailViewModel.state.value.detail
+                if (detail != null) {
+                    offerCreateViewModel.startEdit(offerId, detail.productName)
+                }
                 OfferCreateScreen(
                     stateFlow = offerCreateViewModel.state,
                     onBack = { navController.popBackStack() },

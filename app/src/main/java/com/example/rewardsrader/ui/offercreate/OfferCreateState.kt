@@ -1,8 +1,8 @@
 package com.example.rewardsrader.ui.offercreate
 
 data class OfferCreateState(
-    val offerId: Long? = null,
-    val cardId: Long = 0L,
+    val offerId: String? = null,
+    val cardId: String = "",
     val productName: String = "",
     val title: String = "",
     val note: String = "",

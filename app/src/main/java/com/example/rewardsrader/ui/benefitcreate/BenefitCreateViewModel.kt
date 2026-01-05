@@ -3,12 +3,16 @@ package com.example.rewardsrader.ui.benefitcreate
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.rewardsrader.data.local.entity.BenefitCategory
 import com.example.rewardsrader.data.local.entity.BenefitEntity
+import com.example.rewardsrader.data.local.entity.BenefitFrequency
+import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class BenefitCreateViewModel(
     private val repository: CardRepository
@@ -17,49 +21,44 @@ class BenefitCreateViewModel(
     private val _state = MutableStateFlow(BenefitCreateState())
     val state: StateFlow<BenefitCreateState> = _state.asStateFlow()
 
-    fun init(cardId: Long, productName: String, issuer: String) {
+    fun init(profileCardId: String, productName: String, issuer: String) {
         val existingCustom = _state.value.customCategories
         _state.value = BenefitCreateState(
-            cardId = cardId,
+            cardId = profileCardId,
             productName = productName,
             issuer = issuer,
             customCategories = existingCustom
         )
     }
 
-    fun startEdit(benefitId: Long, productName: String, issuer: String) {
+    fun startEdit(benefitId: String, productName: String, issuer: String) {
         viewModelScope.launch {
             val existingCustom = _state.value.customCategories.toMutableList()
             runCatching { repository.getBenefit(benefitId) }
                 .onSuccess { benefit ->
                     benefit ?: return@onSuccess
-                    val categories = benefit.category
-                        ?.split(",")
-                        ?.map { it.trim() }
-                        ?.filter { it.isNotBlank() }
-                        ?: emptyList()
+                    val categories = benefit.category.map { it.name }
                     existingCustom.addAll(categories)
-                    val transactions = decodeTransactions(benefit.transactionsJson)
                     _state.value = BenefitCreateState(
                         benefitId = benefit.id,
-                        cardId = benefit.cardId,
+                        cardId = _state.value.cardId,
                         productName = productName,
                         issuer = issuer,
                         title = benefit.notes.orEmpty(),
-                        type = benefit.type,
-                        amount = benefit.amountUsd?.toString().orEmpty(),
-                        cap = benefit.capUsd?.toString().orEmpty(),
-                        cadence = benefit.cadence,
+                        type = benefit.type.name.lowercase(),
+                        amount = benefit.amount?.toString().orEmpty(),
+                        cap = benefit.cap?.toString().orEmpty(),
+                        cadence = benefit.frequency.name.lowercase(),
                         categories = categories,
                         customCategories = existingCustom.distinct(),
                         customCategory = "",
-                        effectiveDate = benefit.effectiveDateUtc,
-                        expiryDate = benefit.expiryDateUtc.orEmpty(),
-                        notes = benefit.terms.orEmpty(),
-                        transactions = transactions,
-                        dataSource = benefit.dataSource,
+                        effectiveDate = benefit.startDateUtc,
+                        expiryDate = benefit.endDateUtc.orEmpty(),
+                        notes = benefit.notes.orEmpty(),
+                        transactions = emptyList(),
+                        dataSource = null,
                         enrollmentRequired = benefit.enrollmentRequired,
-                        merchant = benefit.merchant,
+                        merchant = null,
                         isEditing = true
                     )
                 }
@@ -161,32 +160,27 @@ class BenefitCreateViewModel(
         val isEditing = _state.value.isEditing && _state.value.benefitId != null
         val amount = _state.value.amount.toDoubleOrNull()
         val cap = _state.value.cap.toDoubleOrNull()
+        val benefitId = _state.value.benefitId ?: repository.newId()
         val benefit = BenefitEntity(
-            id = _state.value.benefitId ?: 0L,
-            cardId = _state.value.cardId,
-            type = _state.value.type,
-            amountUsd = amount,
-            capUsd = if (_state.value.type == "multiplier") cap else null,
-            cadence = _state.value.cadence,
-            category = _state.value.categories.takeIf { it.isNotEmpty() }?.joinToString(","),
-            merchant = _state.value.merchant,
+            id = benefitId,
+            type = _state.value.type.toBenefitType(),
+            amount = amount,
+            cap = if (_state.value.type == "multiplier") cap else cap,
+            frequency = _state.value.cadence.toBenefitFrequency(),
+            category = _state.value.categories.map { it.toBenefitCategory() },
             enrollmentRequired = _state.value.enrollmentRequired,
-            effectiveDateUtc = _state.value.effectiveDate.ifBlank { "" },
-            expiryDateUtc = _state.value.expiryDate.ifBlank { null },
-            terms = _state.value.notes.ifBlank { null },
-            dataSource = _state.value.dataSource ?: "user",
-            notes = _state.value.title.ifBlank { null },
-            transactionsJson = encodeTransactions(_state.value.transactions)
+            startDateUtc = _state.value.effectiveDate.ifBlank { "" },
+            endDateUtc = _state.value.expiryDate.ifBlank { null },
+            notes = _state.value.title.ifBlank { _state.value.notes.ifBlank { null } }
         )
         _state.value = _state.value.copy(isSaving = true, error = null)
         viewModelScope.launch {
             runCatching {
                 if (isEditing) {
-                    repository.updateBenefit(benefit)
+                    repository.upsertBenefit(benefit)
                     benefit
                 } else {
-                    val id = repository.addBenefit(benefit)
-                    benefit.copy(id = id)
+                    repository.addBenefitForProfileCard(_state.value.cardId, benefit)
                 }
             }.onSuccess {
                 if (isEditing) {
@@ -212,24 +206,22 @@ class BenefitCreateViewModel(
         val parts = normalized.split(".", limit = 2)
         return if (parts.size == 2) {
             val decimals = parts[1].take(scale)
-            "${parts[0]}.${decimals}"
+            "${parts[0]}.$decimals"
         } else {
             normalized
         }
     }
 
-    private fun encodeTransactions(entries: List<TransactionEntry>): String? {
-        if (entries.isEmpty()) return null
-        return entries.joinToString("|") { "${it.amount}@${it.date}" }
-    }
+    private fun String.toBenefitType(): BenefitType =
+        runCatching { BenefitType.valueOf(uppercase(Locale.US)) }.getOrDefault(BenefitType.Credit)
 
-    private fun decodeTransactions(serialized: String?): List<TransactionEntry> {
-        if (serialized.isNullOrBlank()) return emptyList()
-        return serialized.split("|")
-            .mapNotNull { raw ->
-                val parts = raw.split("@", limit = 2)
-                if (parts.size == 2) TransactionEntry(parts[0], parts[1]) else null
-            }
+    private fun String.toBenefitFrequency(): BenefitFrequency =
+        runCatching { BenefitFrequency.valueOf(uppercase(Locale.US)) }.getOrDefault(BenefitFrequency.Monthly)
+
+    private fun String.toBenefitCategory(): BenefitCategory {
+        val normalized = replace(" ", "").replace("-", "").replace(":", "").replace("_", "")
+        return runCatching { BenefitCategory.valueOf(normalized.replaceFirstChar { it.uppercase() }) }
+            .getOrDefault(BenefitCategory.Others)
     }
 
     companion object {
