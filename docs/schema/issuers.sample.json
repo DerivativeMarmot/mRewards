@@ -1,7 +1,0 @@
-[
-  { "id": "chase", "slug": "chase", "name": "Chase" },
-  { "id": "amex",  "slug": "amex",  "name": "American Express" },
-  { "id": "citi",  "slug": "citi",  "name": "Citi" },
-  { "id": "boa",   "slug": "boa",   "name": "Bank of America" },
-  { "id": "discover", "slug": "discover", "name": "Discover" }
-]
