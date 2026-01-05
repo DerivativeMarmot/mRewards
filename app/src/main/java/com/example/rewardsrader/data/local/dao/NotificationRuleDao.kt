@@ -9,14 +9,14 @@ import com.example.rewardsrader.data.local.entity.NotificationRuleEntity
 @Dao
 interface NotificationRuleDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(rule: NotificationRuleEntity): Long
+    suspend fun insert(rule: NotificationRuleEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(rules: List<NotificationRuleEntity>)
 
     @Query("SELECT * FROM notification_rules WHERE benefitId = :benefitId")
-    suspend fun getForBenefit(benefitId: Long): List<NotificationRuleEntity>
+    suspend fun getForBenefit(benefitId: String): List<NotificationRuleEntity>
 
     @Query("SELECT * FROM notification_rules WHERE benefitId IN (:benefitIds)")
-    suspend fun getForBenefits(benefitIds: List<Long>): List<NotificationRuleEntity>
+    suspend fun getForBenefits(benefitIds: List<String>): List<NotificationRuleEntity>
 }

@@ -20,7 +20,7 @@ model Issuer {
 }
 
 model Card {
-  id                       String        @id 
+  id                       String        @id
   issuerId                 String        @map("issuer_id")
   productName              String        @map("product_name")
   faces                    CardFace[]
@@ -38,7 +38,7 @@ model Card {
 
 model CardFace {
   id        String  @id
-  remoteUrl  String
+  remoteUrl String
   localPath String?
   isDefault Boolean @default(false)
 
@@ -57,15 +57,15 @@ model ProfileCard {
   closeDateUtc         String?              @map("close_date_utc")
   statementCutUtc      String?              @map("statement_cut_utc")
   welcomeOfferProgress String?              @map("welcome_offer_progress")
-  status               CardStaus            @default(Active)
+  status               CardStatus           @default(Active)
   notes                String?
   subSpending          Float?               @map("sub_spending")
   subDuration          Int?                 @map("sub_duration")
   subDurationUnit      CardSubDurationUnit? @map("sub_duration_unit")
 
-  benefitsLink ProfileCardBenefit[]
-  offers       Offer[]
-  applications Application[]
+  profileCardBenefits ProfileCardBenefit[]
+  offers              Offer[]
+  applications        Application[]
 
   profile  Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   template Card?   @relation(fields: [templateCardId], references: [id])
@@ -86,26 +86,25 @@ model Benefit {
   startDateUtc       String            @map("start_date_utc")
   endDateUtc         String?           @map("end_date_utc")
   notes              String?
-  transactions       Transaction[]
 
   // Relations
-  notificationRules NotificationRule[]
-  cardBenefits         CardBenefit[]
-  profileCardBenefits  ProfileCardBenefit[]
+  notificationRules   NotificationRule[]
+  cardBenefits        CardBenefit[]
+  profileCardBenefits ProfileCardBenefit[]
 
   @@map("benefits")
 }
 
 model Transaction {
-  id        String  @id @default(cuid()) @map("_id")
-  benefitId String? @map("benefit_id")
-  notes     String?
-  dateUtc   String?
-  amount    Float
+  id                   String              @id @default(cuid()) @map("_id")
+  benefitId            String?             @map("benefit_id")
+  notes                String?
+  dateUtc              String?
+  amount               Float
+  
+  profileCardBenefit   ProfileCardBenefit? @relation(fields: [profileCardBenefitId], references: [id])
+  profileCardBenefitId String?
 
-  benefit Benefit? @relation(fields: [benefitId], references: [id])
-
-  @@index([benefitId])
   @@map("transactions")
 }
 
@@ -167,7 +166,7 @@ enum CardNetwork {
   Amex
 }
 
-enum CardStaus {
+enum CardStatus {
   Active
   Closed
   Pending
@@ -188,26 +187,27 @@ model Profile {
 }
 
 model CardBenefit {
+  id        String @id
   cardId    String @map("card_id")
   benefitId String @map("benefit_id")
 
   card    Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
   benefit Benefit @relation(fields: [benefitId], references: [id], onDelete: Cascade)
 
-  @@id([cardId, benefitId])
   @@index([benefitId])
   @@map("card_benefits")
 }
 
 model ProfileCardBenefit {
-  profileCardId String @map("profile_card_id")
-  benefitId     String @map("benefit_id")
+  id            String        @id
+  profileCardId String        @map("profile_card_id")
+  benefitId     String        @map("benefit_id")
+  transactions  Transaction[]
 
   profileCard ProfileCard @relation(fields: [profileCardId], references: [id], onDelete: Cascade)
   benefit     Benefit     @relation(fields: [benefitId], references: [id], onDelete: Cascade)
 
-  @@id([profileCardId, benefitId])
-  @@index([benefitId])
+  @@index([profileCardId, benefitId])
   @@map("profile_card_benefits")
 }
 

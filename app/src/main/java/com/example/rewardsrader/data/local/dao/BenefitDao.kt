@@ -10,20 +10,20 @@ import com.example.rewardsrader.data.local.entity.BenefitEntity
 @Dao
 interface BenefitDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(benefit: BenefitEntity): Long
+    suspend fun insert(benefit: BenefitEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(benefits: List<BenefitEntity>)
 
-    @Query("SELECT * FROM benefits WHERE cardId = :cardId")
-    suspend fun getForCard(cardId: Long): List<BenefitEntity>
+    @Query("SELECT * FROM benefits WHERE id IN (:benefitIds)")
+    suspend fun getByIds(benefitIds: List<String>): List<BenefitEntity>
 
     @Query("SELECT * FROM benefits WHERE id = :benefitId LIMIT 1")
-    suspend fun getById(benefitId: Long): BenefitEntity?
+    suspend fun getById(benefitId: String): BenefitEntity?
 
     @Update
     suspend fun update(benefit: BenefitEntity)
 
     @Query("DELETE FROM benefits WHERE id = :benefitId")
-    suspend fun deleteById(benefitId: Long)
+    suspend fun deleteById(benefitId: String)
 }

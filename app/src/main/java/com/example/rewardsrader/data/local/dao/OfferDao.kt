@@ -10,17 +10,17 @@ import com.example.rewardsrader.data.local.entity.OfferEntity
 @Dao
 interface OfferDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(offer: OfferEntity): Long
+    suspend fun insert(offer: OfferEntity)
 
     @Update
     suspend fun update(offer: OfferEntity)
 
-    @Query("SELECT * FROM offers WHERE cardId = :cardId ORDER BY startDateUtc IS NULL, startDateUtc")
-    suspend fun getForCard(cardId: Long): List<OfferEntity>
+    @Query("SELECT * FROM offers WHERE profileCardId = :profileCardId ORDER BY startDateUtc IS NULL, startDateUtc")
+    suspend fun getForProfileCard(profileCardId: String): List<OfferEntity>
 
     @Query("SELECT * FROM offers WHERE id = :offerId LIMIT 1")
-    suspend fun getById(offerId: Long): OfferEntity?
+    suspend fun getById(offerId: String): OfferEntity?
 
     @Query("DELETE FROM offers WHERE id = :offerId")
-    suspend fun deleteById(offerId: Long)
+    suspend fun deleteById(offerId: String)
 }

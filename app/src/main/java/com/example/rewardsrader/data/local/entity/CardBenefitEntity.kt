@@ -6,8 +6,14 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "notification_rules",
+    tableName = "card_benefits",
     foreignKeys = [
+        ForeignKey(
+            entity = CardEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["cardId"],
+            onDelete = ForeignKey.CASCADE
+        ),
         ForeignKey(
             entity = BenefitEntity::class,
             parentColumns = ["id"],
@@ -15,12 +21,10 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("benefitId")]
+    indices = [Index("cardId"), Index("benefitId")]
 )
-data class NotificationRuleEntity(
+data class CardBenefitEntity(
     @PrimaryKey val id: String,
-    val benefitId: String,
-    val trigger: String,
-    val channel: String,
-    val enabled: Boolean
+    val cardId: String,
+    val benefitId: String
 )

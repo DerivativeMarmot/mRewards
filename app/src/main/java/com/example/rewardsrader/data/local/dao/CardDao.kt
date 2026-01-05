@@ -13,13 +13,13 @@ import com.example.rewardsrader.data.local.entity.CardWithBenefits
 @Dao
 interface CardDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(card: CardEntity): Long
+    suspend fun insert(card: CardEntity)
 
     @Delete
     suspend fun delete(card: CardEntity)
 
     @Query("DELETE FROM cards WHERE id = :cardId")
-    suspend fun deleteById(cardId: Long)
+    suspend fun deleteById(cardId: String)
 
     @Query("SELECT * FROM cards")
     suspend fun getAll(): List<CardEntity>
@@ -29,12 +29,12 @@ interface CardDao {
     suspend fun getAllWithBenefits(): List<CardWithBenefits>
 
     @Query("SELECT * FROM cards WHERE id = :cardId LIMIT 1")
-    suspend fun getById(cardId: Long): CardEntity?
+    suspend fun getById(cardId: String): CardEntity?
 
     @Update
     suspend fun update(card: CardEntity)
 
     @Transaction
     @Query("SELECT * FROM cards WHERE id = :cardId LIMIT 1")
-    suspend fun getWithBenefits(cardId: Long): CardWithBenefits?
+    suspend fun getWithBenefits(cardId: String): CardWithBenefits?
 }

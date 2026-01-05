@@ -9,17 +9,17 @@ import androidx.room.PrimaryKey
     tableName = "applications",
     foreignKeys = [
         ForeignKey(
-            entity = CardEntity::class,
+            entity = ProfileCardEntity::class,
             parentColumns = ["id"],
-            childColumns = ["cardId"],
+            childColumns = ["profileCardId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("cardId")]
+    indices = [Index("profileCardId")]
 )
 data class ApplicationEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val cardId: Long,
+    @PrimaryKey val id: String,
+    val profileCardId: String,
     val applicationDateUtc: String? = null,
     val decisionDateUtc: String? = null,
     val status: String,

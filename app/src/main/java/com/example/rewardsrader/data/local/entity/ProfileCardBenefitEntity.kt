@@ -6,27 +6,25 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "offers",
+    tableName = "profile_card_benefits",
     foreignKeys = [
         ForeignKey(
             entity = ProfileCardEntity::class,
             parentColumns = ["id"],
             childColumns = ["profileCardId"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = BenefitEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["benefitId"],
+            onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("profileCardId")]
+    indices = [Index("profileCardId"), Index("benefitId")]
 )
-data class OfferEntity(
+data class ProfileCardBenefitEntity(
     @PrimaryKey val id: String,
     val profileCardId: String,
-    val title: String,
-    val note: String? = null,
-    val startDateUtc: String? = null,
-    val endDateUtc: String? = null,
-    val type: String,
-    val multiplierRate: Double? = null,
-    val minSpend: Double? = null,
-    val maxCashBack: Double? = null,
-    val status: String = "active"
+    val benefitId: String
 )

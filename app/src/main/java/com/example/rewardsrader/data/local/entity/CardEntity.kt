@@ -1,24 +1,27 @@
 package com.example.rewardsrader.data.local.entity
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "cards")
+@Entity(
+    tableName = "cards",
+    foreignKeys = [
+        ForeignKey(
+            entity = IssuerEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["issuerId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("issuerId")]
+)
 data class CardEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val issuer: String,
-    val nickname: String? = null,
+    @PrimaryKey val id: String,
+    val issuerId: String,
     val productName: String,
-    val network: String,
-    val annualFeeUsd: Double,
-    val lastFour: String? = null,
-    val openDateUtc: String? = null,
-    val closeDateUtc: String? = null,
-    val statementCutUtc: String? = null,
-    val welcomeOfferProgress: String? = null,
-    val status: String,
-    val notes: String? = null,
-    val subSpendingUsd: Double? = null,
-    val subDuration: Int? = null,
-    val subDurationUnit: String? = "months"
+    val network: CardNetwork = CardNetwork.Visa,
+    val annualFee: Double,
+    val foreignFeeTransactionFee: Double = 0.0
 )
