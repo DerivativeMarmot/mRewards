@@ -30,10 +30,15 @@
 - Store only non-sensitive card details; if sensitive identifiers are ever added, gate them behind local encryption/biometric unlock.
 
 ## Mandatory Pre-work for Agents
-- Read the full `docs/product_functionality.md` before making code changes to stay aligned with product scope.
-- Read the full `docs/architecture.md` before making code changes to align with structural decisions (create/update the file if missing).
-- After adding a major feature or completing a milestone, update `docs/architecture.md`.
+- Read all files in `docs/`
+- `docs/product_functionality.md` overall functionality.
+- `docs/architecture.md` each file's functionality and purpose.
+- `docs/feature_implementation.md` features.
+- `schema.prisma` system / database structure.
+- `schema.md` detailed description of database structure.
 
-## Commit & Pull Request Guidelines
-- Commit messages: short imperative mood (“Add card config loader”, “Fix benefit progress calc”). Keep related changes together.
-- PRs: include a brief summary, testing performed (`./gradlew testDebugUnitTest`, previews/attach screenshots for UI), and links to any tracking issues. Call out schema/config changes that require client refresh or migration.***
+## Logging
+- You should log what you did, current progress and conversation when you are given a command to do so.
+- Log each file's functionality, what's the purpose of each file in `docs/architecture.md`.
+- Log what features implemented, what changes you made to each file, progress so far in `docs/progress.md`.
+- Log our full conversation into `conversation-log.md` with date and time followed by message.
