@@ -477,3 +477,8 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2025-12-31 00:37] Assistant: wrote this log
 [2025-12-31 00:38] User: append with timestamps instead of override
 [2025-12-31 00:39] Assistant: appended log with timestamps
+[2026-01-05 23:40] User: read docs
+[2026-01-05 23:40] Assistant: read required docs (product_functionality, architecture, implementation_plan, feature_implementation, progress, schema.md, schema.prisma)
+[2026-01-06 00:11] User: add sync button at card list top bar. when user clicks, it gets issuers and cards collections from firestore and load into room database. before starting, do you have any questions.
+[2026-01-06 00:12] Assistant: asked about firestore setup/auth, collection schemas, merge strategy (upsert vs replace), and icon vs text button preference
+[2026-01-06 00:13] User: firebase configured, collections mirror schema.prisma with doc id as id; no auth; upsert on id; collection names match room tables; prefer icon

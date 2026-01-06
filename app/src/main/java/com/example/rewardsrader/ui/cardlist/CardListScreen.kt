@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,7 +21,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -41,8 +41,9 @@ fun CardListScreen(
     onSelectCard: (String) -> Unit,
     onAddCard: () -> Unit,
     onDeleteCard: (String) -> Unit,
-    onSnackbarShown: () -> Unit
-    ) {
+    onSnackbarShown: () -> Unit,
+    onSync: () -> Unit
+) {
     val state by stateFlow.collectAsState()
     val error = state.error
     val snackbarHostState = remember { SnackbarHostState() }
@@ -54,7 +55,16 @@ fun CardListScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Cards") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Cards") },
+                actions = {
+                    IconButton(onClick = onSync) {
+                        Icon(imageVector = Icons.Default.Sync, contentDescription = "Sync cards")
+                    }
+                }
+            )
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         when {
@@ -128,7 +138,7 @@ private fun LoadingMessage(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Loading¡­")
+        Text("Loading...")
     }
 }
 

@@ -4,11 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.SnackbarHostState
+import androidx.activity.viewModels
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,8 +28,6 @@ import com.example.rewardsrader.ui.cardlist.CardListViewModel
 import com.example.rewardsrader.ui.offercreate.OfferCreateScreen
 import com.example.rewardsrader.ui.offercreate.OfferCreateViewModel
 import com.example.rewardsrader.ui.theme.RewardsRaderTheme
-import androidx.activity.viewModels
-import androidx.navigation.NavHostController
 
 class MainActivity : ComponentActivity() {
 
@@ -47,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
         appContainer = AppContainer(applicationContext)
         val cardListViewModel: CardListViewModel by viewModels {
-            CardListViewModel.factory(appContainer.cardRepository)
+            CardListViewModel.factory(appContainer.cardRepository, appContainer.firestoreSyncer)
         }
         val cardDetailViewModel: CardDetailViewModel by viewModels {
             CardDetailViewModel.factory(appContainer.cardRepository)
@@ -64,7 +65,19 @@ class MainActivity : ComponentActivity() {
 
         NavHost(
             navController = navController,
-            startDestination = "list"
+            startDestination = "list",
+            enterTransition = {
+                slideInHorizontally(initialOffsetX = { it })
+            },
+            exitTransition = {
+                slideOutHorizontally (targetOffsetX = { -it })
+            },
+            popEnterTransition = {
+                scaleIn(initialScale = 1.2f)
+            },
+            popExitTransition = {
+                scaleOut(targetScale = 0.8f) + fadeOut()
+            }
         ) {
             composable("list") {
                 CardListScreen(
@@ -72,7 +85,8 @@ class MainActivity : ComponentActivity() {
                     onSelectCard = { id -> navController.navigate("detail/$id") },
                     onAddCard = { navController.navigate("create") },
                     onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
-                    onSnackbarShown = { cardListViewModel.snackbarShown() }
+                    onSnackbarShown = { cardListViewModel.snackbarShown() },
+                    onSync = { cardListViewModel.syncFromCloud() }
                 )
             }
 
@@ -93,10 +107,12 @@ class MainActivity : ComponentActivity() {
                         benefitCreateViewModel.init(id, productName, issuer)
                         navController.navigate("benefit/$id/add")
                     },
-                    onEditBenefit = { benefitId ->
-                        val detail = cardDetailViewModel.state.value.detail ?: return@CardDetailScreen
-                        benefitCreateViewModel.startEdit(benefitId, detail.productName, detail.issuer)
-                        navController.navigate("benefit/${detail.id}/edit/$benefitId")
+                    onEditBenefit = { profileCardId, benefitId ->
+                        val detail = cardDetailViewModel.state.value.detail
+                        if (detail != null) {
+                            benefitCreateViewModel.startEdit(profileCardId, benefitId, detail.productName, detail.issuer)
+                        }
+                        navController.navigate("benefit/$profileCardId/edit/$benefitId")
                     },
                     onDeleteBenefit = { benefitId -> cardDetailViewModel.deleteBenefit(benefitId) },
                     onAddOffer = { id, productName ->
@@ -184,11 +200,11 @@ class MainActivity : ComponentActivity() {
                     navArgument("benefitId") { type = NavType.StringType }
                 )
             ) { backStackEntry ->
-                val cardId = backStackEntry.arguments?.getString("cardId") ?: ""
-                val benefitId = backStackEntry.arguments?.getString("benefitId") ?: ""
+                val cardId = backStackEntry.arguments?.getString("cardId") ?: return@composable
+                val benefitId = backStackEntry.arguments?.getString("benefitId") ?: return@composable
                 val detail = cardDetailViewModel.state.value.detail
                 if (detail != null) {
-                    benefitCreateViewModel.startEdit(benefitId, detail.productName, detail.issuer)
+                    benefitCreateViewModel.startEdit(cardId, benefitId, detail.productName, detail.issuer)
                 } else {
                     benefitCreateViewModel.init(cardId, "", "")
                 }

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     id("org.jetbrains.kotlin.plugin.serialization") version "2.3.0"
     id("org.jetbrains.kotlin.kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -67,6 +68,8 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.firebase.firestore)
+    implementation(libs.kotlinx.coroutines.play.services)
     kapt(libs.androidx.room.compiler)
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     testImplementation(libs.androidx.room.testing)

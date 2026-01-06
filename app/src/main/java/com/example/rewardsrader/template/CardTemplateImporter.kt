@@ -15,7 +15,6 @@ import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
-import com.example.rewardsrader.data.local.entity.ProfileEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import java.util.Locale
 
@@ -175,13 +174,16 @@ class CardTemplateImporter(
         when (this) {
             com.example.rewardsrader.config.BenefitType.CREDIT -> BenefitType.Credit
             com.example.rewardsrader.config.BenefitType.MULTIPLIER -> BenefitType.Multiplier
+            else -> BenefitType.Credit
         }
 
     private fun com.example.rewardsrader.config.BenefitCadence.toBenefitFrequency(): BenefitFrequency =
         when (this) {
-            com.example.rewardsrader.config.BenefitCadence.ONCE -> BenefitFrequency.Annually
             com.example.rewardsrader.config.BenefitCadence.MONTHLY -> BenefitFrequency.Monthly
             com.example.rewardsrader.config.BenefitCadence.QUARTERLY -> BenefitFrequency.Quarterly
-            com.example.rewardsrader.config.BenefitCadence.ANNUAL -> BenefitFrequency.Annually
+            com.example.rewardsrader.config.BenefitCadence.ANNUALLY -> BenefitFrequency.Annually
+            com.example.rewardsrader.config.BenefitCadence.SEMI_ANNUALLY -> BenefitFrequency.Annually
+            com.example.rewardsrader.config.BenefitCadence.EVERY_ANNIVERSARY -> BenefitFrequency.EveryAnniversary
+            else -> BenefitFrequency.Monthly
         }
 }
