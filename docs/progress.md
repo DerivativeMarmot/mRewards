@@ -97,3 +97,9 @@
 - Implemented offer create/edit flow with validation (credit/multiplier, min/max, dates, status), multiplier field, recommended spend hint, and form reset; added dedicated Compose screen/viewmodel/state.
 - Integrated offers into card detail: tab shows offers with add/edit/delete, FAB switches per tab, pager tabs swipeable; date UTC handling fixed.
 - Refactored card detail UI into sticky TabRow with HorizontalPager (min height to keep swipe active), removing nested scroll crashes; split shared components/tabs into separate files for clarity.
+## 2026-01-06 Firestore sync button
+- Added FirestoreSyncer to pull `issuers` and `cards` collections and upsert into Room (doc ID as key, camel/underscore fields accepted).
+- AppContainer wires FirebaseFirestore into the sync helper.
+- CardListViewModel exposes sync action with IO dispatch, snackbar on success, and reload of list state.
+- CardListScreen top bar now includes a sync icon; MainActivity passes the callback.
+- Added coroutines play-services dependency for Task await support.

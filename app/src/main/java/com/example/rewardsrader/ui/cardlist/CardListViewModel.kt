@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.rewardsrader.data.local.repository.CardRepository
-import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
+import com.example.rewardsrader.data.remote.FirestoreSyncer
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class CardSummaryUi(
     val id: String,
@@ -26,7 +28,8 @@ data class CardListUiState(
 )
 
 class CardListViewModel(
-    private val repository: CardRepository
+    private val repository: CardRepository,
+    private val firestoreSyncer: FirestoreSyncer
 ) : ViewModel() {
 
     private val defaultProfileId = "default_profile"
@@ -63,6 +66,23 @@ class CardListViewModel(
         }
     }
 
+    fun syncFromCloud() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true, error = null)
+            runCatching {
+                withContext(Dispatchers.IO) { firestoreSyncer.syncIssuersAndCards() }
+            }
+                .onSuccess {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        snackbarMessage = "Synced ${it.issuersSynced} issuers, ${it.cardsSynced} cards"
+                    )
+                    loadCards(showLoading = false)
+                }
+                .onFailure { _state.value = _state.value.copy(isLoading = false, error = it.message) }
+        }
+    }
+
     fun snackbarShown() {
         _state.value = _state.value.copy(snackbarMessage = null)
     }
@@ -76,11 +96,11 @@ class CardListViewModel(
         )
 
     companion object {
-        fun factory(repository: CardRepository): ViewModelProvider.Factory {
+        fun factory(repository: CardRepository, firestoreSyncer: FirestoreSyncer): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     @Suppress("UNCHECKED_CAST")
-                    return CardListViewModel(repository) as T
+                    return CardListViewModel(repository, firestoreSyncer) as T
                 }
             }
         }

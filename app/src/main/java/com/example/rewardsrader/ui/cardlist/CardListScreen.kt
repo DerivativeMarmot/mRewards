@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,7 +41,8 @@ fun CardListScreen(
     onSelectCard: (String) -> Unit,
     onAddCard: () -> Unit,
     onDeleteCard: (String) -> Unit,
-    onSnackbarShown: () -> Unit
+    onSnackbarShown: () -> Unit,
+    onSync: () -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val error = state.error
@@ -53,7 +55,16 @@ fun CardListScreen(
     }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Cards") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Cards") },
+                actions = {
+                    IconButton(onClick = onSync) {
+                        Icon(imageVector = Icons.Default.Sync, contentDescription = "Sync cards")
+                    }
+                }
+            )
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         when {

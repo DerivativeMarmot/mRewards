@@ -116,3 +116,9 @@
 - Data: Added `OfferEntity`, `OfferDao`, migration `MIGRATION_6_7`, DB bumped to v7, repository hooks for get/add/update/delete offers, and wiring in `AppContainer`.
 - UI: Offer create/edit flow (`ui/offercreate/*`) with multiplier field, min/max cash back, status, dates, recommended spend hint; navigation wired in `MainActivity`.
 - Card detail: split shared UI into components (`ui/carddetail/components/*`) and tabs (`ui/carddetail/tabs/*`); `CardDetailScreen.kt` now uses `LazyColumn` with sticky `TabRow` + `HorizontalPager` (min height to keep swipe active) to avoid nested scroll crashes and keep FAB per tab; offers tab lists add/edit/delete items.
+## 2026-01-06 Firestore sync button
+- `app/src/main/java/com/example/rewardsrader/data/remote/FirestoreSyncer.kt`: Pulls `issuers` and `cards` collections from Firestore (doc ID as primary key) and upserts into Room via repository; tolerates camel/underscore field names.
+- `app/src/main/java/com/example/rewardsrader/AppContainer.kt`: Wires `FirebaseFirestore` into `FirestoreSyncer` for dependency injection.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Adds cloud sync trigger dispatched on IO with success snackbar and reload.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Adds sync icon in the top bar.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Passes sync callback into the card list screen.

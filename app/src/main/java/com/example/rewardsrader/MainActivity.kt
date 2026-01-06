@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
 
         appContainer = AppContainer(applicationContext)
         val cardListViewModel: CardListViewModel by viewModels {
-            CardListViewModel.factory(appContainer.cardRepository)
+            CardListViewModel.factory(appContainer.cardRepository, appContainer.firestoreSyncer)
         }
         val cardDetailViewModel: CardDetailViewModel by viewModels {
             CardDetailViewModel.factory(appContainer.cardRepository)
@@ -85,7 +85,8 @@ class MainActivity : ComponentActivity() {
                     onSelectCard = { id -> navController.navigate("detail/$id") },
                     onAddCard = { navController.navigate("create") },
                     onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
-                    onSnackbarShown = { cardListViewModel.snackbarShown() }
+                    onSnackbarShown = { cardListViewModel.snackbarShown() },
+                    onSync = { cardListViewModel.syncFromCloud() }
                 )
             }
 
