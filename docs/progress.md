@@ -103,3 +103,8 @@
 - CardListViewModel exposes sync action with IO dispatch, snackbar on success, and reload of list state.
 - CardListScreen top bar now includes a sync icon; MainActivity passes the callback.
 - Added coroutines play-services dependency for Task await support.
+
+## 2026-01-06 Card creation from local DB
+- Card creation state/viewmodel/screen now load issuer and card options from Room via `CardTemplateSource`, filter products by issuer, and pass string IDs; save uses a database-backed importer.
+- CardRepository exposes issuer/card getters and `getCardWithBenefits`, and CardTemplateImporter adds `importFromDatabase` to build profile cards/applications from stored templates (linking benefits when present).
+- CardCreateViewModelTest updated for the new flow; CardRepositoryTest and CardTemplateImporterTest were refactored to the current schema and all targeted unit tests now pass (`./gradlew testDebugUnitTest --tests ...CardRepositoryTest --tests ...CardTemplateImporterTest --tests ...CardCreateViewModelTest`).

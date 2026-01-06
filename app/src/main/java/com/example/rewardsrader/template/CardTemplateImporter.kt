@@ -32,6 +32,14 @@ interface CardTemplateImporterContract {
         applicationStatus: String,
         welcomeOfferProgress: String?
     ): ImportResult
+
+    suspend fun importFromDatabase(
+        templateCardId: String,
+        openDateUtc: String?,
+        statementCutUtc: String?,
+        applicationStatus: String,
+        welcomeOfferProgress: String?
+    ): ImportResult
 }
 
 class CardTemplateImporter(
@@ -94,6 +102,63 @@ class CardTemplateImporter(
             welcomeOfferTerms = welcomeOfferProgress
         )
         repository.addApplications(listOf(application))
+        return ImportResult.Success(profileCardId)
+    }
+
+    override suspend fun importFromDatabase(
+        templateCardId: String,
+        openDateUtc: String?,
+        statementCutUtc: String?,
+        applicationStatus: String,
+        welcomeOfferProgress: String?
+    ): ImportResult {
+        val cardWithBenefits = repository.getCardWithBenefits(templateCardId)
+            ?: return ImportResult.Failure("Card $templateCardId not found.")
+        val profile = repository.ensureProfile(defaultProfileId, name = "Default Profile")
+
+        val profileCardId = repository.newId()
+        val profileCard = ProfileCardEntity(
+            id = profileCardId,
+            profileId = profile.id,
+            templateCardId = cardWithBenefits.card.id,
+            nickname = cardWithBenefits.card.productName,
+            annualFee = cardWithBenefits.card.annualFee,
+            lastFour = null,
+            openDateUtc = openDateUtc,
+            closeDateUtc = null,
+            statementCutUtc = statementCutUtc,
+            welcomeOfferProgress = welcomeOfferProgress,
+            status = applicationStatus.toCardStatus(),
+            notes = null,
+            subSpending = null,
+            subDuration = null,
+            subDurationUnit = null
+        )
+        repository.upsertProfileCards(listOf(profileCard))
+
+        if (cardWithBenefits.benefits.isNotEmpty()) {
+            val profileBenefitLinks = cardWithBenefits.benefits.map {
+                ProfileCardBenefitEntity(
+                    id = repository.newId(),
+                    profileCardId = profileCardId,
+                    benefitId = it.id
+                )
+            }
+            repository.upsertProfileCardBenefits(profileBenefitLinks)
+        }
+
+        val application = ApplicationEntity(
+            id = repository.newId(),
+            profileCardId = profileCardId,
+            applicationDateUtc = openDateUtc,
+            decisionDateUtc = null,
+            status = applicationStatus,
+            creditBureau = null,
+            reconsiderationNotes = null,
+            welcomeOfferTerms = welcomeOfferProgress
+        )
+        repository.addApplications(listOf(application))
+
         return ImportResult.Success(profileCardId)
     }
 

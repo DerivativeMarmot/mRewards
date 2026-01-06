@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity() {
             OfferCreateViewModel.factory(appContainer.cardRepository)
         }
         val cardCreateViewModel: CardCreateViewModel by viewModels {
-            CardCreateViewModel.factory(appContainer.cardConfigProvider, appContainer.cardTemplateImporter)
+            CardCreateViewModel.factory(appContainer.cardRepository, appContainer.cardTemplateImporter)
         }
 
         NavHost(
@@ -142,7 +142,7 @@ class MainActivity : ComponentActivity() {
                     stateFlow = cardCreateViewModel.state,
                     onLoad = { cardCreateViewModel.loadTemplates() },
                     onIssuerSelected = { cardCreateViewModel.updateSelectedIssuer(it) },
-                    onTemplateSelected = { cardCreateViewModel.updateSelectedTemplate(it) },
+                    onCardSelected = { cardCreateViewModel.updateSelectedTemplate(it) },
                     onOpenDateChange = { cardCreateViewModel.updateOpenDate(it) },
                     onStatementCutChange = { cardCreateViewModel.updateStatementCut(it) },
                     onApplicationStatusChange = { cardCreateViewModel.updateApplicationStatus(it) },

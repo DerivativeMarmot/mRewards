@@ -482,3 +482,6 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-06 00:11] User: add sync button at card list top bar. when user clicks, it gets issuers and cards collections from firestore and load into room database. before starting, do you have any questions.
 [2026-01-06 00:12] Assistant: asked about firestore setup/auth, collection schemas, merge strategy (upsert vs replace), and icon vs text button preference
 [2026-01-06 00:13] User: firebase configured, collections mirror schema.prisma with doc id as id; no auth; upsert on id; collection names match room tables; prefer icon
+[2026-01-06 11:38] User: in card creation screen, fetch issuers and cards from local database.
+[2026-01-06 11:40] Assistant: Implemented DB-backed card creation selections/importer; see progress log for test status.
+[2026-01-06 12:31] Assistant: Refactored repository/importer tests to current schema and reran unit tests successfully.

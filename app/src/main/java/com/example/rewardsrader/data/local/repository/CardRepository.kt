@@ -17,6 +17,7 @@ import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardBenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardFaceEntity
+import com.example.rewardsrader.data.local.entity.CardWithBenefits
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.NotificationRuleEntity
 import com.example.rewardsrader.data.local.entity.OfferEntity
@@ -26,6 +27,11 @@ import com.example.rewardsrader.data.local.entity.ProfileEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.entity.TransactionEntity
 import java.util.UUID
+
+interface CardTemplateSource {
+    suspend fun getIssuers(): List<IssuerEntity>
+    suspend fun getCards(): List<CardEntity>
+}
 
 /**
  * Repository facade around the Prisma-aligned Room schema.
@@ -44,7 +50,7 @@ class CardRepository(
     private val notificationRuleDao: NotificationRuleDao,
     private val offerDao: OfferDao,
     private val applicationDao: ApplicationDao
-) {
+) : CardTemplateSource {
     suspend fun upsertIssuers(issuers: List<IssuerEntity>) {
         if (issuers.isNotEmpty()) issuerDao.insertAll(issuers)
     }
@@ -60,6 +66,12 @@ class CardRepository(
     suspend fun upsertBenefits(benefits: List<BenefitEntity>) {
         if (benefits.isNotEmpty()) benefitDao.insertAll(benefits)
     }
+
+    override suspend fun getIssuers(): List<IssuerEntity> = issuerDao.getAll()
+
+    override suspend fun getCards(): List<CardEntity> = cardDao.getAll()
+
+    suspend fun getCardWithBenefits(cardId: String): CardWithBenefits? = cardDao.getWithBenefits(cardId)
 
     suspend fun upsertBenefit(benefit: BenefitEntity) {
         benefitDao.insert(benefit)
