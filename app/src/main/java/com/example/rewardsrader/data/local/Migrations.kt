@@ -73,3 +73,11 @@ val MIGRATION_8_9 = object : Migration(8, 9) {
         database.execSQL("ALTER TABLE cards ADD COLUMN segment TEXT NOT NULL DEFAULT 'Personal'")
     }
 }
+
+// Migration 9->10 renames foreign transaction fee column by adding a new column and backfilling.
+val MIGRATION_9_10 = object : Migration(9, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE cards ADD COLUMN foreignTransactionFee REAL NOT NULL DEFAULT 0.0")
+        database.execSQL("UPDATE cards SET foreignTransactionFee = COALESCE(foreignFeeTransactionFee, 0.0)")
+    }
+}

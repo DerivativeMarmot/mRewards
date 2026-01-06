@@ -113,3 +113,4 @@
 - Added `PaymentInstrument` (Credit, Debit, Charge) and `CardSegment` (Personal, Business) enums to the Prisma schema and wired them into the `Card` model with defaults and column mapping.
 - Mirrored the schema in code: Room enums/converters, `CardEntity` fields, Firestore sync mapping, importer defaults, DB version bump (v9), and migration stub for new columns.
 - Targeted unit tests remain passing after the schema changes (`./gradlew testDebugUnitTest --tests ...CardRepositoryTest --tests ...CardTemplateImporterTest --tests ...CardCreateViewModelTest`).
+- Renamed `foreignFeeTransactionFee` to `foreignTransactionFee` across schema and code (entity, Firestore sync fallback, importer), added migration 9->10 to backfill the new column, bumped DB to v10, and re-ran targeted unit tests (pass).

@@ -25,5 +25,5 @@ data class CardEntity(
     val paymentInstrument: PaymentInstrument = PaymentInstrument.Credit,
     val segment: CardSegment = CardSegment.Personal,
     val annualFee: Double,
-    val foreignFeeTransactionFee: Double = 0.0
+    val foreignTransactionFee: Double = 0.0
 )

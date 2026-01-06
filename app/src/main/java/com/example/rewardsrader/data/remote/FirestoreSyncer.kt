@@ -54,7 +54,9 @@ class FirestoreSyncer(
             ?.let { runCatching { CardSegment.valueOf(it) }.getOrNull() }
             ?: CardSegment.Personal
         val annualFee = doubleField("annualFee", "annual_fee") ?: 0.0
-        val foreignFee = doubleField("foreignFeeTransactionFee", "foreign_fee_transaction_fee") ?: 0.0
+        val foreignFee = doubleField("foreignTransactionFee", "foreign_transaction_fee")
+            ?: doubleField("foreignFeeTransactionFee", "foreign_fee_transaction_fee")
+            ?: 0.0
         return CardEntity(
             id = id,
             issuerId = issuerId,
@@ -63,7 +65,7 @@ class FirestoreSyncer(
             paymentInstrument = paymentInstrument,
             segment = segment,
             annualFee = annualFee,
-            foreignFeeTransactionFee = foreignFee
+            foreignTransactionFee = foreignFee
         )
     }
 

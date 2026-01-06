@@ -487,3 +487,4 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-06 12:31] Assistant: Refactored repository/importer tests to current schema and reran unit tests successfully.
 [2026-01-06 14:31] Assistant: Updated schema.prisma and schema.md to include PaymentInstrument and CardSegment enums and added them to Card model; logged progress.
 [2026-01-06 14:45] Assistant: Implemented PaymentInstrument/CardSegment enums in Room schema (entity, converters, importer default, Firestore sync), bumped DB version, added migration stub, and reran targeted unit tests (pass).
+[2026-01-06 15:05] Assistant: Renamed foreign fee field to foreignTransactionFee (schema, Room entity, Firestore sync fallback, importer), added migration 9->10 and bumped DB to v10; targeted unit tests still passing.

@@ -78,7 +78,7 @@ class CardRepositoryTest {
                     productName = "Example Cash Preferred",
                     network = CardNetwork.Visa,
                     annualFee = 95.0,
-                    foreignFeeTransactionFee = 0.0
+                    foreignTransactionFee = 0.0
                 )
             )
         )

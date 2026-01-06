@@ -29,7 +29,7 @@ model Card {
   segment                  CardSegment   @default(Personal)
   annualFee                Float         @map("annual_fee")
   profileCards             ProfileCard[]
-  foreignFeeTransactionFee Float         @default(0.00) @map("foreign_fee_transaction_fee")
+  foreignTransactionFee Float         @default(0.00) @map("foreign_transaction_fee")
   cardBenefits             CardBenefit[]
 
   issuer Issuer @relation(fields: [issuerId], references: [id], onDelete: Cascade)

@@ -173,7 +173,7 @@ class CardTemplateImporter(
             paymentInstrument = PaymentInstrument.Credit,
             segment = CardSegment.Personal,
             annualFee = template.annualFeeUsd,
-            foreignFeeTransactionFee = 0.0
+            foreignTransactionFee = 0.0
         )
 
     private fun mapProfileCard(

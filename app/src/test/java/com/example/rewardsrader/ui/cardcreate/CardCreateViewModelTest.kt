@@ -9,7 +9,6 @@ import com.example.rewardsrader.template.ImportResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import com.example.rewardsrader.util.MainDispatcherRule
@@ -34,7 +33,7 @@ class CardCreateViewModelTest {
                         productName = "Example Cash Preferred",
                         network = CardNetwork.Visa,
                         annualFee = 95.0,
-                        foreignFeeTransactionFee = 0.0
+                        foreignTransactionFee = 0.0
                     )
                 )
         }
