@@ -2,6 +2,8 @@ package com.example.rewardsrader.data.remote
 
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardNetwork
+import com.example.rewardsrader.data.local.entity.CardSegment
+import com.example.rewardsrader.data.local.entity.PaymentInstrument
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import com.google.firebase.firestore.DocumentSnapshot
@@ -43,6 +45,14 @@ class FirestoreSyncer(
         val network = networkValue
             ?.let { runCatching { CardNetwork.valueOf(it) }.getOrNull() }
             ?: CardNetwork.Visa
+        val instrumentValue = stringField("paymentInstrument", "payment_instrument")?.uppercase()
+        val paymentInstrument = instrumentValue
+            ?.let { runCatching { PaymentInstrument.valueOf(it) }.getOrNull() }
+            ?: PaymentInstrument.Credit
+        val segmentValue = stringField("segment")?.uppercase()
+        val segment = segmentValue
+            ?.let { runCatching { CardSegment.valueOf(it) }.getOrNull() }
+            ?: CardSegment.Personal
         val annualFee = doubleField("annualFee", "annual_fee") ?: 0.0
         val foreignFee = doubleField("foreignFeeTransactionFee", "foreign_fee_transaction_fee") ?: 0.0
         return CardEntity(
@@ -50,6 +60,8 @@ class FirestoreSyncer(
             issuerId = issuerId,
             productName = productName,
             network = network,
+            paymentInstrument = paymentInstrument,
+            segment = segment,
             annualFee = annualFee,
             foreignFeeTransactionFee = foreignFee
         )

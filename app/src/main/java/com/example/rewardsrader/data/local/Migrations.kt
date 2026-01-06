@@ -65,3 +65,11 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         database.execSQL("ALTER TABLE offers ADD COLUMN multiplierRate REAL")
     }
 }
+
+// Migration 8->9 adds paymentInstrument and segment to cards.
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE cards ADD COLUMN paymentInstrument TEXT NOT NULL DEFAULT 'Credit'")
+        database.execSQL("ALTER TABLE cards ADD COLUMN segment TEXT NOT NULL DEFAULT 'Personal'")
+    }
+}

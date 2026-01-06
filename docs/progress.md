@@ -108,3 +108,8 @@
 - Card creation state/viewmodel/screen now load issuer and card options from Room via `CardTemplateSource`, filter products by issuer, and pass string IDs; save uses a database-backed importer.
 - CardRepository exposes issuer/card getters and `getCardWithBenefits`, and CardTemplateImporter adds `importFromDatabase` to build profile cards/applications from stored templates (linking benefits when present).
 - CardCreateViewModelTest updated for the new flow; CardRepositoryTest and CardTemplateImporterTest were refactored to the current schema and all targeted unit tests now pass (`./gradlew testDebugUnitTest --tests ...CardRepositoryTest --tests ...CardTemplateImporterTest --tests ...CardCreateViewModelTest`).
+
+## 2026-01-06 Schema updates
+- Added `PaymentInstrument` (Credit, Debit, Charge) and `CardSegment` (Personal, Business) enums to the Prisma schema and wired them into the `Card` model with defaults and column mapping.
+- Mirrored the schema in code: Room enums/converters, `CardEntity` fields, Firestore sync mapping, importer defaults, DB version bump (v9), and migration stub for new columns.
+- Targeted unit tests remain passing after the schema changes (`./gradlew testDebugUnitTest --tests ...CardRepositoryTest --tests ...CardTemplateImporterTest --tests ...CardCreateViewModelTest`).

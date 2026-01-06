@@ -55,6 +55,23 @@ enum CardNetwork {
 }
 ```
 
+### PaymentInstrument
+```prisma
+enum PaymentInstrument {
+  Credit
+  Debit
+  Charge
+}
+```
+
+### CardSegment
+```prisma
+enum CardSegment {
+  Personal
+  Business
+}
+```
+
 ### CardStaus
 ```prisma
 enum CardStaus {
@@ -113,6 +130,8 @@ enum CardSubDurationUnit {
 | `productName` | String | @map("product_name") |
 | `faces` | CardFace[] | |
 | `network` | CardNetwork | @default(Visa) |
+| `paymentInstrument` | PaymentInstrument | @default(Credit) @map("payment_instrument") |
+| `segment` | CardSegment | @default(Personal) |
 | `annualFee` | Float | @map("annual_fee") |
 | `profileCards` | ProfileCard[] | |
 | `foreignFeeTransactionFee` | Float | @default(0.00) @map("foreign_fee_transaction_fee") |

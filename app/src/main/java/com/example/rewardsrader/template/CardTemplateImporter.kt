@@ -11,7 +11,9 @@ import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.data.local.entity.CardBenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardNetwork
+import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.CardStatus
+import com.example.rewardsrader.data.local.entity.PaymentInstrument
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
@@ -168,6 +170,8 @@ class CardTemplateImporter(
             issuerId = template.issuer,
             productName = template.productName,
             network = template.network.toCardNetwork(),
+            paymentInstrument = PaymentInstrument.Credit,
+            segment = CardSegment.Personal,
             annualFee = template.annualFeeUsd,
             foreignFeeTransactionFee = 0.0
         )
