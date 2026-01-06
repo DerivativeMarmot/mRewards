@@ -30,7 +30,7 @@ data class BenefitTemplate(
     val type: BenefitType,
     @SerialName("amount_usd") val amountUsd: Double? = null,
     @SerialName("cap_usd") val capUsd: Double? = null,
-    val cadence: Cadence,
+    val cadence: BenefitCadence,
     val category: String? = null,
     val merchant: String? = null,
     @SerialName("enrollment_required") val enrollmentRequired: Boolean,
@@ -49,9 +49,11 @@ enum class BenefitType {
 }
 
 @Serializable
-enum class Cadence {
+enum class BenefitCadence {
     @SerialName("once") ONCE,
     @SerialName("monthly") MONTHLY,
     @SerialName("quarterly") QUARTERLY,
-    @SerialName("annual") ANNUAL
+    @SerialName("annual") ANNUALLY,
+    @SerialName("semi_annually") SEMI_ANNUALLY,
+    @SerialName("every_anniversary") EVERY_ANNIVERSARY
 }

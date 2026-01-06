@@ -31,7 +31,7 @@ class BenefitCreateViewModel(
         )
     }
 
-    fun startEdit(benefitId: String, productName: String, issuer: String) {
+    fun startEdit(profileCardId: String, benefitId: String, productName: String, issuer: String) {
         viewModelScope.launch {
             val existingCustom = _state.value.customCategories.toMutableList()
             runCatching { repository.getBenefit(benefitId) }
@@ -41,7 +41,7 @@ class BenefitCreateViewModel(
                     existingCustom.addAll(categories)
                     _state.value = BenefitCreateState(
                         benefitId = benefit.id,
-                        cardId = _state.value.cardId,
+                        cardId = profileCardId,
                         productName = productName,
                         issuer = issuer,
                         title = benefit.notes.orEmpty(),
