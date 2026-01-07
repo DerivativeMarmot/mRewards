@@ -99,7 +99,7 @@ class CardDetailViewModel(
                     ?: throw IllegalArgumentException("Card not found")
             }.onSuccess { relations ->
                 currentCard = relations.profileCard
-                templateAnnualFee = relations.templateCard?.annualFee ?: 0.0
+                templateAnnualFee = relations.profileCard.annualFee
                 templateIssuer = relations.templateCard?.issuerId.orEmpty()
                 templateNetwork = relations.templateCard?.network?.name ?: ""
                 _state.value = CardDetailState(
@@ -145,8 +145,9 @@ class CardDetailViewModel(
 
     fun updateOpenDate(value: String) = updateCard { it.copy(openDateUtc = value.ifBlank { null }) }
 
-    fun updateAnnualFee(value: String) {
-        // Annual fee comes from template; no-op placeholder for legacy UI wiring.
+    fun updateAnnualFee(value: String) = updateCard {
+        val parsed = value.toDoubleOrNull() ?: it.annualFee
+        it.copy(annualFee = parsed)
     }
 
     fun updateStatementCut(value: String) = updateCard { it.copy(statementCutUtc = value.ifBlank { null }) }
@@ -170,6 +171,7 @@ class CardDetailViewModel(
         viewModelScope.launch {
             runCatching {
                 val updated = update(card)
+                templateAnnualFee = updated.annualFee
                 repository.updateProfileCard(updated)
                 currentCard = updated
                 val currentDetail = _state.value.detail
@@ -179,7 +181,7 @@ class CardDetailViewModel(
                             nickname = updated.nickname,
                             lastFour = updated.lastFour,
                             status = updated.status.name,
-                            annualFee = "$$templateAnnualFee",
+                            annualFee = "${'$'}${updated.annualFee}",
                             openDate = updated.openDateUtc,
                             statementCut = updated.statementCutUtc,
                             welcomeOfferProgress = updated.welcomeOfferProgress,
@@ -210,7 +212,7 @@ class CardDetailViewModel(
             nickname = card.profileCard.nickname,
             lastFour = card.profileCard.lastFour,
             status = card.profileCard.status.name,
-            annualFee = "${'$'}${card.templateCard?.annualFee ?: 0.0}",
+            annualFee = "${'$'}${card.profileCard.annualFee}",
             openDate = card.profileCard.openDateUtc,
             statementCut = card.profileCard.statementCutUtc,
             welcomeOfferProgress = card.profileCard.welcomeOfferProgress,
