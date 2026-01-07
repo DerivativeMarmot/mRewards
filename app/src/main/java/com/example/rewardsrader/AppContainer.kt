@@ -17,7 +17,17 @@ class AppContainer(context: Context) {
         AppDatabase::class.java,
         "rewardsrader.db"
     )
-        .fallbackToDestructiveMigration()
+        .addMigrations(
+            com.example.rewardsrader.data.local.MIGRATION_1_2,
+            com.example.rewardsrader.data.local.MIGRATION_2_3,
+            com.example.rewardsrader.data.local.MIGRATION_3_4,
+            com.example.rewardsrader.data.local.MIGRATION_4_5,
+            com.example.rewardsrader.data.local.MIGRATION_5_6,
+            com.example.rewardsrader.data.local.MIGRATION_6_7,
+            com.example.rewardsrader.data.local.MIGRATION_8_9,
+            com.example.rewardsrader.data.local.MIGRATION_9_10,
+            com.example.rewardsrader.data.local.MIGRATION_10_12
+        )
         .build()
 
     val cardRepository: CardRepository = CardRepository(

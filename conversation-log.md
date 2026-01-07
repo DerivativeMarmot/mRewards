@@ -489,3 +489,6 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-06 14:45] Assistant: Implemented PaymentInstrument/CardSegment enums in Room schema (entity, converters, importer default, Firestore sync), bumped DB version, added migration stub, and reran targeted unit tests (pass).
 [2026-01-06 15:05] Assistant: Renamed foreign fee field to foreignTransactionFee (schema, Room entity, Firestore sync fallback, importer), added migration 9->10 and bumped DB to v10; targeted unit tests still passing.
 [2026-01-06 15:25] Assistant: Deep-copied benefits on card add (new per-user benefit IDs) and updated tests/progress; kept template/remote records immutable.
+[2026-01-06 15:40] Assistant: Fixed benefit frequency/category mapping so saved values persist; re-ran targeted unit tests (pass).
+[2026-01-06 16:00] Assistant: Added categoriesRaw to benefits for scoped/custom category persistence, fixed frequency/category mapping, bumped DB to v11; clean rebuild and targeted tests passing.
+[2026-01-06 16:20] Assistant: Removed categoriesRaw, enforced enum-only categories, cleaned category dialog, bumped DB to v12; retested after rebuild.

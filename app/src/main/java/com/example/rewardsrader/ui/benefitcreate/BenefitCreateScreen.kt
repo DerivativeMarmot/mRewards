@@ -273,17 +273,12 @@ fun BenefitCreateScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Categories")
-                IconButton(onClick = { showCategoryDialog = true }) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edit categories")
-                }
+                // Categories fixed to enum values; no edit dialog.
             }
-            val issuerPrefix = "${state.issuer}:"
-            val scopedCommon = commonCategories.map { label -> CategoryItem(label = label, key = "$issuerPrefix$label") }
-            val scopedCustom = state.customCategories.filter { it.startsWith(issuerPrefix) }
-                .map { scoped ->
-                    CategoryItem(label = scoped.removePrefix(issuerPrefix), key = scoped)
-                }
-            val allCategories = (scopedCommon + scopedCustom).distinctBy { it.key }
+            val allCategories = com.example.rewardsrader.data.local.entity.BenefitCategory.values().map {
+                val label = it.name.replace(Regex("([A-Z])"), " $1").trim()
+                CategoryItem(label = label, key = it.name)
+            }
             FlowCategoryChips(
                 categories = allCategories,
                 selected = state.categories,
@@ -340,20 +335,7 @@ fun BenefitCreateScreen(
         )
     }
 
-    if (showCategoryDialog) {
-        AddCategoryDialog(
-            current = state.customCategory,
-            onValueChange = onCustomCategoryChange,
-            onAdd = {
-                onAddCustomCategory()
-                showCategoryDialog = false
-            },
-            onRemove = onRemoveCustomCategory,
-            customCategories = state.customCategories,
-            issuer = state.issuer,
-            onDismiss = { showCategoryDialog = false }
-        )
-    }
+    // Custom category dialog removed (enum-only categories).
 
     if (showEffectivePicker) {
         DatePickerDialog(
@@ -514,44 +496,8 @@ private fun AddCategoryDialog(
     onRemove: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Edit categories") },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = current,
-                    onValueChange = onValueChange,
-                    label = { Text("Category name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                val prefix = if (issuer.isNotBlank()) "$issuer:" else ""
-                val scoped = customCategories.filter { prefix.isBlank() || it.startsWith(prefix) }
-                if (scoped.isNotEmpty()) {
-                    Text("Custom categories", style = MaterialTheme.typography.titleSmall)
-                    scoped.forEach { scopedCat ->
-                        val label = scopedCat.removePrefix(prefix)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(label)
-                            IconButton(onClick = { onRemove(scopedCat) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Remove category")
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            Button(onClick = onAdd, enabled = current.isNotBlank()) { Text("Add") }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss) { Text("Cancel") }
-        }
-    )
+    // Unused placeholder retained for API compatibility; categories are fixed to enum values.
+    onDismiss()
 }
 
 @Composable

@@ -216,12 +216,35 @@ class BenefitCreateViewModel(
         runCatching { BenefitType.valueOf(uppercase(Locale.US)) }.getOrDefault(BenefitType.Credit)
 
     private fun String.toBenefitFrequency(): BenefitFrequency =
-        runCatching { BenefitFrequency.valueOf(uppercase(Locale.US)) }.getOrDefault(BenefitFrequency.Monthly)
+        when (lowercase(Locale.US)) {
+            "monthly" -> BenefitFrequency.Monthly
+            "quarterly" -> BenefitFrequency.Quarterly
+            "semiannually", "semi_annual", "semi-annual", "semi-annually" -> BenefitFrequency.SemiAnnually
+            "annually", "annual" -> BenefitFrequency.Annually
+            "everyanniversary", "every_anniversary", "anniversary" -> BenefitFrequency.EveryAnniversary
+            else -> BenefitFrequency.Monthly
+        }
 
     private fun String.toBenefitCategory(): BenefitCategory {
-        val normalized = replace(" ", "").replace("-", "").replace(":", "").replace("_", "")
-        return runCatching { BenefitCategory.valueOf(normalized.replaceFirstChar { it.uppercase() }) }
-            .getOrDefault(BenefitCategory.Others)
+        val normalized = replace(" ", "")
+            .replace("-", "")
+            .replace("_", "")
+            .substringAfter(":")
+            .lowercase(Locale.US)
+        return when (normalized) {
+            "dining" -> BenefitCategory.Dining
+            "onlineshopping" -> BenefitCategory.OnlineShopping
+            "grocery", "groceries" -> BenefitCategory.Grocery
+            "restaurant" -> BenefitCategory.Restaurant
+            "drugstore", "drugstores" -> BenefitCategory.DrugStore
+            "travel" -> BenefitCategory.Travel
+            "gas" -> BenefitCategory.Gas
+            "evcharging", "evcharge", "ev" -> BenefitCategory.EVCharging
+            "streaming" -> BenefitCategory.Streaming
+            "transit" -> BenefitCategory.Transit
+            "utilities", "utility" -> BenefitCategory.Utilities
+            else -> BenefitCategory.Others
+        }
     }
 
     companion object {
