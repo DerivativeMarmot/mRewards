@@ -84,14 +84,10 @@ class CardTemplateImporter(
         val profileCardId = repository.newId()
         val profileCard = mapProfileCard(cardTemplate, profile.id, profileCardId, openDateUtc, statementCutUtc, applicationStatus, welcomeOfferProgress)
         repository.upsertProfileCards(listOf(profileCard))
-        val profileBenefitLinks = benefitEntities.map {
-            ProfileCardBenefitEntity(
-                id = repository.newId(),
-                profileCardId = profileCardId,
-                benefitId = it.id
-            )
+        benefitEntities.forEach { templateBenefit ->
+            val copiedBenefit = templateBenefit.copy(id = repository.newId())
+            repository.addBenefitForProfileCard(profileCardId, copiedBenefit)
         }
-        repository.upsertProfileCardBenefits(profileBenefitLinks)
 
         val application = ApplicationEntity(
             id = repository.newId(),
@@ -139,14 +135,10 @@ class CardTemplateImporter(
         repository.upsertProfileCards(listOf(profileCard))
 
         if (cardWithBenefits.benefits.isNotEmpty()) {
-            val profileBenefitLinks = cardWithBenefits.benefits.map {
-                ProfileCardBenefitEntity(
-                    id = repository.newId(),
-                    profileCardId = profileCardId,
-                    benefitId = it.id
-                )
+            cardWithBenefits.benefits.forEach { benefit ->
+                val copied = benefit.copy(id = repository.newId())
+                repository.addBenefitForProfileCard(profileCardId, copied)
             }
-            repository.upsertProfileCardBenefits(profileBenefitLinks)
         }
 
         val application = ApplicationEntity(

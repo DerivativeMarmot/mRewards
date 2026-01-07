@@ -91,6 +91,11 @@ class CardTemplateImporterTest {
         assertEquals(1, application.size)
         assertEquals("approved", application.first().status)
         assertEquals("75%", application.first().welcomeOfferTerms)
+
+        val profileBenefits = repository.getBenefitsForProfileCard(profileCardId)
+        assertEquals(2, profileBenefits.size)
+        val templateBenefitIds = card?.benefits?.map { it.id }?.toSet().orEmpty()
+        assertTrue(profileBenefits.none { it.id in templateBenefitIds })
     }
 
     private val sampleJson = """
