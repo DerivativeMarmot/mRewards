@@ -112,3 +112,12 @@ val MIGRATION_10_12 = object : Migration(10, 12) {
         database.execSQL("ALTER TABLE benefits_new RENAME TO benefits")
     }
 }
+
+// Migration 12->13 adds SUB fields to profile_cards (previously only on template cards).
+val MIGRATION_12_13 = object : Migration(12, 13) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE profile_cards ADD COLUMN subSpending REAL")
+        database.execSQL("ALTER TABLE profile_cards ADD COLUMN subDuration INTEGER")
+        database.execSQL("ALTER TABLE profile_cards ADD COLUMN subDurationUnit TEXT")
+    }
+}

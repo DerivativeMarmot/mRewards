@@ -162,8 +162,9 @@ class CardDetailViewModel(
     }
 
     fun updateSubDuration(value: String, unit: String) = updateCard {
-        val parsed = value.toIntOrNull()
-        it.copy(subDuration = parsed, subDurationUnit = unit.toCardSubDurationUnit())
+        val parsed = value.trim().toIntOrNull() ?: it.subDuration
+        val mappedUnit = unit.toCardSubDurationUnit() ?: it.subDurationUnit ?: CardSubDurationUnit.Month
+        it.copy(subDuration = parsed, subDurationUnit = mappedUnit)
     }
 
     private fun updateCard(update: (ProfileCardEntity) -> ProfileCardEntity) {
@@ -188,7 +189,7 @@ class CardDetailViewModel(
                             notes = updated.notes,
                             subSpending = updated.subSpending?.toString(),
                             subDuration = updated.subDuration?.toString(),
-                            subDurationUnit = updated.subDurationUnit?.name
+                            subDurationUnit = updated.subDurationUnit.toDisplayUnit()
                         )
                     )
                 }
@@ -219,7 +220,7 @@ class CardDetailViewModel(
             notes = card.profileCard.notes,
             subSpending = card.profileCard.subSpending?.toString(),
             subDuration = card.profileCard.subDuration?.toString(),
-            subDurationUnit = card.profileCard.subDurationUnit?.name,
+            subDurationUnit = card.profileCard.subDurationUnit.toDisplayUnit(),
             applications = applications.map {
                 ApplicationUi(
                     status = it.status,
@@ -346,7 +347,17 @@ class CardDetailViewModel(
         runCatching { CardStatus.valueOf(this) }.getOrDefault(CardStatus.Active)
 
     private fun String.toCardSubDurationUnit(): CardSubDurationUnit? =
-        runCatching { CardSubDurationUnit.valueOf(this) }.getOrNull()
+        when (lowercase()) {
+            "month", "months", "cardsubdurationunit.month" -> CardSubDurationUnit.Month
+            "day", "days", "cardsubdurationunit.day" -> CardSubDurationUnit.Day
+            else -> runCatching { CardSubDurationUnit.valueOf(uppercase()) }.getOrNull()
+        }
+
+    private fun CardSubDurationUnit?.toDisplayUnit(): String? = when (this) {
+        CardSubDurationUnit.Day -> "days"
+        CardSubDurationUnit.Month -> "months"
+        null -> null
+    }
 
     companion object {
         fun factory(repository: CardRepository): ViewModelProvider.Factory {

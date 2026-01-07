@@ -43,7 +43,7 @@ import com.example.rewardsrader.data.local.entity.TransactionEntity
         OfferEntity::class,
         ApplicationEntity::class
     ],
-    version = 12,
+    version = 13,
     exportSchema = false
 )
 @TypeConverters(EnumConverters::class)

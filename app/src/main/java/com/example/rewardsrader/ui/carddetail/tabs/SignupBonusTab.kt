@@ -51,7 +51,12 @@ fun SignupBonusTab(
     var spendingValue by rememberSaveable(spending) { mutableStateOf(spending.orEmpty()) }
     var durationValue by rememberSaveable(duration) { mutableStateOf(duration.orEmpty()) }
     var durationUnitSelection by rememberSaveable(durationUnit) {
-        mutableStateOf(if (durationUnit == DurationUnit.DAYS.label) DurationUnit.DAYS else DurationUnit.MONTHS)
+        mutableStateOf(
+            when (durationUnit.lowercase()) {
+                DurationUnit.DAYS.label, DurationUnit.DAYS.name.lowercase() -> DurationUnit.DAYS
+                else -> DurationUnit.MONTHS
+            }
+        )
     }
     var editingField by remember { mutableStateOf<BonusField?>(null) }
     Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)) {
@@ -152,7 +157,7 @@ fun SignupBonusTab(
                     } else {
                         durationValue = draft
                         durationUnitSelection = unitSelection
-                        onUpdateDuration(draft, unitSelection.label)
+                        onUpdateDuration(draft, unitSelection.name)
                     }
                     editingField = null
                 }) { Text("Save") }
