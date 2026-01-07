@@ -23,6 +23,7 @@ enum BenefitCategory {
   Transit
   Utilities
   Others
+  RideShare
 }
 ```
 

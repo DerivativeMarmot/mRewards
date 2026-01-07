@@ -240,6 +240,7 @@ class BenefitCreateViewModel(
             "travel" -> BenefitCategory.Travel
             "gas" -> BenefitCategory.Gas
             "evcharging", "evcharge", "ev" -> BenefitCategory.EVCharging
+            "rideshare", "ride", "rides" -> BenefitCategory.RideShare
             "streaming" -> BenefitCategory.Streaming
             "transit" -> BenefitCategory.Transit
             "utilities", "utility" -> BenefitCategory.Utilities

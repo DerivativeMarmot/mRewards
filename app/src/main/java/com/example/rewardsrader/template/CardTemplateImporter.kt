@@ -222,6 +222,7 @@ class CardTemplateImporter(
                 when (normalized) {
                     "drugstore" -> BenefitCategory.DrugStore
                     "online shopping", "online_shopping" -> BenefitCategory.OnlineShopping
+                    "rideshare", "ride share", "ride_share" -> BenefitCategory.RideShare
                     else -> BenefitCategory.Others
                 }
             }

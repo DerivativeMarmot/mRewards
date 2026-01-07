@@ -56,7 +56,7 @@ import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.StateFlow
 
 private val commonCategories = listOf(
-    "Dining", "Grocery", "Online Shopping", "Travel", "Gas", "Drugstore", "Streaming", "Transit", "Utilities"
+    "Dining", "Grocery", "Online Shopping", "Travel", "Gas", "Drugstore", "Streaming", "Transit", "Utilities", "RideShare"
 )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)

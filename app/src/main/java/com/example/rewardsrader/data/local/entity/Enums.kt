@@ -54,5 +54,6 @@ enum class BenefitCategory {
     Streaming,
     Transit,
     Utilities,
-    Others
+    Others,
+    RideShare
 }
