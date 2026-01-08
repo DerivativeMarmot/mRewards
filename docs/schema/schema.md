@@ -73,9 +73,9 @@ enum CardSegment {
 }
 ```
 
-### CardStaus
+### CardStatus
 ```prisma
-enum CardStaus {
+enum CardStatus {
   Active
   Closed
   Pending
@@ -135,9 +135,17 @@ enum CardSubDurationUnit {
 | `segment` | CardSegment | @default(Personal) |
 | `annualFee` | Float | @map("annual_fee") |
 | `profileCards` | ProfileCard[] | |
+| `templateCards` | TemplateCard[] | |
 | `foreignTransactionFee` | Float | @default(0.00) @map("foreign_transaction_fee") |
 | `cardBenefits` | CardBenefit[] | |
 | `issuer` | Issuer | @relation(fields: [issuerId], references: [id], onDelete: Cascade) |
+
+### TemplateCard
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | String | @id |
+| `cardId` | String? | @map("card_id") |
+| `card` | Card? | @relation(fields: [cardId], references: [id]) |
 
 ### CardBenefit
 | Field | Type | Description |
@@ -203,7 +211,7 @@ enum CardSubDurationUnit {
 | :--- | :--- | :--- |
 | `id` | String | @id @default(cuid()) |
 | `profileId` | String | @map("profile_id") |
-| `templateCardId` | String? | @map("template_card_id") |
+| `cardId` | String? | @map("card_id") |
 | `nickname` | String? | |
 | `annualFee` | Float | @map("annual_fee") |
 | `lastFour` | String? | @map("last_four") |
@@ -220,7 +228,7 @@ enum CardSubDurationUnit {
 | `offers` | Offer[] | |
 | `applications` | Application[] | |
 | `profile` | Profile | @relation(fields: [profileId], references: [id], onDelete: Cascade) |
-| `template` | Card? | @relation(fields: [templateCardId], references: [id]) |
+| `card` | Card? | @relation(fields: [cardId], references: [id]) |
 
 ### ProfileCardBenefit
 | Field | Type | Description |

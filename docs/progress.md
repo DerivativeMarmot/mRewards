@@ -115,3 +115,12 @@
 - Renamed `foreignFeeTransactionFee` to `foreignTransactionFee` across schema and code (entity, Firestore sync fallback, importer), with migration 9->10.
 - CardTemplateImporter deep-copies benefits when adding a card (new benefit IDs linked only to the user’s profile card), keeping template/remote benefits immutable references.
 - Categories now rely solely on the enum values (no extra raw field); benefit save/init mappings normalized to enum names; targeted unit tests pass after clean rebuild.
+
+## 2026-01-08 - Schema review
+- Read updated Prisma schema with the new `TemplateCard` model meant for Firestore-synced templates.
+- Noted drift from Room/code (e.g., `Card.annualFee` missing, TemplateCard not yet represented in entities/DAOs/migrations).
+- Shared feedback on aligning TemplateCard usage, table mapping, and indexes; no code changes made yet.
+
+## 2026-01-08 - Schema rename
+- Updated Prisma schema to link ProfileCard directly to `card_id` (renamed from `template_card_id`) per template separation plan.
+- Refreshed schema documentation to reflect the new ProfileCard linkage, TemplateCard model, and corrected enum spelling.

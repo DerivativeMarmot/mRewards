@@ -492,3 +492,8 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-06 15:40] Assistant: Fixed benefit frequency/category mapping so saved values persist; re-ran targeted unit tests (pass).
 [2026-01-06 16:00] Assistant: Added categoriesRaw to benefits for scoped/custom category persistence, fixed frequency/category mapping, bumped DB to v11; clean rebuild and targeted tests passing.
 [2026-01-06 16:20] Assistant: Removed categoriesRaw, enforced enum-only categories, cleaned category dialog, bumped DB to v12; retested after rebuild.
+[2026-01-08 11:32:40 -08:00] User: # AGENTS.md instructions for D:\WorkSpaces\Android Studio\rewards-radar (shared repository rules).
+[2026-01-08 11:33:10 -08:00] User: Updated docs/schema/schema.prisma with a TemplateCard table for Firestore templates; asked for suggestions before code changes.
+[2026-01-08 11:33:40 -08:00] Assistant: Read required docs (product_functionality, architecture, feature_implementation, schema.md, schema.prisma) and existing Room entities to assess TemplateCard addition and schema alignment; preparing feedback.
+[2026-01-08 11:51:39 -08:00] User: Clarified TemplateCard is only for template reference, not ProfileCard; asked to rename ProfileCard.templateCardId to cardId and requested further schema suggestions.
+[2026-01-08 11:51:39 -08:00] Assistant: Renamed ProfileCard link to card_id in schema.prisma, updated schema.md for TemplateCard and enum spelling, and logged progress; ready for Room/migration follow-up if desired.

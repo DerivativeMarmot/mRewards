@@ -20,22 +20,30 @@ model Issuer {
 }
 
 model Card {
-  id                       String        @id
-  issuerId                 String        @map("issuer_id")
-  productName              String        @map("product_name")
-  faces                    CardFace[]
-  network                  CardNetwork   @default(Visa)
-  paymentInstrument        PaymentInstrument @default(Credit) @map("payment_instrument")
-  segment                  CardSegment   @default(Personal)
-  annualFee                Float         @map("annual_fee")
-  profileCards             ProfileCard[]
-  foreignTransactionFee Float         @default(0.00) @map("foreign_transaction_fee")
-  cardBenefits             CardBenefit[]
+  id                String            @id
+  issuerId          String            @map("issuer_id")
+  productName       String            @map("product_name")
+  faces             CardFace[]
+  network           CardNetwork       @default(Visa)
+  paymentInstrument PaymentInstrument @default(Credit) @map("payment_instrument")
+  segment           CardSegment       @default(Personal)
+  annualFee         Float             @map("annual_fee")
 
-  issuer Issuer @relation(fields: [issuerId], references: [id], onDelete: Cascade)
+  profileCards          ProfileCard[]
+  templateCards         TemplateCard[]
+  foreignTransactionFee Float          @default(0.00) @map("foreign_transaction_fee")
+
+  issuer       Issuer        @relation(fields: [issuerId], references: [id], onDelete: Cascade)
+  cardBenefits CardBenefit[]
 
   @@index([issuerId])
   @@map("cards")
+}
+
+model TemplateCard {
+  id     String  @id
+  cardId String? @map("card_id")
+  card   Card?   @relation(fields: [cardId], references: [id])
 }
 
 model CardFace {
@@ -51,7 +59,7 @@ model CardFace {
 model ProfileCard {
   id                   String               @id @default(cuid())
   profileId            String               @map("profile_id")
-  templateCardId       String?              @map("template_card_id")
+  cardId               String?              @map("card_id")
   nickname             String?
   annualFee            Float                @map("annual_fee")
   lastFour             String?              @map("last_four")
@@ -69,11 +77,11 @@ model ProfileCard {
   offers              Offer[]
   applications        Application[]
 
-  profile  Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  template Card?   @relation(fields: [templateCardId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  card    Card?   @relation(fields: [cardId], references: [id])
 
   @@index([profileId])
-  @@index([templateCardId])
+  @@index([cardId])
   @@map("profile_cards")
 }
 
@@ -98,12 +106,12 @@ model Benefit {
 }
 
 model Transaction {
-  id                   String              @id @default(cuid()) @map("_id")
-  benefitId            String?             @map("benefit_id")
-  notes                String?
-  dateUtc              String?
-  amount               Float
-  
+  id        String  @id @default(cuid()) @map("_id")
+  benefitId String? @map("benefit_id")
+  notes     String?
+  dateUtc   String?
+  amount    Float
+
   profileCardBenefit   ProfileCardBenefit? @relation(fields: [profileCardBenefitId], references: [id])
   profileCardBenefitId String?
 
