@@ -50,7 +50,9 @@ class CardTemplateImporterTest {
             db.transactionDao(),
             db.notificationRuleDao(),
             db.offerDao(),
-            db.applicationDao()
+            db.applicationDao(),
+            db.templateCardDao(),
+            db.templateCardBenefitDao()
         )
         importer = CardTemplateImporter(repository)
     }
@@ -76,7 +78,7 @@ class CardTemplateImporterTest {
         assertTrue(result is ImportResult.Success)
         val profileCardId = (result as ImportResult.Success).profileCardId
 
-        val card = repository.getCardWithBenefits("1")
+        val card = repository.getTemplateCardWithBenefits("1")
         assertNotNull(card)
         assertEquals(2, card?.benefits?.size ?: 0)
         assertEquals(CardNetwork.Visa, card?.card?.network)

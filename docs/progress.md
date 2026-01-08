@@ -124,3 +124,14 @@
 ## 2026-01-08 - Schema rename
 - Updated Prisma schema to link ProfileCard directly to `card_id` (renamed from `template_card_id`) per template separation plan.
 - Refreshed schema documentation to reflect the new ProfileCard linkage, TemplateCard model, and corrected enum spelling.
+
+## 2026-01-08 - Room TemplateCard & cardId migration
+- Added Room `TemplateCardEntity`/DAO and wired it into `AppDatabase` (version 14), repository, and Firestore sync (templates mirror card IDs).
+- Renamed ProfileCard foreign key to `cardId` across entities, relations, importer, viewmodels, and tests; added migration 13→14 to rename the column and create the template_cards table.
+- Updated Prisma/docs to make `TemplateCard.cardId` non-null with cascade and indexed; UI now reads card metadata via the new relation name.
+
+## 2026-01-08 - TemplateCard benefits refactor
+- Replaced card-level benefit joins with template-level joins: removed `card_benefits`, added `template_card_benefits` with Room entity/DAO and migration 14→15 that drops old links and migrates existing rows.
+- Added `TemplateCardWithBenefits` relation and `TemplateCardBenefitEntity`; repository exposes `getTemplateCardWithBenefits` and upserts template benefit links.
+- Updated importer, DAOs, repository usage, and tests to read/write template benefits; AppDatabase bumped to v15 and migration wired.
+- Prisma/schema docs updated to drop `CardBenefit`, add `TemplateCardBenefit`, and align Benefit relations.

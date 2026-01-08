@@ -6,8 +6,8 @@ import androidx.room.Relation
 
 data class ProfileCardWithRelations(
     @Embedded val profileCard: ProfileCardEntity,
-    @Relation(parentColumn = "templateCardId", entityColumn = "id")
-    val templateCard: CardEntity?,
+    @Relation(parentColumn = "cardId", entityColumn = "id")
+    val card: CardEntity?,
     @Relation(parentColumn = "id", entityColumn = "profileCardId")
     val applications: List<ApplicationEntity>,
     @Relation(parentColumn = "id", entityColumn = "profileCardId")

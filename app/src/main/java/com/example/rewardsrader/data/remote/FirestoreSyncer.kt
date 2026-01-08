@@ -5,6 +5,7 @@ import com.example.rewardsrader.data.local.entity.CardNetwork
 import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.PaymentInstrument
 import com.example.rewardsrader.data.local.entity.IssuerEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,6 +30,8 @@ class FirestoreSyncer(
             .documents
             .mapNotNull { it.toCardEntity() }
         repository.upsertCards(cards)
+        val templateCards = cards.map { TemplateCardEntity(id = it.id, cardId = it.id) }
+        repository.upsertTemplateCards(templateCards)
 
         return SyncResult(issuersSynced = issuers.size, cardsSynced = cards.size)
     }

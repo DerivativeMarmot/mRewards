@@ -121,3 +121,111 @@ val MIGRATION_12_13 = object : Migration(12, 13) {
         database.execSQL("ALTER TABLE profile_cards ADD COLUMN subDurationUnit TEXT")
     }
 }
+
+// Migration 13->14 renames templateCardId to cardId on profile_cards and adds template_cards table.
+val MIGRATION_13_14 = object : Migration(13, 14) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS profile_cards_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                profileId TEXT NOT NULL,
+                cardId TEXT,
+                nickname TEXT,
+                annualFee REAL NOT NULL,
+                lastFour TEXT,
+                openDateUtc TEXT,
+                closeDateUtc TEXT,
+                statementCutUtc TEXT,
+                welcomeOfferProgress TEXT,
+                status TEXT NOT NULL,
+                notes TEXT,
+                subSpending REAL,
+                subDuration INTEGER,
+                subDurationUnit TEXT,
+                FOREIGN KEY(profileId) REFERENCES profiles(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+                FOREIGN KEY(cardId) REFERENCES cards(id) ON DELETE SET NULL ON UPDATE NO ACTION
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            INSERT INTO profile_cards_new (
+                id,
+                profileId,
+                cardId,
+                nickname,
+                annualFee,
+                lastFour,
+                openDateUtc,
+                closeDateUtc,
+                statementCutUtc,
+                welcomeOfferProgress,
+                status,
+                notes,
+                subSpending,
+                subDuration,
+                subDurationUnit
+            )
+            SELECT
+                id,
+                profileId,
+                templateCardId,
+                nickname,
+                annualFee,
+                lastFour,
+                openDateUtc,
+                closeDateUtc,
+                statementCutUtc,
+                welcomeOfferProgress,
+                status,
+                notes,
+                subSpending,
+                subDuration,
+                subDurationUnit
+            FROM profile_cards
+            """.trimIndent()
+        )
+        database.execSQL("DROP TABLE profile_cards")
+        database.execSQL("ALTER TABLE profile_cards_new RENAME TO profile_cards")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_profile_cards_profileId ON profile_cards(profileId)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_profile_cards_cardId ON profile_cards(cardId)")
+
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS template_cards (
+                id TEXT NOT NULL PRIMARY KEY,
+                cardId TEXT NOT NULL,
+                FOREIGN KEY(cardId) REFERENCES cards(id) ON DELETE CASCADE ON UPDATE NO ACTION
+            )
+            """.trimIndent()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_template_cards_cardId ON template_cards(cardId)")
+    }
+}
+
+// Migration 14->15 replaces card_benefits with template_card_benefits.
+val MIGRATION_14_15 = object : Migration(14, 15) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS template_card_benefits (
+                id TEXT NOT NULL PRIMARY KEY,
+                templateCardId TEXT NOT NULL,
+                benefitId TEXT NOT NULL,
+                FOREIGN KEY(templateCardId) REFERENCES template_cards(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+                FOREIGN KEY(benefitId) REFERENCES benefits(id) ON DELETE CASCADE ON UPDATE NO ACTION
+            )
+            """.trimIndent()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_template_card_benefits_templateCardId ON template_card_benefits(templateCardId)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_template_card_benefits_benefitId ON template_card_benefits(benefitId)")
+        database.execSQL(
+            """
+            INSERT INTO template_card_benefits (id, templateCardId, benefitId)
+            SELECT id, cardId, benefitId FROM card_benefits
+            """.trimIndent()
+        )
+        database.execSQL("DROP TABLE IF EXISTS card_benefits")
+    }
+}

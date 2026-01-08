@@ -6,7 +6,6 @@ import com.example.rewardsrader.data.local.entity.BenefitCategory
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.BenefitFrequency
 import com.example.rewardsrader.data.local.entity.BenefitType
-import com.example.rewardsrader.data.local.entity.CardBenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardNetwork
 import com.example.rewardsrader.data.local.entity.CardStatus
@@ -14,6 +13,8 @@ import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -48,7 +49,6 @@ class CardRepositoryTest {
             db.issuerDao(),
             db.cardDao(),
             db.cardFaceDao(),
-            db.cardBenefitDao(),
             db.profileDao(),
             db.profileCardDao(),
             db.profileCardBenefitDao(),
@@ -56,7 +56,9 @@ class CardRepositoryTest {
             db.transactionDao(),
             db.notificationRuleDao(),
             db.offerDao(),
-            db.applicationDao()
+            db.applicationDao(),
+            db.templateCardDao(),
+            db.templateCardBenefitDao()
         )
     }
 
@@ -82,6 +84,7 @@ class CardRepositoryTest {
                 )
             )
         )
+        repository.upsertTemplateCards(listOf(TemplateCardEntity(id = "card_1", cardId = "card_1")))
         val benefits = listOf(
             BenefitEntity(
                 id = "benefit_1",
@@ -109,11 +112,11 @@ class CardRepositoryTest {
             )
         )
         repository.upsertBenefits(benefits)
-        repository.upsertCardBenefits(
+        repository.upsertTemplateCardBenefits(
             benefits.map {
-                CardBenefitEntity(
+                TemplateCardBenefitEntity(
                     id = repository.newId(),
-                    cardId = "card_1",
+                    templateCardId = "card_1",
                     benefitId = it.id
                 )
             }
@@ -124,7 +127,7 @@ class CardRepositoryTest {
                 ProfileCardEntity(
                     id = profileCardId,
                     profileId = profile.id,
-                    templateCardId = "card_1",
+                    cardId = "card_1",
                     nickname = "Daily Driver",
                     annualFee = 95.0,
                     lastFour = "1234",

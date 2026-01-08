@@ -33,17 +33,20 @@ model Card {
   templateCards         TemplateCard[]
   foreignTransactionFee Float          @default(0.00) @map("foreign_transaction_fee")
 
-  issuer       Issuer        @relation(fields: [issuerId], references: [id], onDelete: Cascade)
-  cardBenefits CardBenefit[]
+  issuer Issuer @relation(fields: [issuerId], references: [id], onDelete: Cascade)
 
   @@index([issuerId])
   @@map("cards")
 }
 
 model TemplateCard {
-  id     String  @id
-  cardId String? @map("card_id")
-  card   Card?   @relation(fields: [cardId], references: [id])
+  id     String @id
+  cardId String @map("card_id")
+  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  benefits TemplateCardBenefit[]
+
+  @@index([cardId])
+  @@map("template_cards")
 }
 
 model CardFace {
@@ -98,9 +101,9 @@ model Benefit {
   notes              String?
 
   // Relations
-  notificationRules   NotificationRule[]
-  cardBenefits        CardBenefit[]
-  profileCardBenefits ProfileCardBenefit[]
+  notificationRules      NotificationRule[]
+  templateCardBenefits   TemplateCardBenefit[]
+  profileCardBenefits    ProfileCardBenefit[]
 
   @@map("benefits")
 }
@@ -207,18 +210,6 @@ model Profile {
   @@map("profiles")
 }
 
-model CardBenefit {
-  id        String @id
-  cardId    String @map("card_id")
-  benefitId String @map("benefit_id")
-
-  card    Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
-  benefit Benefit @relation(fields: [benefitId], references: [id], onDelete: Cascade)
-
-  @@index([benefitId])
-  @@map("card_benefits")
-}
-
 model ProfileCardBenefit {
   id            String        @id
   profileCardId String        @map("profile_card_id")
@@ -230,6 +221,19 @@ model ProfileCardBenefit {
 
   @@index([profileCardId, benefitId])
   @@map("profile_card_benefits")
+}
+
+model TemplateCardBenefit {
+  id             String @id
+  templateCardId String @map("template_card_id")
+  benefitId      String @map("benefit_id")
+
+  templateCard TemplateCard @relation(fields: [templateCardId], references: [id], onDelete: Cascade)
+  benefit      Benefit      @relation(fields: [benefitId], references: [id], onDelete: Cascade)
+
+  @@index([benefitId])
+  @@index([templateCardId])
+  @@map("template_card_benefits")
 }
 
 enum BenefitCategory {

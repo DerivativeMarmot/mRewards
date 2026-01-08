@@ -86,7 +86,7 @@ class CardCreateViewModel(
         viewModelScope.launch {
             when (
                 val result = importer.importFromDatabase(
-                    templateCardId = templateId,
+                    cardId = templateId,
                     openDateUtc = _state.value.openDateUtc.ifBlank { null },
                     statementCutUtc = _state.value.statementCutUtc.ifBlank { null },
                     applicationStatus = _state.value.applicationStatus.ifBlank { "pending" },

@@ -27,7 +27,9 @@ class AppContainer(context: Context) {
             com.example.rewardsrader.data.local.MIGRATION_8_9,
             com.example.rewardsrader.data.local.MIGRATION_9_10,
             com.example.rewardsrader.data.local.MIGRATION_10_12,
-            com.example.rewardsrader.data.local.MIGRATION_12_13
+            com.example.rewardsrader.data.local.MIGRATION_12_13,
+            com.example.rewardsrader.data.local.MIGRATION_13_14,
+            com.example.rewardsrader.data.local.MIGRATION_14_15
         )
         .build()
 
@@ -35,7 +37,6 @@ class AppContainer(context: Context) {
         issuerDao = db.issuerDao(),
         cardDao = db.cardDao(),
         cardFaceDao = db.cardFaceDao(),
-        cardBenefitDao = db.cardBenefitDao(),
         profileDao = db.profileDao(),
         profileCardDao = db.profileCardDao(),
         profileCardBenefitDao = db.profileCardBenefitDao(),
@@ -43,7 +44,9 @@ class AppContainer(context: Context) {
         transactionDao = db.transactionDao(),
         notificationRuleDao = db.notificationRuleDao(),
         offerDao = db.offerDao(),
-        applicationDao = db.applicationDao()
+        applicationDao = db.applicationDao(),
+        templateCardDao = db.templateCardDao(),
+        templateCardBenefitDao = db.templateCardBenefitDao()
     )
 
     private val cardConfigLoader = CardConfigLoader(context)

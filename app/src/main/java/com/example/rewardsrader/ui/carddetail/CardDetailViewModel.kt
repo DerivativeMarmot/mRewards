@@ -100,8 +100,8 @@ class CardDetailViewModel(
             }.onSuccess { relations ->
                 currentCard = relations.profileCard
                 templateAnnualFee = relations.profileCard.annualFee
-                templateIssuer = relations.templateCard?.issuerId.orEmpty()
-                templateNetwork = relations.templateCard?.network?.name ?: ""
+                templateIssuer = relations.card?.issuerId.orEmpty()
+                templateNetwork = relations.card?.network?.name ?: ""
                 _state.value = CardDetailState(
                     isLoading = false,
                     detail = mapDetail(
@@ -207,7 +207,7 @@ class CardDetailViewModel(
     ): CardDetailUi {
         return CardDetailUi(
             id = card.profileCard.id,
-            productName = card.templateCard?.productName ?: card.profileCard.nickname.orEmpty(),
+            productName = card.card?.productName ?: card.profileCard.nickname.orEmpty(),
             issuer = templateIssuer,
             network = templateNetwork,
             nickname = card.profileCard.nickname,

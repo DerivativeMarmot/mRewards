@@ -8,7 +8,6 @@ import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.BenefitCategory
 import com.example.rewardsrader.data.local.entity.BenefitFrequency
 import com.example.rewardsrader.data.local.entity.BenefitType
-import com.example.rewardsrader.data.local.entity.CardBenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardNetwork
 import com.example.rewardsrader.data.local.entity.CardSegment
@@ -18,6 +17,8 @@ import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
+import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import java.util.Locale
 
 sealed class ImportResult {
@@ -36,7 +37,7 @@ interface CardTemplateImporterContract {
     ): ImportResult
 
     suspend fun importFromDatabase(
-        templateCardId: String,
+        cardId: String,
         openDateUtc: String?,
         statementCutUtc: String?,
         applicationStatus: String,
@@ -71,15 +72,17 @@ class CardTemplateImporter(
         val cardEntity = mapCard(cardTemplate)
         val benefitEntities = benefitTemplates.map { mapBenefit(it) }
         repository.upsertCards(listOf(cardEntity))
+        val templateCard = TemplateCardEntity(id = cardEntity.id, cardId = cardEntity.id)
+        repository.upsertTemplateCards(listOf(templateCard))
         repository.upsertBenefits(benefitEntities)
-        val cardBenefitLinks = benefitEntities.map {
-            CardBenefitEntity(
+        val templateBenefitLinks = benefitEntities.map {
+            TemplateCardBenefitEntity(
                 id = repository.newId(),
-                cardId = cardEntity.id,
+                templateCardId = templateCard.id,
                 benefitId = it.id
             )
         }
-        repository.upsertCardBenefits(cardBenefitLinks)
+        repository.upsertTemplateCardBenefits(templateBenefitLinks)
 
         val profileCardId = repository.newId()
         val profileCard = mapProfileCard(cardTemplate, profile.id, profileCardId, openDateUtc, statementCutUtc, applicationStatus, welcomeOfferProgress)
@@ -104,21 +107,21 @@ class CardTemplateImporter(
     }
 
     override suspend fun importFromDatabase(
-        templateCardId: String,
+        cardId: String,
         openDateUtc: String?,
         statementCutUtc: String?,
         applicationStatus: String,
         welcomeOfferProgress: String?
     ): ImportResult {
-        val cardWithBenefits = repository.getCardWithBenefits(templateCardId)
-            ?: return ImportResult.Failure("Card $templateCardId not found.")
+        val cardWithBenefits = repository.getTemplateCardWithBenefits(cardId)
+            ?: return ImportResult.Failure("Card $cardId not found.")
         val profile = repository.ensureProfile(defaultProfileId, name = "Default Profile")
 
         val profileCardId = repository.newId()
         val profileCard = ProfileCardEntity(
             id = profileCardId,
             profileId = profile.id,
-            templateCardId = cardWithBenefits.card.id,
+            cardId = cardWithBenefits.card.id,
             nickname = cardWithBenefits.card.productName,
             annualFee = cardWithBenefits.card.annualFee,
             lastFour = null,
@@ -180,7 +183,7 @@ class CardTemplateImporter(
         ProfileCardEntity(
             id = profileCardId,
             profileId = profileId,
-            templateCardId = template.cardId.toString(),
+            cardId = template.cardId.toString(),
             nickname = template.productName,
             annualFee = template.annualFeeUsd,
             lastFour = null,

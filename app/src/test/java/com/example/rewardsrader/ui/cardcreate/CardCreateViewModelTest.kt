@@ -48,7 +48,7 @@ class CardCreateViewModelTest {
             ): ImportResult = ImportResult.Success("profile_1")
 
             override suspend fun importFromDatabase(
-                templateCardId: String,
+                cardId: String,
                 openDateUtc: String?,
                 statementCutUtc: String?,
                 applicationStatus: String,
