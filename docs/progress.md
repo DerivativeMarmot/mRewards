@@ -141,3 +141,7 @@
 - Updated Room entities/DAOs/repository/importer to store benefit dates on the profile link and enforce unique `benefitId` per template card; AppDatabase bumped to 16 and migration wired.
 - Benefit create/edit flow now reads/writes title and per-profile dates via the updated repository; Card detail mapping uses profile benefit links for expiry.
 - Prisma/schema docs reflect the new benefit fields and profile link date storage.
+
+## 2026-01-08 - Firestore template sync
+- Firestore sync now pulls `benefits`, `template_cards` (falling back to cards), and `template_card_benefits` in addition to issuers/cards, mapping to Room entities with enum/category parsing.
+- Repository upserts template cards/benefits and links; sync result now reports counts for all synced collections.

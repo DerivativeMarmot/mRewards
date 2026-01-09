@@ -503,3 +503,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-08 14:55:30 -08:00] Assistant: Dropped card_benefits in schema/Room, added template_card_benefits entity/DAO/relation/migration to v15, updated importer/repository/tests/docs to fetch template benefits via TemplateCardWithBenefits, and refreshed progress log.
 [2026-01-08 17:01:44 -08:00] User: Asked to add Benefit.title, remove enrollmentRequired, move start/end dates to ProfileCardBenefit.
 [2026-01-08 17:01:44 -08:00] Assistant: Added title to benefits, shifted benefit dates to profile_card_benefits, removed enrollment field, enforced unique template benefit links, bumped DB to v16 with migrations, updated importer/repository/VMs/tests/docs, and logged changes.
+[2026-01-09 11:33:56 -08:00] User: Wanted Firestore to sync template_cards, template_card_benefits, and benefits.
+[2026-01-09 11:33:56 -08:00] Assistant: Updated FirestoreSyncer to fetch benefits/template cards/template card benefits with enum/category parsing, upsert via repository, expanded sync result counts, and logged progress.
