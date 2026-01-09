@@ -12,6 +12,7 @@ import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.repository.CardRepository
+import com.example.rewardsrader.data.local.entity.ProfileCardBenefitWithBenefit
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -202,7 +203,7 @@ class CardDetailViewModel(
     private fun mapDetail(
         card: ProfileCardWithRelations,
         applications: List<ApplicationEntity>,
-        benefits: List<BenefitEntity>,
+        benefits: List<ProfileCardBenefitWithBenefit>,
         offers: List<OfferEntity>
     ): CardDetailUi {
         return CardDetailUi(
@@ -254,14 +255,15 @@ class CardDetailViewModel(
         }
     }
 
-    private fun mapBenefit(benefit: BenefitEntity): BenefitUi {
+    private fun mapBenefit(entry: ProfileCardBenefitWithBenefit): BenefitUi {
+        val benefit = entry.benefit
         return BenefitUi(
             id = benefit.id,
-            title = benefit.notes,
+            title = benefit.title ?: benefit.notes,
             type = benefit.type.name,
             amount = buildAmount(benefit),
             cadence = benefit.frequency.name,
-            expiry = benefit.endDateUtc,
+            expiry = entry.link.endDateUtc,
             notes = benefit.notes
         )
     }
@@ -297,7 +299,15 @@ class CardDetailViewModel(
         val detail = _state.value.detail ?: return
         val updatedList = detail.benefits.toMutableList()
         val index = updatedList.indexOfFirst { it.id == benefit.id }
-        val mapped = mapBenefit(benefit)
+        val mapped = BenefitUi(
+            id = benefit.id,
+            title = benefit.title ?: benefit.notes,
+            type = benefit.type.name,
+            amount = buildAmount(benefit),
+            cadence = benefit.frequency.name,
+            expiry = null,
+            notes = benefit.notes
+        )
         if (index >= 0) {
             updatedList[index] = mapped
         } else {

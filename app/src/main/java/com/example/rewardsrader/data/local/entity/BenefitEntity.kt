@@ -6,13 +6,11 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "benefits")
 data class BenefitEntity(
     @PrimaryKey val id: String,
+    val title: String? = null,
     val type: BenefitType = BenefitType.Credit,
     val amount: Double? = null,
     val cap: Double? = null,
     val frequency: BenefitFrequency,
     val category: List<BenefitCategory>,
-    val enrollmentRequired: Boolean,
-    val startDateUtc: String,
-    val endDateUtc: String? = null,
     val notes: String? = null
 )

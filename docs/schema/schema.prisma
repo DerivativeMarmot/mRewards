@@ -40,9 +40,9 @@ model Card {
 }
 
 model TemplateCard {
-  id     String @id
-  cardId String @map("card_id")
-  card   Card   @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  id       String                @id
+  cardId   String                @map("card_id")
+  card     Card                  @relation(fields: [cardId], references: [id], onDelete: Cascade)
   benefits TemplateCardBenefit[]
 
   @@index([cardId])
@@ -57,6 +57,8 @@ model CardFace {
 
   card   Card?   @relation(fields: [cardId], references: [id])
   cardId String?
+
+  @@map("card_faces")
 }
 
 model ProfileCard {
@@ -90,20 +92,18 @@ model ProfileCard {
 
 model Benefit {
   id                 String            @id @default(cuid()) @map("_id")
+  title              String?
   type               BenefitType       @default(Credit)
   amount             Float?            @map("amount")
   cap                Float?            @map("cap")
   frequency          BenefitFrequency
   category           BenefitCategory[]
-  enrollmentRequired Boolean           @map("enrollment_required")
-  startDateUtc       String            @map("start_date_utc")
-  endDateUtc         String?           @map("end_date_utc")
   notes              String?
 
   // Relations
-  notificationRules      NotificationRule[]
-  templateCardBenefits   TemplateCardBenefit[]
-  profileCardBenefits    ProfileCardBenefit[]
+  notificationRules    NotificationRule[]
+  templateCardBenefits TemplateCardBenefit[]
+  profileCardBenefits  ProfileCardBenefit[]
 
   @@map("benefits")
 }
@@ -214,6 +214,8 @@ model ProfileCardBenefit {
   id            String        @id
   profileCardId String        @map("profile_card_id")
   benefitId     String        @map("benefit_id")
+  startDateUtc  String?       @map("start_date_utc")
+  endDateUtc    String?       @map("end_date_utc")
   transactions  Transaction[]
 
   profileCard ProfileCard @relation(fields: [profileCardId], references: [id], onDelete: Cascade)
@@ -231,6 +233,7 @@ model TemplateCardBenefit {
   templateCard TemplateCard @relation(fields: [templateCardId], references: [id], onDelete: Cascade)
   benefit      Benefit      @relation(fields: [benefitId], references: [id], onDelete: Cascade)
 
+  @@unique([benefitId])
   @@index([benefitId])
   @@index([templateCardId])
   @@map("template_card_benefits")

@@ -110,6 +110,7 @@ val MIGRATION_10_12 = object : Migration(10, 12) {
         )
         database.execSQL("DROP TABLE benefits")
         database.execSQL("ALTER TABLE benefits_new RENAME TO benefits")
+        database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS uniq_template_card_benefitId ON template_card_benefits(benefitId)")
     }
 }
 
@@ -227,5 +228,46 @@ val MIGRATION_14_15 = object : Migration(14, 15) {
             """.trimIndent()
         )
         database.execSQL("DROP TABLE IF EXISTS card_benefits")
+    }
+}
+
+// Migration 15->16 adds title to benefits, removes enrollment/dates, and moves dates to profile_card_benefits.
+val MIGRATION_15_16 = object : Migration(15, 16) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE profile_card_benefits ADD COLUMN startDateUtc TEXT")
+        database.execSQL("ALTER TABLE profile_card_benefits ADD COLUMN endDateUtc TEXT")
+        database.execSQL(
+            """
+            UPDATE profile_card_benefits
+            SET startDateUtc = (
+                SELECT startDateUtc FROM benefits WHERE benefits.id = profile_card_benefits.benefitId
+            ),
+                endDateUtc = (
+                SELECT endDateUtc FROM benefits WHERE benefits.id = profile_card_benefits.benefitId
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS benefits_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                title TEXT,
+                type TEXT NOT NULL,
+                amount REAL,
+                cap REAL,
+                frequency TEXT NOT NULL,
+                category TEXT NOT NULL,
+                notes TEXT
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            INSERT INTO benefits_new (id, title, type, amount, cap, frequency, category, notes)
+            SELECT id, NULL, type, amount, cap, frequency, category, notes FROM benefits
+            """.trimIndent()
+        )
+        database.execSQL("DROP TABLE benefits")
+        database.execSQL("ALTER TABLE benefits_new RENAME TO benefits")
     }
 }

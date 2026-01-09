@@ -135,3 +135,9 @@
 - Added `TemplateCardWithBenefits` relation and `TemplateCardBenefitEntity`; repository exposes `getTemplateCardWithBenefits` and upserts template benefit links.
 - Updated importer, DAOs, repository usage, and tests to read/write template benefits; AppDatabase bumped to v15 and migration wired.
 - Prisma/schema docs updated to drop `CardBenefit`, add `TemplateCardBenefit`, and align Benefit relations.
+
+## 2026-01-08 - Benefit fields and profile link dates
+- Added `title` to benefits, removed `enrollmentRequired`, and moved `startDateUtc`/`endDateUtc` to `ProfileCardBenefit` with a new migration to v16.
+- Updated Room entities/DAOs/repository/importer to store benefit dates on the profile link and enforce unique `benefitId` per template card; AppDatabase bumped to 16 and migration wired.
+- Benefit create/edit flow now reads/writes title and per-profile dates via the updated repository; Card detail mapping uses profile benefit links for expiry.
+- Prisma/schema docs reflect the new benefit fields and profile link date storage.

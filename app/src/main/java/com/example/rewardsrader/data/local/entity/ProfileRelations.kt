@@ -12,14 +12,6 @@ data class ProfileCardWithRelations(
     val applications: List<ApplicationEntity>,
     @Relation(parentColumn = "id", entityColumn = "profileCardId")
     val offers: List<OfferEntity>,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "id",
-        associateBy = Junction(
-            value = ProfileCardBenefitEntity::class,
-            parentColumn = "profileCardId",
-            entityColumn = "benefitId"
-        )
-    )
-    val benefits: List<BenefitEntity>
+    @Relation(parentColumn = "id", entityColumn = "profileCardId", entity = ProfileCardBenefitEntity::class)
+    val benefits: List<ProfileCardBenefitWithBenefit>
 )

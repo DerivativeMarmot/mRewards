@@ -87,9 +87,15 @@ class CardTemplateImporter(
         val profileCardId = repository.newId()
         val profileCard = mapProfileCard(cardTemplate, profile.id, profileCardId, openDateUtc, statementCutUtc, applicationStatus, welcomeOfferProgress)
         repository.upsertProfileCards(listOf(profileCard))
-        benefitEntities.forEach { templateBenefit ->
+        benefitEntities.forEachIndexed { index, templateBenefit ->
+            val templateSource = benefitTemplates[index]
             val copiedBenefit = templateBenefit.copy(id = repository.newId())
-            repository.addBenefitForProfileCard(profileCardId, copiedBenefit)
+            repository.addBenefitForProfileCard(
+                profileCardId = profileCardId,
+                benefit = copiedBenefit,
+                startDateUtc = templateSource.effectiveDate,
+                endDateUtc = templateSource.expiryDate
+            )
         }
 
         val application = ApplicationEntity(
@@ -140,7 +146,12 @@ class CardTemplateImporter(
         if (cardWithBenefits.benefits.isNotEmpty()) {
             cardWithBenefits.benefits.forEach { benefit ->
                 val copied = benefit.copy(id = repository.newId())
-                repository.addBenefitForProfileCard(profileCardId, copied)
+                repository.addBenefitForProfileCard(
+                    profileCardId = profileCardId,
+                    benefit = copied,
+                    startDateUtc = null,
+                    endDateUtc = null
+                )
             }
         }
 
@@ -201,14 +212,12 @@ class CardTemplateImporter(
     private fun mapBenefit(template: BenefitTemplate): BenefitEntity =
         BenefitEntity(
             id = template.benefitId.toString(),
+            title = template.notes,
             type = template.type.toBenefitType(),
             amount = template.amountUsd,
             cap = template.capUsd,
             frequency = template.cadence.toBenefitFrequency(),
             category = template.category!!.toBenefitCategories(),
-            enrollmentRequired = template.enrollmentRequired,
-            startDateUtc = template.effectiveDate,
-            endDateUtc = template.expiryDate,
             notes = template.notes
         )
 

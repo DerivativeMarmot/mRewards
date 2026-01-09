@@ -19,3 +19,9 @@ data class TemplateCardWithBenefits(
     )
     val benefits: List<BenefitEntity>
 )
+
+data class ProfileCardBenefitWithBenefit(
+    @Embedded val link: ProfileCardBenefitEntity,
+    @Relation(parentColumn = "benefitId", entityColumn = "id")
+    val benefit: BenefitEntity
+)

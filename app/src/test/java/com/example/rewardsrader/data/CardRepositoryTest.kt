@@ -11,10 +11,7 @@ import com.example.rewardsrader.data.local.entity.CardNetwork
 import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.OfferEntity
-import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
-import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
-import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -84,43 +81,29 @@ class CardRepositoryTest {
                 )
             )
         )
-        repository.upsertTemplateCards(listOf(TemplateCardEntity(id = "card_1", cardId = "card_1")))
         val benefits = listOf(
             BenefitEntity(
                 id = "benefit_1",
+                title = "Dining credit",
                 type = BenefitType.Credit,
                 amount = 10.0,
                 cap = 10.0,
                 frequency = BenefitFrequency.Monthly,
                 category = listOf(BenefitCategory.Dining),
-                enrollmentRequired = true,
-                startDateUtc = "01/01/2025 09:00",
-                endDateUtc = "12/31/2025 11:59",
                 notes = "Dining credit"
             ),
             BenefitEntity(
                 id = "benefit_2",
+                title = "Supermarket multiplier",
                 type = BenefitType.Multiplier,
                 amount = 6.0,
                 cap = 6000.0,
                 frequency = BenefitFrequency.Annually,
                 category = listOf(BenefitCategory.Grocery),
-                enrollmentRequired = false,
-                startDateUtc = "01/01/2025 09:00",
-                endDateUtc = "12/31/2025 11:59",
                 notes = "Supermarket multiplier"
             )
         )
         repository.upsertBenefits(benefits)
-        repository.upsertTemplateCardBenefits(
-            benefits.map {
-                TemplateCardBenefitEntity(
-                    id = repository.newId(),
-                    templateCardId = "card_1",
-                    benefitId = it.id
-                )
-            }
-        )
         val profileCardId = repository.newId()
         repository.upsertProfileCards(
             listOf(
@@ -142,15 +125,14 @@ class CardRepositoryTest {
                 )
             )
         )
-        repository.upsertProfileCardBenefits(
-            benefits.map {
-                ProfileCardBenefitEntity(
-                    id = repository.newId(),
-                    profileCardId = profileCardId,
-                    benefitId = it.id
-                )
-            }
-        )
+        benefits.forEach {
+            repository.addBenefitForProfileCard(
+                profileCardId = profileCardId,
+                benefit = it,
+                startDateUtc = "01/01/2025 09:00",
+                endDateUtc = "12/31/2025 11:59"
+            )
+        }
 
         val relations = repository.getProfileCardWithRelations(profileCardId)
         assertNotNull(relations)

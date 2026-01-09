@@ -42,7 +42,6 @@ class CardTemplateImporterTest {
             db.issuerDao(),
             db.cardDao(),
             db.cardFaceDao(),
-            db.cardBenefitDao(),
             db.profileDao(),
             db.profileCardDao(),
             db.profileCardBenefitDao(),

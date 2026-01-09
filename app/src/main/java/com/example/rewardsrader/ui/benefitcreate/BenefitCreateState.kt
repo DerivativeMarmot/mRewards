@@ -22,8 +22,6 @@ data class BenefitCreateState(
     val editingTransactionIndex: Int? = null,
     val progress: String = "",
     val dataSource: String? = null,
-    val enrollmentRequired: Boolean = false,
-    val merchant: String? = null,
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null

@@ -26,5 +26,7 @@ import androidx.room.PrimaryKey
 data class ProfileCardBenefitEntity(
     @PrimaryKey val id: String,
     val profileCardId: String,
-    val benefitId: String
+    val benefitId: String,
+    val startDateUtc: String? = null,
+    val endDateUtc: String? = null
 )

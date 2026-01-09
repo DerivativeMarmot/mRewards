@@ -21,7 +21,7 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("templateCardId"), Index("benefitId")]
+    indices = [Index("templateCardId"), Index(value = ["benefitId"], unique = true)]
 )
 data class TemplateCardBenefitEntity(
     @PrimaryKey val id: String,

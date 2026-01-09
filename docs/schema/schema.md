@@ -109,14 +109,12 @@ enum CardSubDurationUnit {
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | `id` | String | @id @default(cuid()) @map("_id") |
+| `title` | String? | |
 | `type` | BenefitType | @default(Credit) |
 | `amount` | Float? | @map("amount") |
 | `cap` | Float? | @map("cap") |
 | `frequency` | BenefitFrequency | |
 | `category` | BenefitCategory[] | |
-| `enrollmentRequired` | Boolean | @map("enrollment_required") |
-| `startDateUtc` | String | @map("start_date_utc") |
-| `endDateUtc` | String? | @map("end_date_utc") |
 | `notes` | String? | |
 | `notificationRules` | NotificationRule[] | |
 | `templateCardBenefits` | TemplateCardBenefit[] | |
@@ -226,6 +224,8 @@ enum CardSubDurationUnit {
 | :--- | :--- | :--- |
 | `profileCardId` | String | @map("profile_card_id") |
 | `benefitId` | String | @map("benefit_id") |
+| `startDateUtc` | String? | @map("start_date_utc") |
+| `endDateUtc` | String? | @map("end_date_utc") |
 | `profileCard` | ProfileCard | @relation(fields: [profileCardId], references: [id], onDelete: Cascade) |
 | `benefit` | Benefit | @relation(fields: [benefitId], references: [id], onDelete: Cascade) |
 
@@ -237,6 +237,7 @@ enum CardSubDurationUnit {
 | `benefitId` | String | @map("benefit_id") |
 | `templateCard` | TemplateCard | @relation(fields: [templateCardId], references: [id], onDelete: Cascade) |
 | `benefit` | Benefit | @relation(fields: [benefitId], references: [id], onDelete: Cascade) |
+| unique | @@unique([benefitId]) |
 
 ### Transaction
 | Field | Type | Description |

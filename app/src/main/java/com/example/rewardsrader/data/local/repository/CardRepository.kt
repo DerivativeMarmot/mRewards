@@ -26,8 +26,8 @@ import com.example.rewardsrader.data.local.entity.ProfileEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardEntity
-import com.example.rewardsrader.data.local.entity.TemplateCardWithBenefits
 import com.example.rewardsrader.data.local.entity.TransactionEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardWithBenefits
 import java.util.UUID
 
 interface CardTemplateSource {
@@ -156,17 +156,37 @@ class CardRepository(
     suspend fun getBenefitsByIds(ids: List<String>): List<BenefitEntity> =
         benefitDao.getByIds(ids)
 
-    suspend fun addBenefitForProfileCard(profileCardId: String, benefit: BenefitEntity): BenefitEntity {
+    suspend fun getProfileCardBenefit(profileCardId: String, benefitId: String): ProfileCardBenefitEntity? =
+        profileCardBenefitDao.getForProfileCardAndBenefit(profileCardId, benefitId)
+
+    suspend fun addBenefitForProfileCard(
+        profileCardId: String,
+        benefit: BenefitEntity,
+        startDateUtc: String?,
+        endDateUtc: String?
+    ): BenefitEntity {
         val benefitId = benefit.id.ifBlank { newId() }
         val finalBenefit = benefit.copy(id = benefitId)
         benefitDao.insert(finalBenefit)
         val link = ProfileCardBenefitEntity(
             id = newId(),
             profileCardId = profileCardId,
-            benefitId = benefitId
+            benefitId = benefitId,
+            startDateUtc = startDateUtc,
+            endDateUtc = endDateUtc
         )
         profileCardBenefitDao.insert(link)
         return finalBenefit
+    }
+
+    suspend fun updateBenefitForProfileCard(
+        profileCardId: String,
+        benefit: BenefitEntity,
+        startDateUtc: String?,
+        endDateUtc: String?
+    ) {
+        benefitDao.insert(benefit)
+        profileCardBenefitDao.updateDates(profileCardId, benefit.id, startDateUtc, endDateUtc)
     }
 
     suspend fun deleteProfileCard(profileCardId: String) {
