@@ -39,6 +39,7 @@ enum class BenefitFrequency {
     Quarterly,
     SemiAnnually,
     Annually,
+    EveryTransaction,
     EveryAnniversary
 }
 
@@ -55,5 +56,7 @@ enum class BenefitCategory {
     Transit,
     Utilities,
     Others,
-    RideShare
+    RideShare,
+    Supermarket,
+    RetailStore
 }

@@ -145,3 +145,7 @@
 ## 2026-01-08 - Firestore template sync
 - Firestore sync now pulls `benefits`, `template_cards` (falling back to cards), and `template_card_benefits` in addition to issuers/cards, mapping to Room entities with enum/category parsing.
 - Repository upserts template cards/benefits and links; sync result now reports counts for all synced collections.
+
+## 2026-01-09 - Enum extensions
+- Added `Supermarket` and `RetailStore` to benefit categories and `EveryTransaction` to benefit frequencies across schema/docs and Room enums.
+- Updated importer/VM mappings, category parsing, and frequency selection UI; Firestore sync handles the new categories.

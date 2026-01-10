@@ -227,6 +227,7 @@ class BenefitCreateViewModel(
             "quarterly" -> BenefitFrequency.Quarterly
             "semiannually", "semi_annual", "semi-annual", "semi-annually" -> BenefitFrequency.SemiAnnually
             "annually", "annual" -> BenefitFrequency.Annually
+            "everytransaction", "eachtransaction", "per_txn", "per_transaction" -> BenefitFrequency.EveryTransaction
             "everyanniversary", "every_anniversary", "anniversary" -> BenefitFrequency.EveryAnniversary
             else -> BenefitFrequency.Monthly
         }
@@ -241,6 +242,8 @@ class BenefitCreateViewModel(
             "dining" -> BenefitCategory.Dining
             "onlineshopping" -> BenefitCategory.OnlineShopping
             "grocery", "groceries" -> BenefitCategory.Grocery
+            "supermarket", "supermarkets" -> BenefitCategory.Supermarket
+            "retailstore", "retail", "store" -> BenefitCategory.RetailStore
             "restaurant" -> BenefitCategory.Restaurant
             "drugstore", "drugstores" -> BenefitCategory.DrugStore
             "travel" -> BenefitCategory.Travel

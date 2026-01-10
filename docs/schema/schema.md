@@ -24,6 +24,8 @@ enum BenefitCategory {
   Utilities
   Others
   RideShare
+  Supermarket
+  RetailStore
 }
 ```
 
@@ -34,6 +36,7 @@ enum BenefitFrequency {
   Quarterly
   SemiAnnually
   Annually
+  EveryTransaction
   EveryAnniversary
 }
 ```

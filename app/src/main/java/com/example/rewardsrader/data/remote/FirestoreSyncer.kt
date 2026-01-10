@@ -120,6 +120,8 @@ class FirestoreSyncer(
                     "drugstore" -> BenefitCategory.DrugStore
                     "onlineshopping" -> BenefitCategory.OnlineShopping
                     "rideshare" -> BenefitCategory.RideShare
+                    "supermarket", "supermarkets" -> BenefitCategory.Supermarket
+                    "retail", "retailstore" -> BenefitCategory.RetailStore
                     else -> null
                 }
             }

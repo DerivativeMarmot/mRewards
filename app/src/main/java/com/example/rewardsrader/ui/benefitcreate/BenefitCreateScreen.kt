@@ -325,7 +325,7 @@ fun BenefitCreateScreen(
     if (showFrequencyDialog) {
         RadioSelectionDialog(
             title = "Select frequency",
-            options = listOf("once", "monthly", "quarterly", "annually"),
+            options = listOf("once", "monthly", "quarterly", "annually", "everytransaction"),
             selected = state.cadence,
             onSelect = {
                 onCadenceChange(it)
