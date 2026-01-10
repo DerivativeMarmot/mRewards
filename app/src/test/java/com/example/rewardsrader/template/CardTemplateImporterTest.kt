@@ -4,11 +4,14 @@ import androidx.room.Room
 import com.example.rewardsrader.config.CardConfigParser
 import com.example.rewardsrader.config.CardConfigResult
 import com.example.rewardsrader.data.local.AppDatabase
+import com.example.rewardsrader.data.local.entity.CardNetwork
+import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -36,12 +39,19 @@ class CardTemplateImporterTest {
             .allowMainThreadQueries()
             .build()
         repository = CardRepository(
+            db.issuerDao(),
             db.cardDao(),
+            db.cardFaceDao(),
+            db.profileDao(),
+            db.profileCardDao(),
+            db.profileCardBenefitDao(),
             db.benefitDao(),
-            db.applicationDao(),
-            db.usageEntryDao(),
+            db.transactionDao(),
             db.notificationRuleDao(),
-            db.offerDao()
+            db.offerDao(),
+            db.applicationDao(),
+            db.templateCardDao(),
+            db.templateCardBenefitDao()
         )
         importer = CardTemplateImporter(repository)
     }
@@ -65,19 +75,28 @@ class CardTemplateImporterTest {
         )
 
         assertTrue(result is ImportResult.Success)
-        val cardId = (result as ImportResult.Success).cardId
+        val profileCardId = (result as ImportResult.Success).profileCardId
 
-        val cards = repository.getCardsWithBenefits()
-        assertEquals(1, cards.size)
-        assertEquals(cardId, cards.first().card.id)
-        assertEquals("approved", cards.first().card.status)
-        assertEquals("01/15/2025 09:00", cards.first().card.statementCutUtc)
-        assertEquals(2, cards.first().benefits.size)
+        val card = repository.getTemplateCardWithBenefits("1")
+        assertNotNull(card)
+        assertEquals(2, card?.benefits?.size ?: 0)
+        assertEquals(CardNetwork.Visa, card?.card?.network)
 
-        val application = db.applicationDao().getForCard(cardId)
+        val profileCard = repository.getProfileCardWithRelations(profileCardId)
+        assertNotNull(profileCard)
+        assertEquals("01/05/2025 09:00", profileCard?.profileCard?.openDateUtc)
+        assertEquals(CardStatus.Active, profileCard?.profileCard?.status)
+        assertEquals("Example Cash Preferred", profileCard?.profileCard?.nickname)
+
+        val application = db.applicationDao().getForProfileCard(profileCardId)
         assertEquals(1, application.size)
         assertEquals("approved", application.first().status)
         assertEquals("75%", application.first().welcomeOfferTerms)
+
+        val profileBenefits = repository.getBenefitsForProfileCard(profileCardId)
+        assertEquals(2, profileBenefits.size)
+        val templateBenefitIds = card?.benefits?.map { it.id }?.toSet().orEmpty()
+        assertTrue(profileBenefits.none { it.id in templateBenefitIds })
     }
 
     private val sampleJson = """

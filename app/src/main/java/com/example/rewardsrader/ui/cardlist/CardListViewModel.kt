@@ -90,8 +90,8 @@ class CardListViewModel(
     private fun mapCard(card: ProfileCardWithRelations): CardSummaryUi =
         CardSummaryUi(
             id = card.profileCard.id,
-            productName = card.templateCard?.productName ?: card.profileCard.nickname.orEmpty(),
-            issuer = card.templateCard?.issuerId ?: "",
+            productName = card.card?.productName ?: card.profileCard.nickname.orEmpty(),
+            issuer = card.card?.issuerId ?: "",
             status = card.profileCard.status.name
         )
 

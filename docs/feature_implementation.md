@@ -37,7 +37,7 @@
 - [x] done
 
 ## Notification
-- Notification scheduling: Add triggers (days-before-expiry, statement cut offset, spend remaining thresholds); schedule/dispatch with UTC storage and local display.
+- [ ] Notification scheduling: Add triggers (days-before-expiry, statement cut offset, spend remaining thresholds); schedule/dispatch with UTC storage and local display.
 
 ## App Settings / Platform
 - Config refresh (remote/local): Manual refresh from URL/local JSON with schema validation, hash/signature check, and “last known good” rollback; update template catalog only.
@@ -67,3 +67,8 @@ Default page when page starts. Displays all user added cards.
 Displays all card products. Used as templates
 - [ ] Filters: Combined filters for issuer, benefit type, and annual fee on the card list.
 - [ ] Search: Add search bar on the card list.
+
+## Firebase Cloud Firestore support
+
+- [ ] Sync users' data on cloud storage. like profiles, cards, benefits, and more
+- [ ] Sync card templates

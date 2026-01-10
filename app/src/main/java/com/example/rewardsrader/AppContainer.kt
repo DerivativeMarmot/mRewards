@@ -17,14 +17,27 @@ class AppContainer(context: Context) {
         AppDatabase::class.java,
         "rewardsrader.db"
     )
-        .fallbackToDestructiveMigration()
+        .addMigrations(
+            com.example.rewardsrader.data.local.MIGRATION_1_2,
+            com.example.rewardsrader.data.local.MIGRATION_2_3,
+            com.example.rewardsrader.data.local.MIGRATION_3_4,
+            com.example.rewardsrader.data.local.MIGRATION_4_5,
+            com.example.rewardsrader.data.local.MIGRATION_5_6,
+            com.example.rewardsrader.data.local.MIGRATION_6_7,
+            com.example.rewardsrader.data.local.MIGRATION_8_9,
+            com.example.rewardsrader.data.local.MIGRATION_9_10,
+            com.example.rewardsrader.data.local.MIGRATION_10_12,
+            com.example.rewardsrader.data.local.MIGRATION_12_13,
+            com.example.rewardsrader.data.local.MIGRATION_13_14,
+            com.example.rewardsrader.data.local.MIGRATION_14_15,
+            com.example.rewardsrader.data.local.MIGRATION_15_16
+        )
         .build()
 
     val cardRepository: CardRepository = CardRepository(
         issuerDao = db.issuerDao(),
         cardDao = db.cardDao(),
         cardFaceDao = db.cardFaceDao(),
-        cardBenefitDao = db.cardBenefitDao(),
         profileDao = db.profileDao(),
         profileCardDao = db.profileCardDao(),
         profileCardBenefitDao = db.profileCardBenefitDao(),
@@ -32,7 +45,9 @@ class AppContainer(context: Context) {
         transactionDao = db.transactionDao(),
         notificationRuleDao = db.notificationRuleDao(),
         offerDao = db.offerDao(),
-        applicationDao = db.applicationDao()
+        applicationDao = db.applicationDao(),
+        templateCardDao = db.templateCardDao(),
+        templateCardBenefitDao = db.templateCardBenefitDao()
     )
 
     private val cardConfigLoader = CardConfigLoader(context)

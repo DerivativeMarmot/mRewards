@@ -482,3 +482,28 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-06 00:11] User: add sync button at card list top bar. when user clicks, it gets issuers and cards collections from firestore and load into room database. before starting, do you have any questions.
 [2026-01-06 00:12] Assistant: asked about firestore setup/auth, collection schemas, merge strategy (upsert vs replace), and icon vs text button preference
 [2026-01-06 00:13] User: firebase configured, collections mirror schema.prisma with doc id as id; no auth; upsert on id; collection names match room tables; prefer icon
+[2026-01-06 11:38] User: in card creation screen, fetch issuers and cards from local database.
+[2026-01-06 11:40] Assistant: Implemented DB-backed card creation selections/importer; see progress log for test status.
+[2026-01-06 12:31] Assistant: Refactored repository/importer tests to current schema and reran unit tests successfully.
+[2026-01-06 14:31] Assistant: Updated schema.prisma and schema.md to include PaymentInstrument and CardSegment enums and added them to Card model; logged progress.
+[2026-01-06 14:45] Assistant: Implemented PaymentInstrument/CardSegment enums in Room schema (entity, converters, importer default, Firestore sync), bumped DB version, added migration stub, and reran targeted unit tests (pass).
+[2026-01-06 15:05] Assistant: Renamed foreign fee field to foreignTransactionFee (schema, Room entity, Firestore sync fallback, importer), added migration 9->10 and bumped DB to v10; targeted unit tests still passing.
+[2026-01-06 15:25] Assistant: Deep-copied benefits on card add (new per-user benefit IDs) and updated tests/progress; kept template/remote records immutable.
+[2026-01-06 15:40] Assistant: Fixed benefit frequency/category mapping so saved values persist; re-ran targeted unit tests (pass).
+[2026-01-06 16:00] Assistant: Added categoriesRaw to benefits for scoped/custom category persistence, fixed frequency/category mapping, bumped DB to v11; clean rebuild and targeted tests passing.
+[2026-01-06 16:20] Assistant: Removed categoriesRaw, enforced enum-only categories, cleaned category dialog, bumped DB to v12; retested after rebuild.
+[2026-01-08 11:32:40 -08:00] User: # AGENTS.md instructions for D:\WorkSpaces\Android Studio\rewards-radar (shared repository rules).
+[2026-01-08 11:33:10 -08:00] User: Updated docs/schema/schema.prisma with a TemplateCard table for Firestore templates; asked for suggestions before code changes.
+[2026-01-08 11:33:40 -08:00] Assistant: Read required docs (product_functionality, architecture, feature_implementation, schema.md, schema.prisma) and existing Room entities to assess TemplateCard addition and schema alignment; preparing feedback.
+[2026-01-08 11:51:39 -08:00] User: Clarified TemplateCard is only for template reference, not ProfileCard; asked to rename ProfileCard.templateCardId to cardId and requested further schema suggestions.
+[2026-01-08 11:51:39 -08:00] Assistant: Renamed ProfileCard link to card_id in schema.prisma, updated schema.md for TemplateCard and enum spelling, and logged progress; ready for Room/migration follow-up if desired.
+[2026-01-08 12:15:45 -08:00] User: Asked to continue with Room/schema changes for TemplateCard and cardId linkage plus Firestore/card creation alignment.
+[2026-01-08 12:15:45 -08:00] Assistant: Implemented Room changes (cardId on ProfileCard, TemplateCard entity/DAO, migration to v14), updated Firestore sync, UI viewmodels, tests, and schema docs; logged progress.
+[2026-01-08 14:55:30 -08:00] User: Requested removal of CardBenefit table, addition of TemplateCardBenefit join (TemplateCard↔Benefit), and implementation across code; confirmed benefits are not shared across templates.
+[2026-01-08 14:55:30 -08:00] Assistant: Dropped card_benefits in schema/Room, added template_card_benefits entity/DAO/relation/migration to v15, updated importer/repository/tests/docs to fetch template benefits via TemplateCardWithBenefits, and refreshed progress log.
+[2026-01-08 17:01:44 -08:00] User: Asked to add Benefit.title, remove enrollmentRequired, move start/end dates to ProfileCardBenefit.
+[2026-01-08 17:01:44 -08:00] Assistant: Added title to benefits, shifted benefit dates to profile_card_benefits, removed enrollment field, enforced unique template benefit links, bumped DB to v16 with migrations, updated importer/repository/VMs/tests/docs, and logged changes.
+[2026-01-09 11:33:56 -08:00] User: Wanted Firestore to sync template_cards, template_card_benefits, and benefits.
+[2026-01-09 11:33:56 -08:00] Assistant: Updated FirestoreSyncer to fetch benefits/template cards/template card benefits with enum/category parsing, upsert via repository, expanded sync result counts, and logged progress.
+[2026-01-09 16:08:40 -08:00] User: Asked to add Supermarket/RetailStore categories and EveryTransaction frequency to schema and code.
+[2026-01-09 16:08:40 -08:00] Assistant: Added new enum values in schema/docs and Room enums, updated benefit create/importer mappings and frequency options, and extended Firestore category parsing.

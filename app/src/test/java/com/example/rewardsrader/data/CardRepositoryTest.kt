@@ -2,14 +2,22 @@ package com.example.rewardsrader.data
 
 import androidx.room.Room
 import com.example.rewardsrader.data.local.AppDatabase
+import com.example.rewardsrader.data.local.entity.BenefitCategory
 import com.example.rewardsrader.data.local.entity.BenefitEntity
+import com.example.rewardsrader.data.local.entity.BenefitFrequency
+import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.data.local.entity.CardEntity
+import com.example.rewardsrader.data.local.entity.CardNetwork
+import com.example.rewardsrader.data.local.entity.CardStatus
+import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.OfferEntity
+import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -35,12 +43,19 @@ class CardRepositoryTest {
             .allowMainThreadQueries()
             .build()
         repository = CardRepository(
+            db.issuerDao(),
             db.cardDao(),
+            db.cardFaceDao(),
+            db.profileDao(),
+            db.profileCardDao(),
+            db.profileCardBenefitDao(),
             db.benefitDao(),
-            db.applicationDao(),
-            db.usageEntryDao(),
+            db.transactionDao(),
             db.notificationRuleDao(),
-            db.offerDao()
+            db.offerDao(),
+            db.applicationDao(),
+            db.templateCardDao(),
+            db.templateCardBenefitDao()
         )
     }
 
@@ -51,90 +66,110 @@ class CardRepositoryTest {
     }
 
     @Test
-    fun addListRemoveCardWithBenefits() = runTest {
-        val card = CardEntity(
-            issuer = "Example Bank",
-            nickname = "Daily Driver",
-            productName = "Example Cash Preferred",
-            network = "Visa",
-            annualFeeUsd = 95.0,
-            lastFour = "1234",
-            openDateUtc = "01/01/2025 09:00",
-            statementCutUtc = "01/15/2025 09:00",
-            welcomeOfferProgress = "50%",
-            status = "open"
+    fun upsertAndQueryProfileCardsWithBenefitsAndOffers() = runTest {
+        val profile = repository.ensureProfile("profile_1", "Test User")
+        repository.upsertIssuers(listOf(IssuerEntity(id = "issuer_1", name = "Issuer One")))
+        repository.upsertCards(
+            listOf(
+                CardEntity(
+                    id = "card_1",
+                    issuerId = "issuer_1",
+                    productName = "Example Cash Preferred",
+                    network = CardNetwork.Visa,
+                    annualFee = 95.0,
+                    foreignTransactionFee = 0.0
+                )
+            )
         )
         val benefits = listOf(
             BenefitEntity(
-                cardId = 0,
-                type = "credit",
-                amountUsd = 10.0,
-                capUsd = 10.0,
-                cadence = "monthly",
-                category = "dining",
-                merchant = "Restaurant partners",
-                enrollmentRequired = true,
-                effectiveDateUtc = "01/01/2025 09:00",
-                expiryDateUtc = "12/31/2025 11:59",
-                terms = "Enroll each calendar year; credit resets monthly.",
-                dataSource = "Bundle"
+                id = "benefit_1",
+                title = "Dining credit",
+                type = BenefitType.Credit,
+                amount = 10.0,
+                cap = 10.0,
+                frequency = BenefitFrequency.Monthly,
+                category = listOf(BenefitCategory.Dining),
+                notes = "Dining credit"
             ),
             BenefitEntity(
-                cardId = 0,
-                type = "multiplier",
-                amountUsd = null,
-                capUsd = 6000.0,
-                cadence = "annual",
-                category = "groceries",
-                merchant = "US supermarkets",
-                enrollmentRequired = false,
-                effectiveDateUtc = "01/01/2025 09:00",
-                expiryDateUtc = "12/31/2025 11:59",
-                terms = "6x points on up to $6k annual supermarket spend; excludes superstores.",
-                dataSource = "Bundle"
+                id = "benefit_2",
+                title = "Supermarket multiplier",
+                type = BenefitType.Multiplier,
+                amount = 6.0,
+                cap = 6000.0,
+                frequency = BenefitFrequency.Annually,
+                category = listOf(BenefitCategory.Grocery),
+                notes = "Supermarket multiplier"
             )
         )
+        repository.upsertBenefits(benefits)
+        val profileCardId = repository.newId()
+        repository.upsertProfileCards(
+            listOf(
+                ProfileCardEntity(
+                    id = profileCardId,
+                    profileId = profile.id,
+                    cardId = "card_1",
+                    nickname = "Daily Driver",
+                    annualFee = 95.0,
+                    lastFour = "1234",
+                    openDateUtc = "01/01/2025",
+                    statementCutUtc = "01/15/2025",
+                    welcomeOfferProgress = "50%",
+                    status = CardStatus.Active,
+                    notes = "Test note",
+                    subSpending = 1000.0,
+                    subDuration = 3,
+                    subDurationUnit = com.example.rewardsrader.data.local.entity.CardSubDurationUnit.Month
+                )
+            )
+        )
+        benefits.forEach {
+            repository.addBenefitForProfileCard(
+                profileCardId = profileCardId,
+                benefit = it,
+                startDateUtc = "01/01/2025 09:00",
+                endDateUtc = "12/31/2025 11:59"
+            )
+        }
 
-        val cardId = repository.addCard(card, benefits)
+        val relations = repository.getProfileCardWithRelations(profileCardId)
+        assertNotNull(relations)
+        assertEquals(2, relations?.benefits?.size ?: 0)
+        val profileCards = repository.getProfileCardsWithRelations(profile.id)
+        assertEquals(1, profileCards.size)
 
-        val cards = repository.getCards()
-        assertEquals(1, cards.size)
-        assertEquals(cardId, cards.first().id)
-
-        val withBenefits = repository.getCardsWithBenefits()
-        assertEquals(1, withBenefits.size)
-        assertEquals(2, withBenefits.first().benefits.size)
-        assertEquals("credit", withBenefits.first().benefits.first().type)
-
-        val updatedCard = cards.first().copy(
-            productName = "Updated Product",
-            annualFeeUsd = 120.0,
+        val updatedCard = relations!!.profileCard.copy(
             nickname = "Updated Nick",
             lastFour = "9999",
+            status = CardStatus.Closed,
             welcomeOfferProgress = "done"
         )
-        repository.updateCard(updatedCard)
-        val fetched = repository.getCard(cardId)
-        assertEquals("Updated Product", fetched?.productName)
-        assertEquals(120.0, fetched?.annualFeeUsd ?: 0.0, 0.0)
-        assertEquals("Updated Nick", fetched?.nickname)
-        assertEquals("9999", fetched?.lastFour)
-        assertEquals("done", fetched?.welcomeOfferProgress)
+        repository.updateProfileCard(updatedCard)
+        val fetched = repository.getProfileCardWithRelations(profileCardId)
+        assertEquals("Updated Nick", fetched?.profileCard?.nickname)
+        assertEquals("9999", fetched?.profileCard?.lastFour)
+        assertEquals(CardStatus.Closed, fetched?.profileCard?.status)
+        assertEquals("done", fetched?.profileCard?.welcomeOfferProgress)
 
-        val offerId = repository.addOffer(
+        val offerId = repository.newId()
+        repository.addOffer(
             OfferEntity(
-                cardId = cardId,
+                id = offerId,
+                profileCardId = profileCardId,
                 title = "Groceries Back",
                 note = "Stack with grocery portal",
                 startDateUtc = "01/01/2025",
                 endDateUtc = "03/01/2025",
                 type = "credit",
-                minSpendUsd = 500.0,
-                maxCashBackUsd = 50.0,
+                multiplierRate = null,
+                minSpend = 500.0,
+                maxCashBack = 50.0,
                 status = "active"
             )
         )
-        val offers = repository.getOffersForCard(cardId)
+        val offers = repository.getOffersForProfileCard(profileCardId)
         assertEquals(1, offers.size)
         assertEquals(offerId, offers.first().id)
 
@@ -145,10 +180,10 @@ class CardRepositoryTest {
         assertEquals("Updated", fetchedOffer?.title)
 
         repository.deleteOffer(offerId)
-        assertTrue(repository.getOffersForCard(cardId).isEmpty())
+        assertTrue(repository.getOffersForProfileCard(profileCardId).isEmpty())
 
-        repository.removeCard(cardId)
-        val afterDelete = repository.getCardsWithBenefits()
+        repository.deleteProfileCard(profileCardId)
+        val afterDelete = repository.getProfileCardsWithRelations(profile.id)
         assertTrue(afterDelete.isEmpty())
     }
 }

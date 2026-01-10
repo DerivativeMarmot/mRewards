@@ -6,20 +6,12 @@ import androidx.room.Relation
 
 data class ProfileCardWithRelations(
     @Embedded val profileCard: ProfileCardEntity,
-    @Relation(parentColumn = "templateCardId", entityColumn = "id")
-    val templateCard: CardEntity?,
+    @Relation(parentColumn = "cardId", entityColumn = "id")
+    val card: CardEntity?,
     @Relation(parentColumn = "id", entityColumn = "profileCardId")
     val applications: List<ApplicationEntity>,
     @Relation(parentColumn = "id", entityColumn = "profileCardId")
     val offers: List<OfferEntity>,
-    @Relation(
-        parentColumn = "id",
-        entityColumn = "id",
-        associateBy = Junction(
-            value = ProfileCardBenefitEntity::class,
-            parentColumn = "profileCardId",
-            entityColumn = "benefitId"
-        )
-    )
-    val benefits: List<BenefitEntity>
+    @Relation(parentColumn = "id", entityColumn = "profileCardId", entity = ProfileCardBenefitEntity::class)
+    val benefits: List<ProfileCardBenefitWithBenefit>
 )

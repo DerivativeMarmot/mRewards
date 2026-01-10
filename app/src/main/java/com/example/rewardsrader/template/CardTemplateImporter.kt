@@ -8,14 +8,17 @@ import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.BenefitCategory
 import com.example.rewardsrader.data.local.entity.BenefitFrequency
 import com.example.rewardsrader.data.local.entity.BenefitType
-import com.example.rewardsrader.data.local.entity.CardBenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardNetwork
+import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.CardStatus
+import com.example.rewardsrader.data.local.entity.PaymentInstrument
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
+import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import java.util.Locale
 
 sealed class ImportResult {
@@ -27,6 +30,14 @@ interface CardTemplateImporterContract {
     suspend fun importFromConfig(
         config: CardConfig,
         selectedCardId: Int,
+        openDateUtc: String?,
+        statementCutUtc: String?,
+        applicationStatus: String,
+        welcomeOfferProgress: String?
+    ): ImportResult
+
+    suspend fun importFromDatabase(
+        cardId: String,
         openDateUtc: String?,
         statementCutUtc: String?,
         applicationStatus: String,
@@ -61,27 +72,31 @@ class CardTemplateImporter(
         val cardEntity = mapCard(cardTemplate)
         val benefitEntities = benefitTemplates.map { mapBenefit(it) }
         repository.upsertCards(listOf(cardEntity))
+        val templateCard = TemplateCardEntity(id = cardEntity.id, cardId = cardEntity.id)
+        repository.upsertTemplateCards(listOf(templateCard))
         repository.upsertBenefits(benefitEntities)
-        val cardBenefitLinks = benefitEntities.map {
-            CardBenefitEntity(
+        val templateBenefitLinks = benefitEntities.map {
+            TemplateCardBenefitEntity(
                 id = repository.newId(),
-                cardId = cardEntity.id,
+                templateCardId = templateCard.id,
                 benefitId = it.id
             )
         }
-        repository.upsertCardBenefits(cardBenefitLinks)
+        repository.upsertTemplateCardBenefits(templateBenefitLinks)
 
         val profileCardId = repository.newId()
         val profileCard = mapProfileCard(cardTemplate, profile.id, profileCardId, openDateUtc, statementCutUtc, applicationStatus, welcomeOfferProgress)
         repository.upsertProfileCards(listOf(profileCard))
-        val profileBenefitLinks = benefitEntities.map {
-            ProfileCardBenefitEntity(
-                id = repository.newId(),
+        benefitEntities.forEachIndexed { index, templateBenefit ->
+            val templateSource = benefitTemplates[index]
+            val copiedBenefit = templateBenefit.copy(id = repository.newId())
+            repository.addBenefitForProfileCard(
                 profileCardId = profileCardId,
-                benefitId = it.id
+                benefit = copiedBenefit,
+                startDateUtc = templateSource.effectiveDate,
+                endDateUtc = templateSource.expiryDate
             )
         }
-        repository.upsertProfileCardBenefits(profileBenefitLinks)
 
         val application = ApplicationEntity(
             id = repository.newId(),
@@ -97,14 +112,74 @@ class CardTemplateImporter(
         return ImportResult.Success(profileCardId)
     }
 
+    override suspend fun importFromDatabase(
+        cardId: String,
+        openDateUtc: String?,
+        statementCutUtc: String?,
+        applicationStatus: String,
+        welcomeOfferProgress: String?
+    ): ImportResult {
+        val cardWithBenefits = repository.getTemplateCardWithBenefits(cardId)
+            ?: return ImportResult.Failure("Card $cardId not found.")
+        val profile = repository.ensureProfile(defaultProfileId, name = "Default Profile")
+
+        val profileCardId = repository.newId()
+        val profileCard = ProfileCardEntity(
+            id = profileCardId,
+            profileId = profile.id,
+            cardId = cardWithBenefits.card.id,
+            nickname = cardWithBenefits.card.productName,
+            annualFee = cardWithBenefits.card.annualFee,
+            lastFour = null,
+            openDateUtc = openDateUtc,
+            closeDateUtc = null,
+            statementCutUtc = statementCutUtc,
+            welcomeOfferProgress = welcomeOfferProgress,
+            status = applicationStatus.toCardStatus(),
+            notes = null,
+            subSpending = null,
+            subDuration = null,
+            subDurationUnit = null
+        )
+        repository.upsertProfileCards(listOf(profileCard))
+
+        if (cardWithBenefits.benefits.isNotEmpty()) {
+            cardWithBenefits.benefits.forEach { benefit ->
+                val copied = benefit.copy(id = repository.newId())
+                repository.addBenefitForProfileCard(
+                    profileCardId = profileCardId,
+                    benefit = copied,
+                    startDateUtc = null,
+                    endDateUtc = null
+                )
+            }
+        }
+
+        val application = ApplicationEntity(
+            id = repository.newId(),
+            profileCardId = profileCardId,
+            applicationDateUtc = openDateUtc,
+            decisionDateUtc = null,
+            status = applicationStatus,
+            creditBureau = null,
+            reconsiderationNotes = null,
+            welcomeOfferTerms = welcomeOfferProgress
+        )
+        repository.addApplications(listOf(application))
+
+        return ImportResult.Success(profileCardId)
+    }
+
     private fun mapCard(template: CardTemplate): CardEntity =
         CardEntity(
             id = template.cardId.toString(),
             issuerId = template.issuer,
             productName = template.productName,
             network = template.network.toCardNetwork(),
+            paymentInstrument = PaymentInstrument.Credit,
+            segment = CardSegment.Personal,
             annualFee = template.annualFeeUsd,
-            foreignFeeTransactionFee = 0.0
+            foreignTransactionFee = 0.0
         )
 
     private fun mapProfileCard(
@@ -119,7 +194,7 @@ class CardTemplateImporter(
         ProfileCardEntity(
             id = profileCardId,
             profileId = profileId,
-            templateCardId = template.cardId.toString(),
+            cardId = template.cardId.toString(),
             nickname = template.productName,
             annualFee = template.annualFeeUsd,
             lastFour = null,
@@ -137,14 +212,12 @@ class CardTemplateImporter(
     private fun mapBenefit(template: BenefitTemplate): BenefitEntity =
         BenefitEntity(
             id = template.benefitId.toString(),
+            title = template.notes,
             type = template.type.toBenefitType(),
             amount = template.amountUsd,
             cap = template.capUsd,
             frequency = template.cadence.toBenefitFrequency(),
             category = template.category!!.toBenefitCategories(),
-            enrollmentRequired = template.enrollmentRequired,
-            startDateUtc = template.effectiveDate,
-            endDateUtc = template.expiryDate,
             notes = template.notes
         )
 
@@ -161,6 +234,7 @@ class CardTemplateImporter(
                 when (normalized) {
                     "drugstore" -> BenefitCategory.DrugStore
                     "online shopping", "online_shopping" -> BenefitCategory.OnlineShopping
+                    "rideshare", "ride share", "ride_share" -> BenefitCategory.RideShare
                     else -> BenefitCategory.Others
                 }
             }
@@ -184,6 +258,7 @@ class CardTemplateImporter(
             com.example.rewardsrader.config.BenefitCadence.ANNUALLY -> BenefitFrequency.Annually
             com.example.rewardsrader.config.BenefitCadence.SEMI_ANNUALLY -> BenefitFrequency.Annually
             com.example.rewardsrader.config.BenefitCadence.EVERY_ANNIVERSARY -> BenefitFrequency.EveryAnniversary
+            com.example.rewardsrader.config.BenefitCadence.EACH_TIME -> BenefitFrequency.EveryTransaction
             else -> BenefitFrequency.Monthly
         }
 }

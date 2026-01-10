@@ -5,8 +5,10 @@ import com.example.rewardsrader.data.local.entity.BenefitCategory
 import com.example.rewardsrader.data.local.entity.BenefitFrequency
 import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.data.local.entity.CardNetwork
+import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.entity.CardSubDurationUnit
+import com.example.rewardsrader.data.local.entity.PaymentInstrument
 
 class EnumConverters {
     @TypeConverter
@@ -20,6 +22,19 @@ class EnumConverters {
 
     @TypeConverter
     fun toCardStatus(value: String?): CardStatus? = value?.let { CardStatus.valueOf(it) }
+
+    @TypeConverter
+    fun fromPaymentInstrument(value: PaymentInstrument?): String? = value?.name
+
+    @TypeConverter
+    fun toPaymentInstrument(value: String?): PaymentInstrument? =
+        value?.let { PaymentInstrument.valueOf(it) }
+
+    @TypeConverter
+    fun fromCardSegment(value: CardSegment?): String? = value?.name
+
+    @TypeConverter
+    fun toCardSegment(value: String?): CardSegment? = value?.let { CardSegment.valueOf(it) }
 
     @TypeConverter
     fun fromCardSubDurationUnit(value: CardSubDurationUnit?): String? = value?.name

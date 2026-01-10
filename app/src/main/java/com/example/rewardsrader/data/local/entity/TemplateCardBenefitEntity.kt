@@ -6,12 +6,12 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "profile_card_benefits",
+    tableName = "template_card_benefits",
     foreignKeys = [
         ForeignKey(
-            entity = ProfileCardEntity::class,
+            entity = TemplateCardEntity::class,
             parentColumns = ["id"],
-            childColumns = ["profileCardId"],
+            childColumns = ["templateCardId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
@@ -21,12 +21,10 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index("profileCardId"), Index("benefitId")]
+    indices = [Index("templateCardId"), Index(value = ["benefitId"], unique = true)]
 )
-data class ProfileCardBenefitEntity(
+data class TemplateCardBenefitEntity(
     @PrimaryKey val id: String,
-    val profileCardId: String,
-    val benefitId: String,
-    val startDateUtc: String? = null,
-    val endDateUtc: String? = null
+    val templateCardId: String,
+    val benefitId: String
 )

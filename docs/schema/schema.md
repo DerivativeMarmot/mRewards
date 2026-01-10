@@ -23,6 +23,9 @@ enum BenefitCategory {
   Transit
   Utilities
   Others
+  RideShare
+  Supermarket
+  RetailStore
 }
 ```
 
@@ -33,6 +36,7 @@ enum BenefitFrequency {
   Quarterly
   SemiAnnually
   Annually
+  EveryTransaction
   EveryAnniversary
 }
 ```
@@ -55,9 +59,26 @@ enum CardNetwork {
 }
 ```
 
-### CardStaus
+### PaymentInstrument
 ```prisma
-enum CardStaus {
+enum PaymentInstrument {
+  Credit
+  Debit
+  Charge
+}
+```
+
+### CardSegment
+```prisma
+enum CardSegment {
+  Personal
+  Business
+}
+```
+
+### CardStatus
+```prisma
+enum CardStatus {
   Active
   Closed
   Pending
@@ -91,18 +112,15 @@ enum CardSubDurationUnit {
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | `id` | String | @id @default(cuid()) @map("_id") |
+| `title` | String? | |
 | `type` | BenefitType | @default(Credit) |
 | `amount` | Float? | @map("amount") |
 | `cap` | Float? | @map("cap") |
 | `frequency` | BenefitFrequency | |
 | `category` | BenefitCategory[] | |
-| `enrollmentRequired` | Boolean | @map("enrollment_required") |
-| `startDateUtc` | String | @map("start_date_utc") |
-| `endDateUtc` | String? | @map("end_date_utc") |
 | `notes` | String? | |
-| `transactions` | Transaction[] | |
 | `notificationRules` | NotificationRule[] | |
-| `cardBenefits` | CardBenefit[] | |
+| `templateCardBenefits` | TemplateCardBenefit[] | |
 | `profileCardBenefits` | ProfileCardBenefit[] | |
 
 ### Card
@@ -113,19 +131,21 @@ enum CardSubDurationUnit {
 | `productName` | String | @map("product_name") |
 | `faces` | CardFace[] | |
 | `network` | CardNetwork | @default(Visa) |
+| `paymentInstrument` | PaymentInstrument | @default(Credit) @map("payment_instrument") |
+| `segment` | CardSegment | @default(Personal) |
 | `annualFee` | Float | @map("annual_fee") |
 | `profileCards` | ProfileCard[] | |
-| `foreignFeeTransactionFee` | Float | @default(0.00) @map("foreign_fee_transaction_fee") |
-| `cardBenefits` | CardBenefit[] | |
+| `templateCards` | TemplateCard[] | |
+| `foreignTransactionFee` | Float | @default(0.00) @map("foreign_transaction_fee") |
 | `issuer` | Issuer | @relation(fields: [issuerId], references: [id], onDelete: Cascade) |
 
-### CardBenefit
+### TemplateCard
 | Field | Type | Description |
 | :--- | :--- | :--- |
+| `id` | String | @id |
 | `cardId` | String | @map("card_id") |
-| `benefitId` | String | @map("benefit_id") |
 | `card` | Card | @relation(fields: [cardId], references: [id], onDelete: Cascade) |
-| `benefit` | Benefit | @relation(fields: [benefitId], references: [id], onDelete: Cascade) |
+| `benefits` | TemplateCardBenefit[] | |
 
 ### CardFace
 | Field | Type | Description |
@@ -183,7 +203,7 @@ enum CardSubDurationUnit {
 | :--- | :--- | :--- |
 | `id` | String | @id @default(cuid()) |
 | `profileId` | String | @map("profile_id") |
-| `templateCardId` | String? | @map("template_card_id") |
+| `cardId` | String? | @map("card_id") |
 | `nickname` | String? | |
 | `annualFee` | Float | @map("annual_fee") |
 | `lastFour` | String? | @map("last_four") |
@@ -191,7 +211,7 @@ enum CardSubDurationUnit {
 | `closeDateUtc` | String? | @map("close_date_utc") |
 | `statementCutUtc` | String? | @map("statement_cut_utc") |
 | `welcomeOfferProgress` | String? | @map("welcome_offer_progress") |
-| `status` | CardStaus | @default(Active) |
+| `status` | CardStatus | @default(Active) |
 | `notes` | String? | |
 | `subSpending` | Float? | @map("sub_spending") |
 | `subDuration` | Int? | @map("sub_duration") |
@@ -200,15 +220,27 @@ enum CardSubDurationUnit {
 | `offers` | Offer[] | |
 | `applications` | Application[] | |
 | `profile` | Profile | @relation(fields: [profileId], references: [id], onDelete: Cascade) |
-| `template` | Card? | @relation(fields: [templateCardId], references: [id]) |
+| `card` | Card? | @relation(fields: [cardId], references: [id]) |
 
 ### ProfileCardBenefit
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | `profileCardId` | String | @map("profile_card_id") |
 | `benefitId` | String | @map("benefit_id") |
+| `startDateUtc` | String? | @map("start_date_utc") |
+| `endDateUtc` | String? | @map("end_date_utc") |
 | `profileCard` | ProfileCard | @relation(fields: [profileCardId], references: [id], onDelete: Cascade) |
 | `benefit` | Benefit | @relation(fields: [benefitId], references: [id], onDelete: Cascade) |
+
+### TemplateCardBenefit
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | String | @id |
+| `templateCardId` | String | @map("template_card_id") |
+| `benefitId` | String | @map("benefit_id") |
+| `templateCard` | TemplateCard | @relation(fields: [templateCardId], references: [id], onDelete: Cascade) |
+| `benefit` | Benefit | @relation(fields: [benefitId], references: [id], onDelete: Cascade) |
+| unique | @@unique([benefitId]) |
 
 ### Transaction
 | Field | Type | Description |

@@ -12,6 +12,7 @@ import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.repository.CardRepository
+import com.example.rewardsrader.data.local.entity.ProfileCardBenefitWithBenefit
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -99,9 +100,9 @@ class CardDetailViewModel(
                     ?: throw IllegalArgumentException("Card not found")
             }.onSuccess { relations ->
                 currentCard = relations.profileCard
-                templateAnnualFee = relations.templateCard?.annualFee ?: 0.0
-                templateIssuer = relations.templateCard?.issuerId.orEmpty()
-                templateNetwork = relations.templateCard?.network?.name ?: ""
+                templateAnnualFee = relations.profileCard.annualFee
+                templateIssuer = relations.card?.issuerId.orEmpty()
+                templateNetwork = relations.card?.network?.name ?: ""
                 _state.value = CardDetailState(
                     isLoading = false,
                     detail = mapDetail(
@@ -145,8 +146,9 @@ class CardDetailViewModel(
 
     fun updateOpenDate(value: String) = updateCard { it.copy(openDateUtc = value.ifBlank { null }) }
 
-    fun updateAnnualFee(value: String) {
-        // Annual fee comes from template; no-op placeholder for legacy UI wiring.
+    fun updateAnnualFee(value: String) = updateCard {
+        val parsed = value.toDoubleOrNull() ?: it.annualFee
+        it.copy(annualFee = parsed)
     }
 
     fun updateStatementCut(value: String) = updateCard { it.copy(statementCutUtc = value.ifBlank { null }) }
@@ -161,8 +163,9 @@ class CardDetailViewModel(
     }
 
     fun updateSubDuration(value: String, unit: String) = updateCard {
-        val parsed = value.toIntOrNull()
-        it.copy(subDuration = parsed, subDurationUnit = unit.toCardSubDurationUnit())
+        val parsed = value.trim().toIntOrNull() ?: it.subDuration
+        val mappedUnit = unit.toCardSubDurationUnit() ?: it.subDurationUnit ?: CardSubDurationUnit.Month
+        it.copy(subDuration = parsed, subDurationUnit = mappedUnit)
     }
 
     private fun updateCard(update: (ProfileCardEntity) -> ProfileCardEntity) {
@@ -170,6 +173,7 @@ class CardDetailViewModel(
         viewModelScope.launch {
             runCatching {
                 val updated = update(card)
+                templateAnnualFee = updated.annualFee
                 repository.updateProfileCard(updated)
                 currentCard = updated
                 val currentDetail = _state.value.detail
@@ -179,14 +183,14 @@ class CardDetailViewModel(
                             nickname = updated.nickname,
                             lastFour = updated.lastFour,
                             status = updated.status.name,
-                            annualFee = "$$templateAnnualFee",
+                            annualFee = "${'$'}${updated.annualFee}",
                             openDate = updated.openDateUtc,
                             statementCut = updated.statementCutUtc,
                             welcomeOfferProgress = updated.welcomeOfferProgress,
                             notes = updated.notes,
                             subSpending = updated.subSpending?.toString(),
                             subDuration = updated.subDuration?.toString(),
-                            subDurationUnit = updated.subDurationUnit?.name
+                            subDurationUnit = updated.subDurationUnit.toDisplayUnit()
                         )
                     )
                 }
@@ -199,25 +203,25 @@ class CardDetailViewModel(
     private fun mapDetail(
         card: ProfileCardWithRelations,
         applications: List<ApplicationEntity>,
-        benefits: List<BenefitEntity>,
+        benefits: List<ProfileCardBenefitWithBenefit>,
         offers: List<OfferEntity>
     ): CardDetailUi {
         return CardDetailUi(
             id = card.profileCard.id,
-            productName = card.templateCard?.productName ?: card.profileCard.nickname.orEmpty(),
+            productName = card.card?.productName ?: card.profileCard.nickname.orEmpty(),
             issuer = templateIssuer,
             network = templateNetwork,
             nickname = card.profileCard.nickname,
             lastFour = card.profileCard.lastFour,
             status = card.profileCard.status.name,
-            annualFee = "${'$'}${card.templateCard?.annualFee ?: 0.0}",
+            annualFee = "${'$'}${card.profileCard.annualFee}",
             openDate = card.profileCard.openDateUtc,
             statementCut = card.profileCard.statementCutUtc,
             welcomeOfferProgress = card.profileCard.welcomeOfferProgress,
             notes = card.profileCard.notes,
             subSpending = card.profileCard.subSpending?.toString(),
             subDuration = card.profileCard.subDuration?.toString(),
-            subDurationUnit = card.profileCard.subDurationUnit?.name,
+            subDurationUnit = card.profileCard.subDurationUnit.toDisplayUnit(),
             applications = applications.map {
                 ApplicationUi(
                     status = it.status,
@@ -251,14 +255,15 @@ class CardDetailViewModel(
         }
     }
 
-    private fun mapBenefit(benefit: BenefitEntity): BenefitUi {
+    private fun mapBenefit(entry: ProfileCardBenefitWithBenefit): BenefitUi {
+        val benefit = entry.benefit
         return BenefitUi(
             id = benefit.id,
-            title = benefit.notes,
+            title = benefit.title ?: benefit.notes,
             type = benefit.type.name,
             amount = buildAmount(benefit),
             cadence = benefit.frequency.name,
-            expiry = benefit.endDateUtc,
+            expiry = entry.link.endDateUtc,
             notes = benefit.notes
         )
     }
@@ -294,7 +299,15 @@ class CardDetailViewModel(
         val detail = _state.value.detail ?: return
         val updatedList = detail.benefits.toMutableList()
         val index = updatedList.indexOfFirst { it.id == benefit.id }
-        val mapped = mapBenefit(benefit)
+        val mapped = BenefitUi(
+            id = benefit.id,
+            title = benefit.title ?: benefit.notes,
+            type = benefit.type.name,
+            amount = buildAmount(benefit),
+            cadence = benefit.frequency.name,
+            expiry = null,
+            notes = benefit.notes
+        )
         if (index >= 0) {
             updatedList[index] = mapped
         } else {
@@ -344,7 +357,17 @@ class CardDetailViewModel(
         runCatching { CardStatus.valueOf(this) }.getOrDefault(CardStatus.Active)
 
     private fun String.toCardSubDurationUnit(): CardSubDurationUnit? =
-        runCatching { CardSubDurationUnit.valueOf(this) }.getOrNull()
+        when (lowercase()) {
+            "month", "months", "cardsubdurationunit.month" -> CardSubDurationUnit.Month
+            "day", "days", "cardsubdurationunit.day" -> CardSubDurationUnit.Day
+            else -> runCatching { CardSubDurationUnit.valueOf(uppercase()) }.getOrNull()
+        }
+
+    private fun CardSubDurationUnit?.toDisplayUnit(): String? = when (this) {
+        CardSubDurationUnit.Day -> "days"
+        CardSubDurationUnit.Month -> "months"
+        null -> null
+    }
 
     companion object {
         fun factory(repository: CardRepository): ViewModelProvider.Factory {

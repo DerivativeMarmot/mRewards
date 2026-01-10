@@ -13,7 +13,7 @@
 - `app/src/test/java/com/example/rewardsrader/config/CardConfigParserTest.kt`: Unit tests for parser success and failure paths.
 
 ## Files added/used (Step 3)
-- `app/src/main/java/com/example/rewardsrader/data/local/entity/*.kt`: Room entities for cards, applications, benefits, usage entries, notification rules; `CardWithBenefits` relation for joins.
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/*.kt`: Room entities for cards, applications, benefits, usage entries, notification rules; `TemplateCardWithBenefits` relation for joins.
 - `app/src/main/java/com/example/rewardsrader/data/local/dao/*.kt`: DAOs for cards, benefits, applications, usage entries, notification rules.
 - `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Room database wiring DAOs and entities.
 - `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Repository to add a card with benefits, list, join, and remove.
@@ -122,3 +122,10 @@
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Adds cloud sync trigger dispatched on IO with success snackbar and reload.
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Adds sync icon in the top bar.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Passes sync callback into the card list screen.
+
+## 2026-01-06 Card creation from local DB
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Implements `CardTemplateSource` with issuer/card getters and exposes `getTemplateCardWithBenefits` for template lookups.
+- `app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt`: New `importFromDatabase` maps an existing template card (and benefits, when present) into a profile card/application without config.
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateState.kt` / `CardCreateViewModel.kt` / `CardCreateScreen.kt`: Issuer/product options now load from Room (string IDs), dialogs filter by issuer, and saves use the DB importer; state tracks issuer/card options instead of config templates.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Card creation wiring updated to pass the repository into the viewmodel factory.
+- `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`: Adjusted to stub DB-backed issuer/card sources and the new importer entry point.

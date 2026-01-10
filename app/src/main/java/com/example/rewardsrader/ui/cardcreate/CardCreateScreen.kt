@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.rewardsrader.config.CardTemplate
 import kotlinx.coroutines.flow.StateFlow
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -39,7 +38,7 @@ fun CardCreateScreen(
     stateFlow: StateFlow<CardCreateState>,
     onLoad: () -> Unit,
     onIssuerSelected: (String) -> Unit,
-    onTemplateSelected: (Int) -> Unit,
+    onCardSelected: (String) -> Unit,
     onOpenDateChange: (String) -> Unit,
     onStatementCutChange: (String) -> Unit,
     onApplicationStatusChange: (String) -> Unit,
@@ -55,6 +54,10 @@ fun CardCreateScreen(
     var showStatementDatePicker by remember { mutableStateOf(false) }
     var showStatusDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val selectedIssuerName = state.issuers.firstOrNull { it.id == state.selectedIssuerId }?.name
+        ?: "Select issuer"
+    val selectedProductName = state.cards.firstOrNull { it.id == state.selectedCardId }?.productName
+        ?: "Select product"
 
     Scaffold(
         topBar = {
@@ -73,14 +76,13 @@ fun CardCreateScreen(
         ) {
             SelectionRow(
                 label = "Issuer",
-                value = state.selectedIssuer ?: "Select issuer",
+                value = selectedIssuerName,
                 onClick = { showIssuerDialog = true }
             )
 
             SelectionRow(
                 label = "Product",
-                value = state.templates.firstOrNull { it.cardId == state.selectedTemplateId }?.productName
-                    ?: "Select product",
+                value = selectedProductName,
                 onClick = { showProductDialog = true }
             )
 
@@ -123,10 +125,10 @@ fun CardCreateScreen(
     if (showIssuerDialog) {
         SimpleSelectionDialog(
             title = "Select issuer",
-            options = state.issuers,
-            selected = state.selectedIssuer,
-            onSelect = {
-                onIssuerSelected(it)
+            options = state.issuers.map { it.name },
+            selected = selectedIssuerName,
+            onSelect = { name ->
+                state.issuers.firstOrNull { it.name == name }?.id?.let(onIssuerSelected)
                 showIssuerDialog = false
             },
             onDismiss = { showIssuerDialog = false }
@@ -134,14 +136,15 @@ fun CardCreateScreen(
     }
 
     if (showProductDialog) {
+        val filteredCards = state.cards.filter { card ->
+            state.selectedIssuerId?.let { card.issuerId == it } ?: true
+        }
         SimpleSelectionDialog(
             title = "Select product",
-            options = state.templates.filter { template ->
-                state.selectedIssuer?.let { template.issuer == it } ?: true
-            }.map { it.productName },
-            selected = state.templates.firstOrNull { it.cardId == state.selectedTemplateId }?.productName,
+            options = filteredCards.map { it.productName },
+            selected = filteredCards.firstOrNull { it.id == state.selectedCardId }?.productName,
             onSelect = { productName ->
-                state.templates.firstOrNull { it.productName == productName }?.cardId?.let(onTemplateSelected)
+                filteredCards.firstOrNull { it.productName == productName }?.id?.let(onCardSelected)
                 showProductDialog = false
             },
             onDismiss = { showProductDialog = false }

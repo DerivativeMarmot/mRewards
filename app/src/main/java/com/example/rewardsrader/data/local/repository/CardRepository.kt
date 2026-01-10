@@ -2,7 +2,6 @@ package com.example.rewardsrader.data.local.repository
 
 import com.example.rewardsrader.data.local.dao.ApplicationDao
 import com.example.rewardsrader.data.local.dao.BenefitDao
-import com.example.rewardsrader.data.local.dao.CardBenefitDao
 import com.example.rewardsrader.data.local.dao.CardDao
 import com.example.rewardsrader.data.local.dao.CardFaceDao
 import com.example.rewardsrader.data.local.dao.IssuerDao
@@ -11,10 +10,11 @@ import com.example.rewardsrader.data.local.dao.OfferDao
 import com.example.rewardsrader.data.local.dao.ProfileCardBenefitDao
 import com.example.rewardsrader.data.local.dao.ProfileCardDao
 import com.example.rewardsrader.data.local.dao.ProfileDao
+import com.example.rewardsrader.data.local.dao.TemplateCardBenefitDao
+import com.example.rewardsrader.data.local.dao.TemplateCardDao
 import com.example.rewardsrader.data.local.dao.TransactionDao
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
-import com.example.rewardsrader.data.local.entity.CardBenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardFaceEntity
 import com.example.rewardsrader.data.local.entity.IssuerEntity
@@ -24,8 +24,16 @@ import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.entity.ProfileEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
+import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import com.example.rewardsrader.data.local.entity.TransactionEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardWithBenefits
 import java.util.UUID
+
+interface CardTemplateSource {
+    suspend fun getIssuers(): List<IssuerEntity>
+    suspend fun getCards(): List<CardEntity>
+}
 
 /**
  * Repository facade around the Prisma-aligned Room schema.
@@ -35,7 +43,6 @@ class CardRepository(
     private val issuerDao: IssuerDao,
     private val cardDao: CardDao,
     private val cardFaceDao: CardFaceDao,
-    private val cardBenefitDao: CardBenefitDao,
     private val profileDao: ProfileDao,
     private val profileCardDao: ProfileCardDao,
     private val profileCardBenefitDao: ProfileCardBenefitDao,
@@ -43,8 +50,10 @@ class CardRepository(
     private val transactionDao: TransactionDao,
     private val notificationRuleDao: NotificationRuleDao,
     private val offerDao: OfferDao,
-    private val applicationDao: ApplicationDao
-) {
+    private val applicationDao: ApplicationDao,
+    private val templateCardDao: TemplateCardDao,
+    private val templateCardBenefitDao: TemplateCardBenefitDao
+) : CardTemplateSource {
     suspend fun upsertIssuers(issuers: List<IssuerEntity>) {
         if (issuers.isNotEmpty()) issuerDao.insertAll(issuers)
     }
@@ -61,16 +70,25 @@ class CardRepository(
         if (benefits.isNotEmpty()) benefitDao.insertAll(benefits)
     }
 
+    suspend fun upsertTemplateCards(templateCards: List<TemplateCardEntity>) {
+        if (templateCards.isNotEmpty()) templateCardDao.insertAll(templateCards)
+    }
+    suspend fun upsertTemplateCardBenefits(links: List<TemplateCardBenefitEntity>) {
+        if (links.isNotEmpty()) templateCardBenefitDao.insertAll(links)
+    }
+
+    override suspend fun getIssuers(): List<IssuerEntity> = issuerDao.getAll()
+
+    override suspend fun getCards(): List<CardEntity> = cardDao.getAll()
+
+    suspend fun getTemplateCardWithBenefits(templateCardId: String): TemplateCardWithBenefits? =
+        templateCardDao.getWithBenefits(templateCardId)
+
     suspend fun upsertBenefit(benefit: BenefitEntity) {
         benefitDao.insert(benefit)
     }
 
     suspend fun getBenefit(benefitId: String): BenefitEntity? = benefitDao.getById(benefitId)
-
-    suspend fun upsertCardBenefits(links: List<CardBenefitEntity>) {
-        if (links.isNotEmpty()) cardBenefitDao.insertAll(links)
-    }
-
     suspend fun upsertProfiles(profiles: List<ProfileEntity>) {
         if (profiles.isNotEmpty()) profileDao.insertAll(profiles)
     }
@@ -138,17 +156,37 @@ class CardRepository(
     suspend fun getBenefitsByIds(ids: List<String>): List<BenefitEntity> =
         benefitDao.getByIds(ids)
 
-    suspend fun addBenefitForProfileCard(profileCardId: String, benefit: BenefitEntity): BenefitEntity {
+    suspend fun getProfileCardBenefit(profileCardId: String, benefitId: String): ProfileCardBenefitEntity? =
+        profileCardBenefitDao.getForProfileCardAndBenefit(profileCardId, benefitId)
+
+    suspend fun addBenefitForProfileCard(
+        profileCardId: String,
+        benefit: BenefitEntity,
+        startDateUtc: String?,
+        endDateUtc: String?
+    ): BenefitEntity {
         val benefitId = benefit.id.ifBlank { newId() }
         val finalBenefit = benefit.copy(id = benefitId)
         benefitDao.insert(finalBenefit)
         val link = ProfileCardBenefitEntity(
             id = newId(),
             profileCardId = profileCardId,
-            benefitId = benefitId
+            benefitId = benefitId,
+            startDateUtc = startDateUtc,
+            endDateUtc = endDateUtc
         )
         profileCardBenefitDao.insert(link)
         return finalBenefit
+    }
+
+    suspend fun updateBenefitForProfileCard(
+        profileCardId: String,
+        benefit: BenefitEntity,
+        startDateUtc: String?,
+        endDateUtc: String?
+    ) {
+        benefitDao.insert(benefit)
+        profileCardBenefitDao.updateDates(profileCardId, benefit.id, startDateUtc, endDateUtc)
     }
 
     suspend fun deleteProfileCard(profileCardId: String) {

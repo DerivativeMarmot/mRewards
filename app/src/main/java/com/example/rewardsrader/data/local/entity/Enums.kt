@@ -7,6 +7,17 @@ enum class CardNetwork {
     Amex
 }
 
+enum class PaymentInstrument {
+    Credit,
+    Debit,
+    Charge
+}
+
+enum class CardSegment {
+    Personal,
+    Business
+}
+
 enum class CardStatus {
     Active,
     Closed,
@@ -28,6 +39,7 @@ enum class BenefitFrequency {
     Quarterly,
     SemiAnnually,
     Annually,
+    EveryTransaction,
     EveryAnniversary
 }
 
@@ -43,5 +55,8 @@ enum class BenefitCategory {
     Streaming,
     Transit,
     Utilities,
-    Others
+    Others,
+    RideShare,
+    Supermarket,
+    RetailStore
 }

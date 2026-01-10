@@ -4,16 +4,24 @@ import androidx.room.Embedded
 import androidx.room.Junction
 import androidx.room.Relation
 
-data class CardWithBenefits(
-    @Embedded val card: CardEntity,
+data class TemplateCardWithBenefits(
+    @Embedded val templateCard: TemplateCardEntity,
+    @Relation(parentColumn = "cardId", entityColumn = "id")
+    val card: CardEntity,
     @Relation(
         parentColumn = "id",
         entityColumn = "id",
         associateBy = Junction(
-            value = CardBenefitEntity::class,
-            parentColumn = "cardId",
+            value = TemplateCardBenefitEntity::class,
+            parentColumn = "templateCardId",
             entityColumn = "benefitId"
         )
     )
     val benefits: List<BenefitEntity>
+)
+
+data class ProfileCardBenefitWithBenefit(
+    @Embedded val link: ProfileCardBenefitEntity,
+    @Relation(parentColumn = "benefitId", entityColumn = "id")
+    val benefit: BenefitEntity
 )

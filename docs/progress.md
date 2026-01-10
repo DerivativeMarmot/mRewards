@@ -103,3 +103,49 @@
 - CardListViewModel exposes sync action with IO dispatch, snackbar on success, and reload of list state.
 - CardListScreen top bar now includes a sync icon; MainActivity passes the callback.
 - Added coroutines play-services dependency for Task await support.
+
+## 2026-01-06 Card creation from local DB
+- Card creation state/viewmodel/screen now load issuer and card options from Room via `CardTemplateSource`, filter products by issuer, and pass string IDs; save uses a database-backed importer.
+- CardRepository exposes issuer/card getters and `getCardWithBenefits`, and CardTemplateImporter adds `importFromDatabase` to build profile cards/applications from stored templates (linking benefits when present).
+- CardCreateViewModelTest updated for the new flow; CardRepositoryTest and CardTemplateImporterTest were refactored to the current schema and all targeted unit tests now pass (`./gradlew testDebugUnitTest --tests ...CardRepositoryTest --tests ...CardTemplateImporterTest --tests ...CardCreateViewModelTest`).
+
+## 2026-01-06 Schema updates
+- Added `PaymentInstrument` (Credit, Debit, Charge) and `CardSegment` (Personal, Business) enums to the Prisma schema and wired them into the `Card` model with defaults and column mapping.
+- Mirrored the schema in code: Room enums/converters, `CardEntity` fields, Firestore sync mapping, importer defaults; DB currently at v12.
+- Renamed `foreignFeeTransactionFee` to `foreignTransactionFee` across schema and code (entity, Firestore sync fallback, importer), with migration 9->10.
+- CardTemplateImporter deep-copies benefits when adding a card (new benefit IDs linked only to the user’s profile card), keeping template/remote benefits immutable references.
+- Categories now rely solely on the enum values (no extra raw field); benefit save/init mappings normalized to enum names; targeted unit tests pass after clean rebuild.
+
+## 2026-01-08 - Schema review
+- Read updated Prisma schema with the new `TemplateCard` model meant for Firestore-synced templates.
+- Noted drift from Room/code (e.g., `Card.annualFee` missing, TemplateCard not yet represented in entities/DAOs/migrations).
+- Shared feedback on aligning TemplateCard usage, table mapping, and indexes; no code changes made yet.
+
+## 2026-01-08 - Schema rename
+- Updated Prisma schema to link ProfileCard directly to `card_id` (renamed from `template_card_id`) per template separation plan.
+- Refreshed schema documentation to reflect the new ProfileCard linkage, TemplateCard model, and corrected enum spelling.
+
+## 2026-01-08 - Room TemplateCard & cardId migration
+- Added Room `TemplateCardEntity`/DAO and wired it into `AppDatabase` (version 14), repository, and Firestore sync (templates mirror card IDs).
+- Renamed ProfileCard foreign key to `cardId` across entities, relations, importer, viewmodels, and tests; added migration 13→14 to rename the column and create the template_cards table.
+- Updated Prisma/docs to make `TemplateCard.cardId` non-null with cascade and indexed; UI now reads card metadata via the new relation name.
+
+## 2026-01-08 - TemplateCard benefits refactor
+- Replaced card-level benefit joins with template-level joins: removed `card_benefits`, added `template_card_benefits` with Room entity/DAO and migration 14→15 that drops old links and migrates existing rows.
+- Added `TemplateCardWithBenefits` relation and `TemplateCardBenefitEntity`; repository exposes `getTemplateCardWithBenefits` and upserts template benefit links.
+- Updated importer, DAOs, repository usage, and tests to read/write template benefits; AppDatabase bumped to v15 and migration wired.
+- Prisma/schema docs updated to drop `CardBenefit`, add `TemplateCardBenefit`, and align Benefit relations.
+
+## 2026-01-08 - Benefit fields and profile link dates
+- Added `title` to benefits, removed `enrollmentRequired`, and moved `startDateUtc`/`endDateUtc` to `ProfileCardBenefit` with a new migration to v16.
+- Updated Room entities/DAOs/repository/importer to store benefit dates on the profile link and enforce unique `benefitId` per template card; AppDatabase bumped to 16 and migration wired.
+- Benefit create/edit flow now reads/writes title and per-profile dates via the updated repository; Card detail mapping uses profile benefit links for expiry.
+- Prisma/schema docs reflect the new benefit fields and profile link date storage.
+
+## 2026-01-08 - Firestore template sync
+- Firestore sync now pulls `benefits`, `template_cards` (falling back to cards), and `template_card_benefits` in addition to issuers/cards, mapping to Room entities with enum/category parsing.
+- Repository upserts template cards/benefits and links; sync result now reports counts for all synced collections.
+
+## 2026-01-09 - Enum extensions
+- Added `Supermarket` and `RetailStore` to benefit categories and `EveryTransaction` to benefit frequencies across schema/docs and Room enums.
+- Updated importer/VM mappings, category parsing, and frequency selection UI; Firestore sync handles the new categories.
