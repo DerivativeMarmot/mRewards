@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.unit.dp
 import com.example.rewardsrader.ui.carddetail.CardDetailUi
 import com.example.rewardsrader.ui.carddetail.components.CardField
@@ -39,37 +40,37 @@ fun CardInfoTab(
             value = detail.nickname.orEmpty(),
             onClick = { onStartEdit(CardField.Nickname, detail.nickname.orEmpty()) }
         )
-        Divider()
+        HorizontalDivider()
         InfoRow(
             label = "Last 4 digits",
             value = detail.lastFour.orEmpty(),
             onClick = { onStartEdit(CardField.LastFour, detail.lastFour.orEmpty()) }
         )
-        Divider()
+        HorizontalDivider()
         InfoRow(
             label = "Status",
             value = detail.status.replaceFirstChar { it.uppercase() },
             onClick = { onStartEdit(CardField.Status, detail.status) }
         )
-        Divider()
+        HorizontalDivider()
         InfoRow(
             label = "Annual fee",
             value = detail.annualFee,
             onClick = { onStartEdit(CardField.AnnualFee, detail.annualFee.removePrefix("$")) }
         )
-        Divider()
+        HorizontalDivider()
         InfoRow(
             label = "Open date",
             value = detail.openDate.orEmpty(),
             onClick = onOpenDateClick
         )
-        Divider()
+        HorizontalDivider()
         InfoRow(
             label = "Statement cut",
             value = detail.statementCut.orEmpty(),
             onClick = onStatementDateClick
         )
-        Divider()
+        HorizontalDivider()
         InfoRow(
             label = "Notes",
             value = detail.notes.orEmpty().ifBlank { "Tap to add" },

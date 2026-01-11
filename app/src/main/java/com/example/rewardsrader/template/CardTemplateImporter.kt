@@ -258,7 +258,7 @@ class CardTemplateImporter(
             com.example.rewardsrader.config.BenefitCadence.ANNUALLY -> BenefitFrequency.Annually
             com.example.rewardsrader.config.BenefitCadence.SEMI_ANNUALLY -> BenefitFrequency.Annually
             com.example.rewardsrader.config.BenefitCadence.EVERY_ANNIVERSARY -> BenefitFrequency.EveryAnniversary
-            com.example.rewardsrader.config.BenefitCadence.EACH_TIME -> BenefitFrequency.EveryTransaction
+            com.example.rewardsrader.config.BenefitCadence.EVERY_TRANSACTION -> BenefitFrequency.EveryTransaction
             else -> BenefitFrequency.Monthly
         }
 }

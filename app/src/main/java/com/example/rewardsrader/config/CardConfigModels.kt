@@ -55,5 +55,6 @@ enum class BenefitCadence {
     @SerialName("quarterly") QUARTERLY,
     @SerialName("annual") ANNUALLY,
     @SerialName("semi_annually") SEMI_ANNUALLY,
-    @SerialName("every_anniversary") EVERY_ANNIVERSARY
+    @SerialName("every_anniversary") EVERY_ANNIVERSARY,
+    @SerialName("every_transaction") EVERY_TRANSACTION
 }
