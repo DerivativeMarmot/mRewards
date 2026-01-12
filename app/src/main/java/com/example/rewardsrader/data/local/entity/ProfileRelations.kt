@@ -8,6 +8,8 @@ data class ProfileCardWithRelations(
     @Embedded val profileCard: ProfileCardEntity,
     @Relation(parentColumn = "cardId", entityColumn = "id")
     val card: CardEntity?,
+    @Relation(parentColumn = "cardFaceId", entityColumn = "id")
+    val cardFace: CardFaceEntity?,
     @Relation(parentColumn = "id", entityColumn = "profileCardId")
     val applications: List<ApplicationEntity>,
     @Relation(parentColumn = "id", entityColumn = "profileCardId")

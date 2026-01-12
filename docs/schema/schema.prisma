@@ -65,6 +65,7 @@ model ProfileCard {
   id                   String               @id @default(cuid())
   profileId            String               @map("profile_id")
   cardId               String?              @map("card_id")
+  cardFaceId           String?              @map("card_face_id")
   nickname             String?
   annualFee            Float                @map("annual_fee")
   lastFour             String?              @map("last_four")
@@ -82,11 +83,13 @@ model ProfileCard {
   offers              Offer[]
   applications        Application[]
 
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  card    Card?   @relation(fields: [cardId], references: [id])
+  profile Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  card     Card?   @relation(fields: [cardId], references: [id])
+  cardFace CardFace? @relation(fields: [cardFaceId], references: [id])
 
   @@index([profileId])
   @@index([cardId])
+  @@index([cardFaceId])
   @@map("profile_cards")
 }
 

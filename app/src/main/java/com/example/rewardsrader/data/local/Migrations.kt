@@ -271,3 +271,79 @@ val MIGRATION_15_16 = object : Migration(15, 16) {
         database.execSQL("ALTER TABLE benefits_new RENAME TO benefits")
     }
 }
+
+// Migration 16->17 adds cardFaceId to profile_cards with FK to card_faces.
+val MIGRATION_16_17 = object : Migration(16, 17) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS profile_cards_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                profileId TEXT NOT NULL,
+                cardId TEXT,
+                cardFaceId TEXT,
+                nickname TEXT,
+                annualFee REAL NOT NULL,
+                lastFour TEXT,
+                openDateUtc TEXT,
+                closeDateUtc TEXT,
+                statementCutUtc TEXT,
+                welcomeOfferProgress TEXT,
+                status TEXT NOT NULL,
+                notes TEXT,
+                subSpending REAL,
+                subDuration INTEGER,
+                subDurationUnit TEXT,
+                FOREIGN KEY(profileId) REFERENCES profiles(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+                FOREIGN KEY(cardId) REFERENCES cards(id) ON DELETE SET NULL ON UPDATE NO ACTION,
+                FOREIGN KEY(cardFaceId) REFERENCES card_faces(id) ON DELETE SET NULL ON UPDATE NO ACTION
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            INSERT INTO profile_cards_new (
+                id,
+                profileId,
+                cardId,
+                cardFaceId,
+                nickname,
+                annualFee,
+                lastFour,
+                openDateUtc,
+                closeDateUtc,
+                statementCutUtc,
+                welcomeOfferProgress,
+                status,
+                notes,
+                subSpending,
+                subDuration,
+                subDurationUnit
+            )
+            SELECT
+                id,
+                profileId,
+                cardId,
+                NULL AS cardFaceId,
+                nickname,
+                annualFee,
+                lastFour,
+                openDateUtc,
+                closeDateUtc,
+                statementCutUtc,
+                welcomeOfferProgress,
+                status,
+                notes,
+                subSpending,
+                subDuration,
+                subDurationUnit
+            FROM profile_cards
+            """.trimIndent()
+        )
+        database.execSQL("DROP TABLE profile_cards")
+        database.execSQL("ALTER TABLE profile_cards_new RENAME TO profile_cards")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_profile_cards_profileId ON profile_cards(profileId)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_profile_cards_cardId ON profile_cards(cardId)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_profile_cards_cardFaceId ON profile_cards(cardFaceId)")
+    }
+}

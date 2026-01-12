@@ -19,14 +19,21 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["cardId"],
             onDelete = ForeignKey.SET_NULL
+        ),
+        ForeignKey(
+            entity = CardFaceEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["cardFaceId"],
+            onDelete = ForeignKey.SET_NULL
         )
     ],
-    indices = [Index("profileId"), Index("cardId")]
+    indices = [Index("profileId"), Index("cardId"), Index("cardFaceId")]
 )
 data class ProfileCardEntity(
     @PrimaryKey val id: String,
     val profileId: String,
     val cardId: String? = null,
+    val cardFaceId: String? = null,
     val nickname: String? = null,
     val annualFee: Double,
     val lastFour: String? = null,

@@ -129,3 +129,13 @@
 - `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateState.kt` / `CardCreateViewModel.kt` / `CardCreateScreen.kt`: Issuer/product options now load from Room (string IDs), dialogs filter by issuer, and saves use the DB importer; state tracks issuer/card options instead of config templates.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Card creation wiring updated to pass the repository into the viewmodel factory.
 - `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`: Adjusted to stub DB-backed issuer/card sources and the new importer entry point.
+
+## 2026-01-11 тА?Card creation dialog scroll
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateScreen.kt`: Issuer/product selection dialogs now use a bounded, scrollable list so long catalogs remain accessible.
+
+## 2026-01-11 тА?Profile card face reference
+- `docs/schema/schema.prisma`, `docs/schema/schema.md`: Added `cardFaceId` on `ProfileCard` with relation/index to `CardFace`.
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/ProfileCardEntity.kt`: New optional `cardFaceId` column with FK to `card_faces` and index.
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/ProfileRelations.kt`: Exposes related `CardFaceEntity` on profile card relations.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Migration 16тЖ?7 rebuilds `profile_cards` with `cardFaceId` FK and indexes.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`, `AppContainer.kt`: Bumped DB to v17 and wired the new migration.

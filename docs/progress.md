@@ -149,3 +149,9 @@
 ## 2026-01-09 - Enum extensions
 - Added `Supermarket` and `RetailStore` to benefit categories and `EveryTransaction` to benefit frequencies across schema/docs and Room enums.
 - Updated importer/VM mappings, category parsing, and frequency selection UI; Firestore sync handles the new categories.
+
+## 2026-01-11 - Product selection dialog scroll
+- Updated `CardCreateScreen` selection dialog to use a bounded, scrollable list so long issuer/product catalogs remain accessible.
+
+## 2026-01-11 - Profile card face reference
+- Added `cardFaceId` column/relationship to `ProfileCard` (schema docs, Room entity/relation), migration to v17 with indexes, and wired the migration in AppDatabase/AppContainer.

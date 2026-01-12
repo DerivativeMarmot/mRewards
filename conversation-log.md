@@ -507,3 +507,7 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-09 11:33:56 -08:00] Assistant: Updated FirestoreSyncer to fetch benefits/template cards/template card benefits with enum/category parsing, upsert via repository, expanded sync result counts, and logged progress.
 [2026-01-09 16:08:40 -08:00] User: Asked to add Supermarket/RetailStore categories and EveryTransaction frequency to schema and code.
 [2026-01-09 16:08:40 -08:00] Assistant: Added new enum values in schema/docs and Room enums, updated benefit create/importer mappings and frequency options, and extended Firestore category parsing.
+[2026-01-11 15:54:54 -08:00] User: in card creation screen, in Product selection field, if the product list is really long, the dialog can not show the entire list.
+[2026-01-11 15:55:04 -08:00] Assistant: Made issuer/product selection dialogs scrollable in CardCreateScreen, updated architecture/progress logs; ready to summarize changes.
+[2026-01-11 16:37:44 -08:00] User: add cardFaceId in `ProfileCard` table referencing `CardFace` table.
+[2026-01-11 16:37:44 -08:00] Assistant: Added optional `cardFaceId` with FK/index to `card_faces` across schema docs, Room entity/relations, migration 16->17, and wired DB version bump/migration.

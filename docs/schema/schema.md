@@ -204,6 +204,7 @@ enum CardSubDurationUnit {
 | `id` | String | @id @default(cuid()) |
 | `profileId` | String | @map("profile_id") |
 | `cardId` | String? | @map("card_id") |
+| `cardFaceId` | String? | @map("card_face_id") |
 | `nickname` | String? | |
 | `annualFee` | Float | @map("annual_fee") |
 | `lastFour` | String? | @map("last_four") |
@@ -221,6 +222,7 @@ enum CardSubDurationUnit {
 | `applications` | Application[] | |
 | `profile` | Profile | @relation(fields: [profileId], references: [id], onDelete: Cascade) |
 | `card` | Card? | @relation(fields: [cardId], references: [id]) |
+| `cardFace` | CardFace? | @relation(fields: [cardFaceId], references: [id]) |
 
 ### ProfileCardBenefit
 | Field | Type | Description |
