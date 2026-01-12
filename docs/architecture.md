@@ -140,3 +140,8 @@
 - `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Migration 16тЖ?7 rebuilds `profile_cards` with `cardFaceId` FK and indexes.
 - `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`, `AppContainer.kt`: Bumped DB to v17 and wired the new migration.
 - `app/src/main/java/com/example/rewardsrader/data/local/dao/CardFaceDao.kt`, `CardRepository.kt`, `template/CardTemplateImporter.kt`: Card face DAO now exposes preferred face lookup; importer copies the preferred/default card face ID into new profile cards when created.
+
+## 2026-01-11 тА?Card face display
+- `gradle/libs.versions.toml`, `app/build.gradle.kts`: Added Coil Compose for remote image loading.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Card detail UI model includes card face URL from related card face.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Header now renders the card face from `remoteUrl` (or fallback text) using `AsyncImage`.

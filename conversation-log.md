@@ -513,3 +513,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-11 16:37:44 -08:00] Assistant: Added optional `cardFaceId` with FK/index to `card_faces` across schema docs, Room entity/relations, migration 16->17, and wired DB version bump/migration.
 [2026-01-11 16:48:16 -08:00] User: after the user added a card, copy the default card face id into `ProfileCard` table.
 [2026-01-11 16:48:16 -08:00] Assistant: Added preferred card face lookup and set `cardFaceId` on new profile cards during import.
+[2026-01-11 16:52:52 -08:00] User: display card face in card detail screen. use the link in remoteUrl field.
+[2026-01-11 16:52:52 -08:00] Assistant: Added Coil dependency, exposed card face URL in detail state, and render it in card detail header with AsyncImage fallback text.
