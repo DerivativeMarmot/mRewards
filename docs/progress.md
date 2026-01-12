@@ -173,3 +173,7 @@
 ## 2026-01-11 - Card face picker
 - Added card face menu option on card detail; bottom sheet lists faces for the card and saves selection back to the profile card, updating the displayed face.
   - Picker now caps height at half the screen, shows two faces per row, and displays images uncropped.
+
+## 2026-01-12 - Card creation search plan
+- Documented the new search-style card creation flow in `docs/feature_implementation.md`, covering search-first layout, sort/filter bottom sheets, card result list, selection-to-form handoff, and testing approach.
+- Updated the plan so tapping a search result creates the card immediately via the importer, defaulting open date to today (saved in UTC, shown local) and status to `pending`, leaving optional fields blank; success navigates to the Card List with a snackbar and failures stay on search with an error snackbar.

@@ -154,3 +154,7 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Loads card face options, maps them into state, and updates selection to `cardFaceId` with URL refresh.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Top bar menu with "Switch card face" opens a bottom sheet listing faces for selection; selection saves to the profile card and updates the header face.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires face selection callback to the detail viewmodel.
+
+## 2026-01-12 - Card creation search plan
+- `docs/feature_implementation.md`: Added an implementation plan to turn the card creation screen into a search-first experience with a result list, sort/filter bottom sheets, and selection flow into the existing detail form; includes state, layout, and testing notes.
+- Plan refined: selecting a search result now immediately creates the card via the importer, defaulting open date to today (stored UTC, displayed local) and status to `pending`, leaving optional fields blank; success navigates back to the Card List with snackbar feedback, failures stay on search with an error snackbar.
