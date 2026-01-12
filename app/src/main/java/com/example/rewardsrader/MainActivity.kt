@@ -141,20 +141,26 @@ class MainActivity : ComponentActivity() {
             composable("create") {
                 CardCreateScreen(
                     stateFlow = cardCreateViewModel.state,
+                    events = cardCreateViewModel.events,
                     onLoad = { cardCreateViewModel.loadTemplates() },
-                    onIssuerSelected = { cardCreateViewModel.updateSelectedIssuer(it) },
-                    onCardSelected = { cardCreateViewModel.updateSelectedTemplate(it) },
-                    onOpenDateChange = { cardCreateViewModel.updateOpenDate(it) },
-                    onStatementCutChange = { cardCreateViewModel.updateStatementCut(it) },
-                    onApplicationStatusChange = { cardCreateViewModel.updateApplicationStatus(it) },
-                    onWelcomeOfferChange = { cardCreateViewModel.updateWelcomeOffer(it) },
-                    onSave = {
-                        cardCreateViewModel.save {
-                            cardListViewModel.loadCards()
-                            navController.popBackStack()
-                        }
-                    },
-                    onBack = { navController.popBackStack() }
+                    onQueryChange = { cardCreateViewModel.updateQuery(it) },
+                    onSelectSort = { cardCreateViewModel.setSortMode(it) },
+                    onToggleIssuer = { cardCreateViewModel.toggleIssuerFilter(it) },
+                    onToggleNetwork = { cardCreateViewModel.toggleNetworkFilter(it) },
+                    onToggleSegment = { cardCreateViewModel.toggleSegmentFilter(it) },
+                    onToggleInstrument = { cardCreateViewModel.togglePaymentInstrument(it) },
+                    onToggleBenefitType = { cardCreateViewModel.toggleBenefitType(it) },
+                    onToggleBenefitCategory = { cardCreateViewModel.toggleBenefitCategory(it) },
+                    onUpdateFeeRange = { cardCreateViewModel.updateFeeRange(it) },
+                    onToggleNoFee = { cardCreateViewModel.toggleNoAnnualFeeOnly() },
+                    onResetFilters = { cardCreateViewModel.resetFilters() },
+                    onSelectCard = { cardCreateViewModel.createCard(it) },
+                    onBack = { navController.popBackStack() },
+                    onCreated = {
+                        cardListViewModel.loadCards(showLoading = false)
+                        cardListViewModel.notifyCardAdded()
+                        navController.popBackStack()
+                    }
                 )
             }
 

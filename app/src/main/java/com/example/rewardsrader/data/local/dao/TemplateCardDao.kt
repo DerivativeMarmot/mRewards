@@ -19,4 +19,8 @@ interface TemplateCardDao {
     @Transaction
     @Query("SELECT * FROM template_cards WHERE id = :templateCardId LIMIT 1")
     suspend fun getWithBenefits(templateCardId: String): TemplateCardWithBenefits?
+
+    @Transaction
+    @Query("SELECT * FROM template_cards")
+    suspend fun getAllWithBenefits(): List<TemplateCardWithBenefits>
 }

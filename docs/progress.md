@@ -177,3 +177,12 @@
 ## 2026-01-12 - Card creation search plan
 - Documented the new search-style card creation flow in `docs/feature_implementation.md`, covering search-first layout, sort/filter bottom sheets, card result list, selection-to-form handoff, and testing approach.
 - Updated the plan so tapping a search result creates the card immediately via the importer, defaulting open date to today (saved in UTC, shown local) and status to `pending`, leaving optional fields blank; success navigates to the Card List with a snackbar and failures stay on search with an error snackbar.
+
+## 2026-01-12 - Card creation search UI
+- Rebuilt the card creation screen into a search-first list with search box, sort chip, and filter bottom sheet (issuer/network/segment/payment instrument, annual fee slider + no-fee toggle, benefit type/category chips); results show issuer/product/network/segment/instrument and fee.
+- Card taps now import immediately with open date defaulted to today (stored in UTC) and status `pending`, leaving optional fields blank; success navigates back to Card List and triggers its snackbar, failures stay on search with an error snackbar.
+- CardCreateViewModel now emits events, computes filter metadata from template cards with benefits, and applies query/sort/filter reductions; CardListViewModel exposes a notifier for create success; TemplateCardDao/Repository return template cards with attached benefits for filter data.
+- Updated `CardCreateViewModelTest` for the new flow and ran `./gradlew testDebugUnitTest --tests com.example.rewardsrader.ui.cardcreate.CardCreateViewModelTest`.
+- Added capped height (85%) to the filter bottom sheet so it leaves space under the top bar.
+- Made the filter sheet scrollable to reach all fields on smaller screens.
+- Added a slim scroll indicator on the filter sheet to show scroll position.

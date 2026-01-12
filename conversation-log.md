@@ -538,5 +538,13 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-12 11:54:45 -08:00] Assistant: Asked clarifications on optional fields, error handling, and UTC vs local storage/display for open date.
 [2026-01-12 11:54:45 -08:00] User: 1. skip all optional fields and leave them as blank. 2. yes. 3. you should save UTC in database but display device local time.
 [2026-01-12 11:54:45 -08:00] Assistant: Incorporated clarifications into the plan: optional fields stay blank, failures remain on search with error snackbar, open date saved in UTC and shown in local time; updated feature_implementation, progress, and architecture docs.
+[2026-01-12 12:19:41 -08:00] User: proceed with next step
+[2026-01-12 12:19:41 -08:00] Assistant: Implemented the search-first card creation experience with search/sort/filter UI, immediate create (UTC open date, pending status, optional fields blank), success navigation/snackbar wiring, template-benefit filter metadata, and updated unit test; logged updates and ran the create viewmodel test.
+[2026-01-12 13:55:28 -08:00] User: I don't want the the filter bottom sheet to cover the entire screen. give some spaces between top bar and top edge of filter bottom sheet.
+[2026-01-12 13:55:28 -08:00] Assistant: Capped the filter bottom sheet to 85% height so it leaves top spacing below the app bar; test suite for CardCreateViewModel still passing.
+[2026-01-12 14:10:00 -08:00] User: in filter sheet, there are more fields below but due to some reasons i can not scroll to the bottom.
+[2026-01-12 14:10:00 -08:00] Assistant: Made the filter sheet content scrollable so all filters are reachable; tests still pass.
+[2026-01-12 14:30:00 -08:00] User: add a scroll bar indicator to filter sheet
+[2026-01-12 14:30:00 -08:00] Assistant: Added a slim scroll indicator to the filter sheet while keeping it capped at 85% height; tests still passing.
 [2026-01-12 11:51:21 -08:00] User: set open date to current date, set status to `pending`.
 [2026-01-12 11:51:21 -08:00] Assistant: Updated the plan to default open date to today and status to `pending` on immediate card creation; logged in feature_implementation, progress, and architecture docs.

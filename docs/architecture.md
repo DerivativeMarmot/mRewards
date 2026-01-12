@@ -158,3 +158,15 @@
 ## 2026-01-12 - Card creation search plan
 - `docs/feature_implementation.md`: Added an implementation plan to turn the card creation screen into a search-first experience with a result list, sort/filter bottom sheets, and selection flow into the existing detail form; includes state, layout, and testing notes.
 - Plan refined: selecting a search result now immediately creates the card via the importer, defaulting open date to today (stored UTC, displayed local) and status to `pending`, leaving optional fields blank; success navigates back to the Card List with snackbar feedback, failures stay on search with an error snackbar.
+
+## 2026-01-12 - Card creation search UI
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateState.kt`: Reframed state around search results, filters (issuer/network/segment/payment instrument/benefit type/category, annual fee range, no-fee toggle), sort mode, and query text.
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModel.kt`: Loads issuers/cards with benefits, builds filter metadata, applies query/sort/filter to derive result lists, and emits events on immediate creation (open date in UTC, status pending, optional fields blank) with error/success handling.
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateScreen.kt`: New search-first UI with search bar, sort/filter chips and bottom sheets, result list cards, and snackbar handling; tapping a card triggers immediate import and navigation callback.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Added `notifyCardAdded` to surface a snackbar when returning from create.
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/TemplateCardDao.kt`, `.../repository/CardRepository.kt`: Expose template cards with benefits for filter metadata.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wired new create-screen callbacks/events and success navigation back to the card list.
+- `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`: Updated for search-first flow and creation event assertion.
+- UI tweak: filter bottom sheet height capped to 85% to leave space below the top bar.
+- Filter sheet content is scrollable to ensure all filter controls are reachable on smaller screens.
+- Added a scrollbar indicator on the filter sheet to make scroll position visible.

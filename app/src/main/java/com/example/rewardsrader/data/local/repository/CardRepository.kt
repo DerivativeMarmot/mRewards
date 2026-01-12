@@ -33,6 +33,7 @@ import java.util.UUID
 interface CardTemplateSource {
     suspend fun getIssuers(): List<IssuerEntity>
     suspend fun getCards(): List<CardEntity>
+    suspend fun getTemplateCardsWithBenefits(): List<TemplateCardWithBenefits>
 }
 
 /**
@@ -80,6 +81,9 @@ class CardRepository(
     override suspend fun getIssuers(): List<IssuerEntity> = issuerDao.getAll()
 
     override suspend fun getCards(): List<CardEntity> = cardDao.getAll()
+
+    override suspend fun getTemplateCardsWithBenefits(): List<TemplateCardWithBenefits> =
+        templateCardDao.getAllWithBenefits()
 
     suspend fun getTemplateCardWithBenefits(templateCardId: String): TemplateCardWithBenefits? =
         templateCardDao.getWithBenefits(templateCardId)

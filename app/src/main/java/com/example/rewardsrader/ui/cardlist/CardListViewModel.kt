@@ -66,6 +66,10 @@ class CardListViewModel(
         }
     }
 
+    fun notifyCardAdded(message: String = "Card added") {
+        _state.value = _state.value.copy(snackbarMessage = message)
+    }
+
     fun syncFromCloud() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true, error = null)

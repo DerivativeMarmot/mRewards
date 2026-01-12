@@ -1,17 +1,30 @@
 package com.example.rewardsrader.ui.cardcreate
 
+import com.example.rewardsrader.data.local.entity.BenefitCategory
+import com.example.rewardsrader.data.local.entity.BenefitEntity
+import com.example.rewardsrader.data.local.entity.BenefitFrequency
+import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardNetwork
+import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.IssuerEntity
+import com.example.rewardsrader.data.local.entity.PaymentInstrument
+import com.example.rewardsrader.data.local.entity.TemplateCardEntity
+import com.example.rewardsrader.data.local.entity.TemplateCardWithBenefits
 import com.example.rewardsrader.data.local.repository.CardTemplateSource
 import com.example.rewardsrader.template.CardTemplateImporterContract
 import com.example.rewardsrader.template.ImportResult
+import com.example.rewardsrader.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import com.example.rewardsrader.util.MainDispatcherRule
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CardCreateViewModelTest {
@@ -20,20 +33,40 @@ class CardCreateViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
-    fun loadAndSaveSuccess() = runTest {
+    fun loadAndCreateSuccess() = runTest(UnconfinedTestDispatcher()) {
+        val card = CardEntity(
+            id = "card_1",
+            issuerId = "example_bank",
+            productName = "Example Cash Preferred",
+            network = CardNetwork.Visa,
+            paymentInstrument = PaymentInstrument.Credit,
+            segment = CardSegment.Personal,
+            annualFee = 95.0,
+            foreignTransactionFee = 0.0
+        )
         val templateSource = object : CardTemplateSource {
             override suspend fun getIssuers(): List<IssuerEntity> =
                 listOf(IssuerEntity(id = "example_bank", name = "Example Bank"))
 
-            override suspend fun getCards(): List<CardEntity> =
+            override suspend fun getCards(): List<CardEntity> = listOf(card)
+
+            override suspend fun getTemplateCardsWithBenefits(): List<TemplateCardWithBenefits> =
                 listOf(
-                    CardEntity(
-                        id = "card_1",
-                        issuerId = "example_bank",
-                        productName = "Example Cash Preferred",
-                        network = CardNetwork.Visa,
-                        annualFee = 95.0,
-                        foreignTransactionFee = 0.0
+                    TemplateCardWithBenefits(
+                        templateCard = TemplateCardEntity(id = "card_1", cardId = "card_1"),
+                        card = card,
+                        benefits = listOf(
+                            BenefitEntity(
+                                id = "benefit_1",
+                                title = "Dining",
+                                type = BenefitType.Credit,
+                                amount = 10.0,
+                                cap = null,
+                                frequency = BenefitFrequency.Monthly,
+                                category = listOf(BenefitCategory.Dining),
+                                notes = null
+                            )
+                        )
                     )
                 )
         }
@@ -58,14 +91,15 @@ class CardCreateViewModelTest {
 
         val vm = CardCreateViewModel(templateSource, importer)
         vm.loadTemplates()
-        assertEquals(1, vm.state.value.cards.size)
-        assertEquals("example_bank", vm.state.value.selectedIssuerId)
-        assertEquals("card_1", vm.state.value.selectedCardId)
-        vm.updateSelectedTemplate("card_1")
-        vm.updateOpenDate("01/01/2025")
-        vm.updateApplicationStatus("approved")
-        vm.save { }
+        advanceUntilIdle()
+        assertEquals(1, vm.state.value.filteredResults.size)
+        vm.updateQuery("Preferred")
+        assertEquals(1, vm.state.value.filteredResults.size)
 
-        assertEquals(null, vm.state.value.error)
+        val event = async { vm.events.first() }
+        vm.createCard("card_1")
+        advanceUntilIdle()
+
+        assertTrue(event.await() is CardCreateEvent.Created)
     }
 }
