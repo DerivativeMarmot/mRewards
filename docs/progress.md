@@ -155,3 +155,4 @@
 
 ## 2026-01-11 - Profile card face reference
 - Added `cardFaceId` column/relationship to `ProfileCard` (schema docs, Room entity/relation), migration to v17 with indexes, and wired the migration in AppDatabase/AppContainer.
+- Card face DAO now exposes preferred face lookup, and card creation importer copies the default/preferred card face ID onto new profile cards.

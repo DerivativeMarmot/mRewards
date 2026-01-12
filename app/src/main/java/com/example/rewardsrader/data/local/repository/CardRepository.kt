@@ -84,6 +84,9 @@ class CardRepository(
     suspend fun getTemplateCardWithBenefits(templateCardId: String): TemplateCardWithBenefits? =
         templateCardDao.getWithBenefits(templateCardId)
 
+    suspend fun getPreferredCardFaceId(cardId: String): String? =
+        cardFaceDao.getPreferredForCard(cardId)?.id
+
     suspend fun upsertBenefit(benefit: BenefitEntity) {
         benefitDao.insert(benefit)
     }

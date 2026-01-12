@@ -85,7 +85,17 @@ class CardTemplateImporter(
         repository.upsertTemplateCardBenefits(templateBenefitLinks)
 
         val profileCardId = repository.newId()
-        val profileCard = mapProfileCard(cardTemplate, profile.id, profileCardId, openDateUtc, statementCutUtc, applicationStatus, welcomeOfferProgress)
+        val defaultCardFaceId = repository.getPreferredCardFaceId(cardEntity.id)
+        val profileCard = mapProfileCard(
+            cardTemplate = cardTemplate,
+            profileId = profile.id,
+            profileCardId = profileCardId,
+            openDateUtc = openDateUtc,
+            statementCutUtc = statementCutUtc,
+            applicationStatus = applicationStatus,
+            welcomeOfferProgress = welcomeOfferProgress,
+            cardFaceId = defaultCardFaceId
+        )
         repository.upsertProfileCards(listOf(profileCard))
         benefitEntities.forEachIndexed { index, templateBenefit ->
             val templateSource = benefitTemplates[index]
@@ -122,12 +132,14 @@ class CardTemplateImporter(
         val cardWithBenefits = repository.getTemplateCardWithBenefits(cardId)
             ?: return ImportResult.Failure("Card $cardId not found.")
         val profile = repository.ensureProfile(defaultProfileId, name = "Default Profile")
+        val defaultCardFaceId = repository.getPreferredCardFaceId(cardWithBenefits.card.id)
 
         val profileCardId = repository.newId()
         val profileCard = ProfileCardEntity(
             id = profileCardId,
             profileId = profile.id,
             cardId = cardWithBenefits.card.id,
+            cardFaceId = defaultCardFaceId,
             nickname = cardWithBenefits.card.productName,
             annualFee = cardWithBenefits.card.annualFee,
             lastFour = null,
@@ -189,12 +201,14 @@ class CardTemplateImporter(
         openDateUtc: String?,
         statementCutUtc: String?,
         applicationStatus: String,
-        welcomeOfferProgress: String?
+        welcomeOfferProgress: String?,
+        cardFaceId: String?
     ): ProfileCardEntity =
         ProfileCardEntity(
             id = profileCardId,
             profileId = profileId,
             cardId = template.cardId.toString(),
+            cardFaceId = cardFaceId,
             nickname = template.productName,
             annualFee = template.annualFeeUsd,
             lastFour = null,
