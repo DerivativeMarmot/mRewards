@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +41,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -265,8 +267,7 @@ private fun DetailContent(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                            .fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (!detail.cardFaceUrl.isNullOrBlank()) {
@@ -275,16 +276,15 @@ private fun DetailContent(
                                 contentDescription = "Card face",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(140.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(12.dp))
                             )
                         } else {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(140.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .fillMaxSize()
+                                    .height(220.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                                     .padding(4.dp)
                             ) {
                                 Text(
@@ -294,8 +294,6 @@ private fun DetailContent(
                                 )
                             }
                         }
-                        Text(detail.productName, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                        Text(detail.issuer, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

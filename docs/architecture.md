@@ -144,7 +144,7 @@
 ## 2026-01-11 тА?Card face display
 - `gradle/libs.versions.toml`, `app/build.gradle.kts`: Added Coil Compose for remote image loading.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Card detail UI model includes card face URL from related card face.
-- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Header now renders the card face from `remoteUrl` (or fallback text) using `AsyncImage`.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Header now renders the card face from `remoteUrl` (or fallback text) using `AsyncImage` at larger height without issuer/product labels.
 
 ## 2026-01-11 тА?Firestore card face sync
 - `app/src/main/java/com/example/rewardsrader/data/remote/FirestoreSyncer.kt`: Sync now pulls `card_faces`, maps defaults/URLs, and upserts via repository with result counts including faces.

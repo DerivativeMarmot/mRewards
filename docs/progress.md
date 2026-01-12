@@ -166,3 +166,6 @@
 
 ## 2026-01-11 - Card template importer fix
 - Corrected profile card mapping call to use the updated parameter name, fixing card creation compilation.
+
+## 2026-01-11 - Card face header update
+- Removed issuer/product text from the card face header and increased image height for a larger card face display.
