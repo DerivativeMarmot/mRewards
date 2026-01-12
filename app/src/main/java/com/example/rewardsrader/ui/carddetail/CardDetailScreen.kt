@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,15 +28,19 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.Card
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -41,8 +49,10 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -55,10 +65,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.rewardsrader.ui.carddetail.CardFaceUi
 import com.example.rewardsrader.ui.carddetail.components.BenefitCard
 import com.example.rewardsrader.ui.carddetail.components.CardField
 import com.example.rewardsrader.ui.carddetail.components.EditFieldDialog
@@ -92,12 +104,14 @@ fun CardDetailScreen(
     onUpdateStatus: (String) -> Unit,
     onUpdateNotes: (String) -> Unit,
     onUpdateSubSpending: (String) -> Unit,
-    onUpdateSubDuration: (String, String) -> Unit
+    onUpdateSubDuration: (String, String) -> Unit,
+    onSelectCardFace: (String) -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val detail = state.detail
     var showOpenDatePicker by remember { mutableStateOf(false) }
     var showStatementDatePicker by remember { mutableStateOf(false) }
+    var showFacePicker by remember { mutableStateOf(false) }
     val openDatePickerState = androidx.compose.material3.rememberDatePickerState()
     val statementDatePickerState = androidx.compose.material3.rememberDatePickerState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -110,6 +124,24 @@ fun CardDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    var showMenu by remember { mutableStateOf(false) }
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More actions")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Switch card face") },
+                            onClick = {
+                                showMenu = false
+                                showFacePicker = true
+                            }
+                        )
                     }
                 }
             )
@@ -143,6 +175,10 @@ fun CardDetailScreen(
                 onUpdateSubDuration = onUpdateSubDuration,
                 onOpenDateClick = { showOpenDatePicker = true },
                 onStatementDateClick = { showStatementDatePicker = true },
+                cardFaces = state.cardFaces,
+                showFacePicker = showFacePicker,
+                onDismissFacePicker = { showFacePicker = false },
+                onSelectCardFace = { onSelectCardFace(it) },
                 modifier = Modifier.padding(padding)
             )
         }
@@ -214,6 +250,10 @@ private fun DetailContent(
     onUpdateSubDuration: (String, String) -> Unit,
     onOpenDateClick: () -> Unit,
     onStatementDateClick: () -> Unit,
+    cardFaces: List<CardFaceUi>,
+    showFacePicker: Boolean,
+    onDismissFacePicker: () -> Unit,
+    onSelectCardFace: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(
@@ -253,6 +293,8 @@ private fun DetailContent(
     }
 
     Box(modifier = modifier.fillMaxSize()) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -267,23 +309,26 @@ private fun DetailContent(
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize(),
+                            .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         if (!detail.cardFaceUrl.isNullOrBlank()) {
                             AsyncImage(
                                 model = detail.cardFaceUrl,
                                 contentDescription = "Card face",
-                                contentScale = ContentScale.Crop,
+                                contentScale = ContentScale.Fit,
                                 modifier = Modifier
-                                    .fillMaxSize()
+                                    .fillMaxWidth()
+                                    .heightIn(min = 200.dp)
+                                    .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
                                     .clip(RoundedCornerShape(12.dp))
                             )
                         } else {
                             Box(
                                 modifier = Modifier
-                                    .fillMaxSize()
-                                    .height(220.dp)
+                                    .fillMaxWidth()
+                                    .heightIn(min = 200.dp)
+                                    .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
                                     .clip(RoundedCornerShape(12.dp))
                                     .padding(4.dp)
                             ) {
@@ -401,6 +446,68 @@ private fun DetailContent(
                     .padding(end = 16.dp, bottom = fabBottomPadding)
             ) {
                 Icon(Icons.Default.Add, contentDescription = fabDescription.ifBlank { "Add" })
+            }
+        }
+
+        if (showFacePicker) {
+            val maxSheetHeight = (LocalConfiguration.current.screenHeightDp / 2).dp
+            ModalBottomSheet(
+                onDismissRequest = onDismissFacePicker,
+                sheetState = sheetState
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text("Select card face", style = MaterialTheme.typography.titleMedium)
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = maxSheetHeight)
+                    ) {
+                        items(cardFaces) { face ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        coroutineScope.launch {
+                                            onSelectCardFace(face.id)
+                                            sheetState.hide()
+                                            onDismissFacePicker()
+                                        }
+                                    }
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    AsyncImage(
+                                        model = face.remoteUrl,
+                                        contentDescription = "Card face",
+                                        contentScale = ContentScale.Fit,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .heightIn(min = 80.dp)
+                                            .clip(RoundedCornerShape(8.dp))
+                                    )
+                                    val subtitle = when {
+                                        face.isSelected -> "Current selection"
+                                        face.isDefault -> "Default"
+                                        else -> null
+                                    }
+                                    subtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

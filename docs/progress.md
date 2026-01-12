@@ -169,3 +169,7 @@
 
 ## 2026-01-11 - Card face header update
 - Removed issuer/product text from the card face header and increased image height for a larger card face display.
+
+## 2026-01-11 - Card face picker
+- Added card face menu option on card detail; bottom sheet lists faces for the card and saves selection back to the profile card, updating the displayed face.
+  - Picker now caps height at half the screen, shows two faces per row, and displays images uncropped.

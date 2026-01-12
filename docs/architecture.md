@@ -148,3 +148,9 @@
 
 ## 2026-01-11 тА?Firestore card face sync
 - `app/src/main/java/com/example/rewardsrader/data/remote/FirestoreSyncer.kt`: Sync now pulls `card_faces`, maps defaults/URLs, and upserts via repository with result counts including faces.
+
+## 2026-01-11 тА?Card face picker
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Exposes card face list fetch.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Loads card face options, maps them into state, and updates selection to `cardFaceId` with URL refresh.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Top bar menu with "Switch card face" opens a bottom sheet listing faces for selection; selection saves to the profile card and updates the header face.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires face selection callback to the detail viewmodel.

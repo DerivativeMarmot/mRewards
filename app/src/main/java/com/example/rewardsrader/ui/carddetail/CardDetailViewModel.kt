@@ -50,6 +50,7 @@ data class OfferUi(
 
 data class CardDetailUi(
     val id: String,
+    val cardId: String?,
     val productName: String,
     val issuer: String,
     val network: String,
@@ -73,7 +74,15 @@ data class CardDetailUi(
 data class CardDetailState(
     val isLoading: Boolean = true,
     val detail: CardDetailUi? = null,
-    val error: String? = null
+    val error: String? = null,
+    val cardFaces: List<CardFaceUi> = emptyList()
+)
+
+data class CardFaceUi(
+    val id: String,
+    val remoteUrl: String?,
+    val isDefault: Boolean,
+    val isSelected: Boolean
 )
 
 class CardDetailViewModel(
@@ -104,6 +113,7 @@ class CardDetailViewModel(
                 templateAnnualFee = relations.profileCard.annualFee
                 templateIssuer = relations.card?.issuerId.orEmpty()
                 templateNetwork = relations.card?.network?.name ?: ""
+                val faces = loadCardFaces(relations.profileCard.cardId, relations.profileCard.cardFaceId)
                 _state.value = CardDetailState(
                     isLoading = false,
                     detail = mapDetail(
@@ -111,7 +121,8 @@ class CardDetailViewModel(
                         relations.applications,
                         relations.benefits,
                         relations.offers
-                    )
+                    ),
+                    cardFaces = faces
                 )
             }.onFailure {
                 _state.value = CardDetailState(isLoading = false, error = it.message)
@@ -209,6 +220,7 @@ class CardDetailViewModel(
     ): CardDetailUi {
         return CardDetailUi(
             id = card.profileCard.id,
+            cardId = card.profileCard.cardId,
             productName = card.card?.productName ?: card.profileCard.nickname.orEmpty(),
             issuer = templateIssuer,
             network = templateNetwork,
@@ -369,6 +381,40 @@ class CardDetailViewModel(
         CardSubDurationUnit.Day -> "days"
         CardSubDurationUnit.Month -> "months"
         null -> null
+    }
+
+    private suspend fun loadCardFaces(cardId: String?, selectedId: String?): List<CardFaceUi> {
+        if (cardId.isNullOrBlank()) return emptyList()
+        return repository.getCardFaces(cardId).map {
+            CardFaceUi(
+                id = it.id,
+                remoteUrl = it.remoteUrl,
+                isDefault = it.isDefault,
+                isSelected = it.id == selectedId
+            )
+        }
+    }
+
+    fun selectCardFace(faceId: String) {
+        val card = currentCard ?: return
+        viewModelScope.launch {
+            runCatching {
+                val updated = card.copy(cardFaceId = faceId)
+                repository.updateProfileCard(updated)
+                currentCard = updated
+                val updatedFaces = _state.value.cardFaces.map {
+                    it.copy(isSelected = it.id == faceId)
+                }
+                val selectedFace = updatedFaces.firstOrNull { it.id == faceId }
+                val currentDetail = _state.value.detail
+                _state.value = _state.value.copy(
+                    detail = currentDetail?.copy(cardFaceUrl = selectedFace?.remoteUrl),
+                    cardFaces = updatedFaces
+                )
+            }.onFailure {
+                _state.value = _state.value.copy(error = it.message)
+            }
+        }
     }
 
     companion object {

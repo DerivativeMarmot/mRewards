@@ -521,3 +521,10 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-11 16:59:28 -08:00] Assistant: Fixed mapProfileCard call to use the correct parameter name in CardTemplateImporter.
 [2026-01-11 17:04:32 -08:00] User: remove issuer and product name from card face section. display card face in full size.
 [2026-01-11 17:04:32 -08:00] Assistant: Enlarged card face header and removed issuer/product text from the card face section.
+[2026-01-11 19:34:46 -08:00] User: in card detail screen, add a menu button at most right of top bar. when user click it shows menu option: 1. switch card face. when user clicks on `switch cad face` option. a bottom sheet pops up and show all card faces tied to this card, allowing user to select and save.
+[2026-01-11 19:34:46 -08:00] Assistant: Added top-bar menu to open a card face picker bottom sheet, listing card faces for the card and saving selection to update the displayed face.
+[2026-01-11 19:59:52 -08:00] Assistant: Tweaked picker to half-screen height, show two faces per row, and display images fully without cropping.
+[2026-01-11 20:08:25 -08:00] Assistant: Adjusted picker layout to enforce half-height sheet, fill available space, and keep the two-column grid.
+[2026-01-11 20:14:56 -08:00] Assistant: Tightened bottom sheet height to a fixed half-screen cap and removed extra fill-height usage to avoid transparent space.
+[2026-01-11 20:47:28 -08:00] Assistant: Ensured face picker click hides the sheet via coroutine to close cleanly after selection.
+[2026-01-11 20:48:37 -08:00] Assistant: Stopped prematurely toggling sheet visibility so the hide animation can play before dismissal.

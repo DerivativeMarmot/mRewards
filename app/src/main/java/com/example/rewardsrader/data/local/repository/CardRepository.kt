@@ -87,6 +87,9 @@ class CardRepository(
     suspend fun getPreferredCardFaceId(cardId: String): String? =
         cardFaceDao.getPreferredForCard(cardId)?.id
 
+    suspend fun getCardFaces(cardId: String): List<CardFaceEntity> =
+        cardFaceDao.getForCard(cardId)
+
     suspend fun upsertBenefit(benefit: BenefitEntity) {
         benefitDao.insert(benefit)
     }

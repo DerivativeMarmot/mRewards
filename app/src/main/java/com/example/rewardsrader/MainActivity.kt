@@ -133,7 +133,8 @@ class MainActivity : ComponentActivity() {
                     onUpdateStatus = { cardDetailViewModel.updateStatus(it) },
                     onUpdateNotes = { cardDetailViewModel.updateNotes(it) },
                     onUpdateSubSpending = { cardDetailViewModel.updateSubSpending(it) },
-                    onUpdateSubDuration = { value, unit -> cardDetailViewModel.updateSubDuration(value, unit) }
+                    onUpdateSubDuration = { value, unit -> cardDetailViewModel.updateSubDuration(value, unit) },
+                    onSelectCardFace = { cardDetailViewModel.selectCardFace(it) }
                 )
             }
 
