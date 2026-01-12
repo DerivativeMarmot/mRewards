@@ -5,6 +5,7 @@ import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.BenefitFrequency
 import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.data.local.entity.CardEntity
+import com.example.rewardsrader.data.local.entity.CardFaceEntity
 import com.example.rewardsrader.data.local.entity.CardNetwork
 import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.IssuerEntity
@@ -35,6 +36,12 @@ class FirestoreSyncer(
             .documents
             .mapNotNull { it.toCardEntity() }
         repository.upsertCards(cards)
+        val cardFaces = firestore.collection("card_faces")
+            .get()
+            .await()
+            .documents
+            .mapNotNull { it.toCardFaceEntity() }
+        repository.upsertCardFaces(cardFaces)
         val templateCards = firestore.collection("template_cards")
             .get()
             .await()
@@ -60,6 +67,7 @@ class FirestoreSyncer(
         return SyncResult(
             issuersSynced = issuers.size,
             cardsSynced = cards.size,
+            cardFacesSynced = cardFaces.size,
             templateCardsSynced = templateCards.size,
             benefitsSynced = benefits.size,
             templateCardBenefitsSynced = templateCardBenefits.size
@@ -105,6 +113,20 @@ class FirestoreSyncer(
     private fun DocumentSnapshot.toTemplateCardEntity(): TemplateCardEntity? {
         val cardId = stringField("cardId", "card_id") ?: return null
         return TemplateCardEntity(id = id, cardId = cardId)
+    }
+
+    private fun DocumentSnapshot.toCardFaceEntity(): CardFaceEntity? {
+        val remoteUrl = stringField("remoteUrl", "remote_url") ?: return null
+        val cardId = stringField("cardId", "card_id")
+        val isDefault = getBoolean("isDefault") ?: getBoolean("is_default") ?: false
+        val localPath = stringField("localPath", "local_path")
+        return CardFaceEntity(
+            id = id,
+            remoteUrl = remoteUrl,
+            localPath = localPath,
+            isDefault = isDefault,
+            cardId = cardId
+        )
     }
 
     private fun DocumentSnapshot.toBenefitEntity(): BenefitEntity? {
@@ -186,6 +208,7 @@ class FirestoreSyncer(
     data class SyncResult(
         val issuersSynced: Int,
         val cardsSynced: Int,
+        val cardFacesSynced: Int,
         val templateCardsSynced: Int,
         val benefitsSynced: Int,
         val templateCardBenefitsSynced: Int

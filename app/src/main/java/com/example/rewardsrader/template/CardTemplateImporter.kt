@@ -87,7 +87,7 @@ class CardTemplateImporter(
         val profileCardId = repository.newId()
         val defaultCardFaceId = repository.getPreferredCardFaceId(cardEntity.id)
         val profileCard = mapProfileCard(
-            cardTemplate = cardTemplate,
+            template = cardTemplate,
             profileId = profile.id,
             profileCardId = profileCardId,
             openDateUtc = openDateUtc,

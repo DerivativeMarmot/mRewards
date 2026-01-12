@@ -515,3 +515,7 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-11 16:48:16 -08:00] Assistant: Added preferred card face lookup and set `cardFaceId` on new profile cards during import.
 [2026-01-11 16:52:52 -08:00] User: display card face in card detail screen. use the link in remoteUrl field.
 [2026-01-11 16:52:52 -08:00] Assistant: Added Coil dependency, exposed card face URL in detail state, and render it in card detail header with AsyncImage fallback text.
+[2026-01-11 16:55:41 -08:00] User: sync card face from firestore
+[2026-01-11 16:55:41 -08:00] Assistant: Synced `card_faces` collection in FirestoreSyncer, mapping remote URLs/default flags and counting faces in sync results.
+[2026-01-11 16:59:28 -08:00] User: e: file:///E:/WorkSpace/Android_Studio_Workspace/ReawrdsRadar/app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt:90:13 No parameter with name 'cardTemplate' found. e: file:///E:/WorkSpace/Android_Studio_Workspace/ReawrdsRadar/app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt:97:13 No value passed for parameter 'template'.
+[2026-01-11 16:59:28 -08:00] Assistant: Fixed mapProfileCard call to use the correct parameter name in CardTemplateImporter.

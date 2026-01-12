@@ -160,3 +160,9 @@
 ## 2026-01-11 - Card face display
 - Added Coil Compose dependency and surfaced `cardFaceUrl` in card detail state.
 - Card detail header now loads the remote card face URL when available, with a simple fallback text placeholder.
+
+## 2026-01-11 - Firestore card face sync
+- Firestore sync now pulls `card_faces`, maps remote URLs/default flags, and upserts them; sync result reports face counts.
+
+## 2026-01-11 - Card template importer fix
+- Corrected profile card mapping call to use the updated parameter name, fixing card creation compilation.
