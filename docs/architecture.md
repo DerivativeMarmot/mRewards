@@ -170,3 +170,4 @@
 - UI tweak: filter bottom sheet height capped to 85% to leave space below the top bar.
 - Filter sheet content is scrollable to ensure all filter controls are reachable on smaller screens.
 - Added a scrollbar indicator on the filter sheet to make scroll position visible.
+- Issuer filter chips now render leading icons from drawable assets (amex/chase/citi/bofa/capital one/discover/barclays/hsbc/us bank) for quicker visual scanning.

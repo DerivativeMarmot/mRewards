@@ -186,3 +186,4 @@
 - Added capped height (85%) to the filter bottom sheet so it leaves space under the top bar.
 - Made the filter sheet scrollable to reach all fields on smaller screens.
 - Added a slim scroll indicator on the filter sheet to show scroll position.
+- Issuer chips in the filter sheet now show leading issuer icons pulled from `res/drawable` (amex/chase/citi/bofa/capital one/discover/barclays/hsbc/us bank).

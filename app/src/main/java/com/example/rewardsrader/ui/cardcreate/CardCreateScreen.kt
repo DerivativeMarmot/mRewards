@@ -35,6 +35,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,10 +64,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.rewardsrader.R
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -337,7 +341,8 @@ private fun FilterSheet(
                 FlowChips(
                     options = state.issuers.map { it.id to it.name },
                     selected = state.filters.issuerIds,
-                    onToggle = onToggleIssuer
+                    onToggle = onToggleIssuer,
+                    iconFor = { issuerIconRes(it) }
                 )
             }
             if (state.networks.isNotEmpty()) {
@@ -457,17 +462,30 @@ private fun FilterSection(
 private fun FlowChips(
     options: List<Pair<String, String>>,
     selected: Set<String>,
-    onToggle: (String) -> Unit
+    onToggle: (String) -> Unit,
+    iconFor: (String) -> Int? = { null }
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         options.forEach { (id, label) ->
+            val iconRes = iconFor(id)
             FilterChip(
                 selected = selected.contains(id),
                 onClick = { onToggle(id) },
-                label = { Text(label) }
+                label = { Text(label) },
+                leadingIcon = iconRes?.let { res ->
+                    {
+                        Icon(
+                            painter = painterResource(res),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.Unspecified
+                        )
+                    }
+                },
+//                colors = FilterChipDefaults.filterChipColors()
             )
         }
     }
@@ -535,6 +553,22 @@ private fun activeFilterCount(state: CardCreateState): Int {
     if (boundsChanged) count++
     if (filters.noAnnualFeeOnly) count++
     return count
+}
+
+private fun issuerIconRes(issuerId: String): Int? {
+    val key = issuerId.lowercase().replace(" ", "_")
+    return when (key) {
+        "chase" -> R.drawable.ic_issuer_chase
+        "citi", "citibank" -> R.drawable.ic_issuer_citi
+        "amex", "american_express", "americanexpress" -> R.drawable.ic_issuer_amex
+        "capital_one", "capitalone" -> R.drawable.ic_issuer_capital_one
+        "bofa", "bank_of_america", "bankofamerica" -> R.drawable.ic_issuer_bofa
+        "discover" -> R.drawable.ic_issuer_discover
+        "barclays" -> R.drawable.ic_issuer_barclays
+        "hsbc" -> R.drawable.ic_issuer_hsbc
+        "us_bank", "usbank", "u.s._bank" -> R.drawable.ic_issuer_us_bank
+        else -> null
+    }
 }
 
 @Composable
