@@ -171,3 +171,4 @@
 - Filter sheet content is scrollable to ensure all filter controls are reachable on smaller screens.
 - Added a scrollbar indicator on the filter sheet to make scroll position visible.
 - Issuer filter chips now render leading icons from drawable assets (amex/chase/citi/bofa/capital one/discover/barclays/hsbc/us bank) for quicker visual scanning.
+- Card search list items redesigned: three rows with product title, a scaled-down default card face thumbnail plus annual fee, and benefit category chips; default face URLs are pulled when available with a text fallback otherwise.

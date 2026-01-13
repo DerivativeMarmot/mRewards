@@ -548,5 +548,7 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-12 14:30:00 -08:00] Assistant: Added a slim scroll indicator to the filter sheet while keeping it capped at 85% height; tests still passing.
 [2026-01-12 15:21:00 -08:00] User: in filter sheet, in issuer section. add leading icon to each issuer. I have already placed icons in `res/drawable`
 [2026-01-12 15:21:00 -08:00] Assistant: Added issuer icons to filter chips (amex/chase/citi/bofa/capital one/discover/barclays/hsbc/us bank); tests still passing.
+[2026-01-13 13:24:35 -08:00] User: redesign the list item in card searching result list...
+[2026-01-13 13:24:35 -08:00] Assistant: Redesigned card search items to three rows (title; scaled card face thumbnail + annual fee; benefit category chips) and pulled default face URLs via repository; tests still passing.
 [2026-01-12 11:51:21 -08:00] User: set open date to current date, set status to `pending`.
 [2026-01-12 11:51:21 -08:00] Assistant: Updated the plan to default open date to today and status to `pending` on immediate card creation; logged in feature_implementation, progress, and architecture docs.

@@ -10,6 +10,7 @@ data class CardSearchItem(
     val issuerId: String,
     val issuerName: String,
     val productName: String,
+    val cardFaceUrl: String?,
     val network: String,
     val segment: String,
     val paymentInstrument: String,

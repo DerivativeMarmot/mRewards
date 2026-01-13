@@ -46,10 +46,12 @@ class CardCreateViewModel(
                 val issuers = cardTemplates.getIssuers()
                 val cards = cardTemplates.getCards()
                 val templates = cardTemplates.getTemplateCardsWithBenefits()
-                Triple(issuers, cards, templates)
-            }.onSuccess { (issuers, cards, templates) ->
+                val faceUrls = cards.associate { it.id to cardTemplates.getPreferredCardFaceUrl(it.id) }
+                Triple(issuers, cards, Pair(templates, faceUrls))
+            }.onSuccess { (issuers, cards, templateAndFaces) ->
+                val (templates, faceUrls) = templateAndFaces
                 val issuerOptions = issuers.map { IssuerOption(id = it.id, name = it.name) }
-                val searchItems = buildSearchItems(issuerOptions, cards, templates)
+                val searchItems = buildSearchItems(issuerOptions, cards, templates, faceUrls)
                 cachedResults = searchItems
                 val networks = searchItems.map { it.network }.distinct().sorted()
                 val segments = searchItems.map { it.segment }.distinct().sorted()
@@ -219,7 +221,8 @@ class CardCreateViewModel(
     private fun buildSearchItems(
         issuerOptions: List<IssuerOption>,
         cards: List<com.example.rewardsrader.data.local.entity.CardEntity>,
-        templates: List<TemplateCardWithBenefits>
+        templates: List<TemplateCardWithBenefits>,
+        faceUrls: Map<String, String?>
     ): List<CardSearchItem> {
         val issuersById = issuerOptions.associateBy { it.id }
         val benefitsByCardId = templates.associateBy { it.card.id }
@@ -234,6 +237,7 @@ class CardCreateViewModel(
                 issuerId = card.issuerId,
                 issuerName = issuersById[card.issuerId]?.name ?: card.issuerId,
                 productName = card.productName,
+                cardFaceUrl = faceUrls[card.id],
                 network = card.network.name,
                 segment = card.segment.name,
                 paymentInstrument = card.paymentInstrument.name,

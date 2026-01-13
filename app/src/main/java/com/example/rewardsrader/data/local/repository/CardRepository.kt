@@ -34,6 +34,7 @@ interface CardTemplateSource {
     suspend fun getIssuers(): List<IssuerEntity>
     suspend fun getCards(): List<CardEntity>
     suspend fun getTemplateCardsWithBenefits(): List<TemplateCardWithBenefits>
+    suspend fun getPreferredCardFaceUrl(cardId: String): String?
 }
 
 /**
@@ -84,6 +85,9 @@ class CardRepository(
 
     override suspend fun getTemplateCardsWithBenefits(): List<TemplateCardWithBenefits> =
         templateCardDao.getAllWithBenefits()
+
+    override suspend fun getPreferredCardFaceUrl(cardId: String): String? =
+        cardFaceDao.getPreferredForCard(cardId)?.remoteUrl
 
     suspend fun getTemplateCardWithBenefits(templateCardId: String): TemplateCardWithBenefits? =
         templateCardDao.getWithBenefits(templateCardId)
