@@ -624,14 +624,15 @@ private fun issuerIconRes(issuerId: String): Int? {
     val key = issuerId.lowercase().replace(" ", "_")
     return when (key) {
         "chase" -> R.drawable.ic_issuer_chase
-        "citi", "citibank" -> R.drawable.ic_issuer_citi
-        "amex", "american_express", "americanexpress" -> R.drawable.ic_issuer_amex
-        "capital_one", "capitalone" -> R.drawable.ic_issuer_capital_one
-        "bofa", "bank_of_america", "bankofamerica" -> R.drawable.ic_issuer_bofa
+        "citi" -> R.drawable.ic_issuer_citi
+        "amex" -> R.drawable.ic_issuer_amex
+        "capitalone" -> R.drawable.ic_issuer_capital_one
+        "boa" -> R.drawable.ic_issuer_bofa
         "discover" -> R.drawable.ic_issuer_discover
         "barclays" -> R.drawable.ic_issuer_barclays
         "hsbc" -> R.drawable.ic_issuer_hsbc
-        "us_bank", "usbank", "u.s._bank" -> R.drawable.ic_issuer_us_bank
+        "usbank" -> R.drawable.ic_issuer_us_bank
+        "wellsfargo" -> R.drawable.ic_issuer_wells_fargo
         else -> null
     }
 }
