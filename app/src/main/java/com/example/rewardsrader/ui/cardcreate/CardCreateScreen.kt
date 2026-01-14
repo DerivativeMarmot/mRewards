@@ -332,107 +332,110 @@ private fun FilterSheet(
     onApply: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        Column(
+    Column(modifier = Modifier.fillMaxWidth()) {
+        HeaderWithActions(onReset = onReset, onApply = onApply)
+        Box(
             modifier = Modifier
+                .weight(1f, fill = true)
                 .fillMaxWidth()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        )
-        {
-            HeaderWithActions(onReset = onReset, onApply = onApply)
-            FilterSection(title = "Issuer") {
-                FlowChips(
-                    options = state.issuers.map { it.id to it.name },
-                    selected = state.filters.issuerIds,
-                    onToggle = onToggleIssuer,
-                    iconFor = { issuerIconRes(it) }
-                )
-            }
-            if (state.networks.isNotEmpty()) {
-                FilterSection(title = "Network") {
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                FilterSection(title = "Issuer") {
                     FlowChips(
-                        options = state.networks.map { it to it },
-                        selected = state.filters.networks,
-                        onToggle = onToggleNetwork
+                        options = state.issuers.map { it.id to it.name },
+                        selected = state.filters.issuerIds,
+                        onToggle = onToggleIssuer,
+                        iconFor = { issuerIconRes(it) }
                     )
                 }
-            }
-            if (state.segments.isNotEmpty()) {
-                FilterSection(title = "Segment") {
-                    FlowChips(
-                        options = state.segments.map { it to it },
-                        selected = state.filters.segments,
-                        onToggle = onToggleSegment
-                    )
-                }
-            }
-            if (state.paymentInstruments.isNotEmpty()) {
-                FilterSection(title = "Payment instrument") {
-                    FlowChips(
-                        options = state.paymentInstruments.map { it to it },
-                        selected = state.filters.paymentInstruments,
-                        onToggle = onToggleInstrument
-                    )
-                }
-            }
-            FilterSection(title = "Annual fee") {
-                val range = state.filters.annualFeeRange ?: state.feeRangeBounds
-                val hasRange = state.feeRangeBounds.endInclusive > state.feeRangeBounds.start
-                if (hasRange) {
-                    RangeSlider(
-                        value = range,
-                        onValueChange = onUpdateFeeRange,
-                        valueRange = state.feeRangeBounds,
-                        steps = 4
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = "$${range.start.toInt()}")
-                        Text(text = "$${range.endInclusive.toInt()}")
+                if (state.networks.isNotEmpty()) {
+                    FilterSection(title = "Network") {
+                        FlowChips(
+                            options = state.networks.map { it to it },
+                            selected = state.filters.networks,
+                            onToggle = onToggleNetwork
+                        )
                     }
-                    Spacer(Modifier.height(8.dp))
-                } else {
-                    Text(text = "Annual fee: $${range.start.toInt()}")
                 }
-                FilterChip(
-                    selected = state.filters.noAnnualFeeOnly,
-                    onClick = onToggleNoFee,
-                    label = { Text("No annual fee only") }
-                )
-            }
-            if (state.benefitTypes.isNotEmpty()) {
-                FilterSection(title = "Benefit type") {
-                    FlowChips(
-                        options = state.benefitTypes.map { it to it },
-                        selected = state.filters.benefitTypes,
-                        onToggle = onToggleBenefitType
+                if (state.segments.isNotEmpty()) {
+                    FilterSection(title = "Segment") {
+                        FlowChips(
+                            options = state.segments.map { it to it },
+                            selected = state.filters.segments,
+                            onToggle = onToggleSegment
+                        )
+                    }
+                }
+                if (state.paymentInstruments.isNotEmpty()) {
+                    FilterSection(title = "Payment instrument") {
+                        FlowChips(
+                            options = state.paymentInstruments.map { it to it },
+                            selected = state.filters.paymentInstruments,
+                            onToggle = onToggleInstrument
+                        )
+                    }
+                }
+                FilterSection(title = "Annual fee") {
+                    val range = state.filters.annualFeeRange ?: state.feeRangeBounds
+                    val hasRange = state.feeRangeBounds.endInclusive > state.feeRangeBounds.start
+                    if (hasRange) {
+                        RangeSlider(
+                            value = range,
+                            onValueChange = onUpdateFeeRange,
+                            valueRange = state.feeRangeBounds,
+                            steps = 4
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(text = "$${range.start.toInt()}")
+                            Text(text = "$${range.endInclusive.toInt()}")
+                        }
+                        Spacer(Modifier.height(8.dp))
+                    } else {
+                        Text(text = "Annual fee: $${range.start.toInt()}")
+                    }
+                    FilterChip(
+                        selected = state.filters.noAnnualFeeOnly,
+                        onClick = onToggleNoFee,
+                        label = { Text("No annual fee only") }
                     )
                 }
-            }
-            if (state.benefitCategories.isNotEmpty()) {
-                FilterSection(title = "Benefit categories") {
-                    FlowChips(
-                        options = state.benefitCategories.map { it to it },
-                        selected = state.filters.benefitCategories,
-                        onToggle = onToggleBenefitCategory
-                    )
+                if (state.benefitTypes.isNotEmpty()) {
+                    FilterSection(title = "Benefit type") {
+                        FlowChips(
+                            options = state.benefitTypes.map { it to it },
+                            selected = state.filters.benefitTypes,
+                            onToggle = onToggleBenefitType
+                        )
+                    }
                 }
+                if (state.benefitCategories.isNotEmpty()) {
+                    FilterSection(title = "Benefit categories") {
+                        FlowChips(
+                            options = state.benefitCategories.map { it to it },
+                            selected = state.filters.benefitCategories,
+                            onToggle = onToggleBenefitCategory
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            ScrollIndicator(
+                scrollState = scrollState,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 4.dp)
+                    .fillMaxHeight()
+            )
         }
-        ScrollIndicator(
-            scrollState = scrollState,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
-        )
     }
 }
 
@@ -442,7 +445,7 @@ private fun HeaderWithActions(
     onApply: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -678,3 +681,4 @@ private fun ScrollIndicator(
         )
     }
 }
+
