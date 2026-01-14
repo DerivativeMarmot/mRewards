@@ -82,6 +82,7 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -531,7 +532,7 @@ private fun CardResultRow(
                     label = item.productName
                 )
                 Text(
-                    text = if (item.annualFee > 0) "$${item.annualFee}" else "No annual fee",
+                    text = if (item.annualFee > 0) "$${floor(item.annualFee).toInt()}" else "No annual fee",
                     fontWeight = FontWeight.Medium
                 )
             }
