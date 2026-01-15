@@ -189,3 +189,9 @@
 - Issuer chips in the filter sheet now show leading issuer icons pulled from `res/drawable` (amex/chase/citi/bofa/capital one/discover/barclays/hsbc/us bank).
 - Card search results now use a three-row layout: product title on top; middle row with a scaled-down card face thumbnail on the left and annual fee on the right; bottom row with benefit category chips. Card faces use default URLs when available and fall back to text.
 - Added card preview bottom sheet triggered by tapping a search result: shows card name, full-size card face, large annual fee, and benefit bullet points (title/amount/cadence). Plus icon on list items now adds the card directly; row tap opens the preview.
+
+## 2026-01-15 - Card creation search polish
+- Fixed CardCreateScreen modal structure so filter apply/reset closes correctly and list scrolls back to the top after applying sort or filters; filter sheet stays bounded with the header actions outside the scroll area and a visible scroll indicator.
+- Scaled card face thumbnails down in result rows while keeping the three-row layout; plus icon still adds directly while row taps open the preview sheet.
+- Preview bottom sheet now caps at 80% screen height with a scrolling body, pinned header (title/add), larger annual fee text, and benefit bullets showing title/amount/cadence; uses card title fallback and keeps the close action outside the scrollable area.
+- Tests: `./gradlew testDebugUnitTest --tests com.example.rewardsrader.ui.cardcreate.CardCreateViewModelTest`.

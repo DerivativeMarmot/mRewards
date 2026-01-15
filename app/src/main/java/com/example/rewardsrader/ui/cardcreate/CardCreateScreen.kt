@@ -297,38 +297,12 @@ fun CardCreateScreen(
                             filterSheetState.hide()
                             showFilterSheet = false
                         }
-                }
-            )
+                    }
+                )
+            }
         }
     }
 
-    previewItem?.let { selected ->
-        LaunchedEffect(selected) {
-            previewSheetState.show()
-        }
-        ModalBottomSheet(
-            onDismissRequest = { previewItem = null },
-            sheetState = previewSheetState
-        ) {
-            CardPreviewSheet(
-                item = selected,
-                onAdd = {
-                    coroutineScope.launch {
-                        onSelectCard(selected.id)
-                        previewSheetState.hide()
-                        previewItem = null
-                    }
-                },
-                onClose = {
-                    coroutineScope.launch {
-                        previewSheetState.hide()
-                        previewItem = null
-                    }
-                }
-            )
-        }
-        }
-    }
     previewItem?.let { selected ->
         LaunchedEffect(selected) {
             previewSheetState.show()
@@ -656,8 +630,9 @@ private fun Pill(text: String) {
 private fun CardFacePreview(url: String?, label: String) {
     Box(
         modifier = Modifier
-            .height(100.dp)
-            .width(160.dp)
+            .height(90.dp)
+            .width(150.dp)
+            .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -688,9 +663,11 @@ private fun CardPreviewSheet(
     onAdd: () -> Unit,
     onClose: () -> Unit
 ) {
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .fillMaxHeight(0.8f)
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -708,54 +685,57 @@ private fun CardPreviewSheet(
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add card")
             }
         }
-        Box(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-            .heightIn(min = 200.dp)
-            .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
-            .clip(RoundedCornerShape(12.dp)),
-            contentAlignment = Alignment.Center
+                .weight(1f, fill = true)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (item.cardFaceUrl.isNullOrBlank()) {
-                Text(
-                    text = item.productName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(horizontal = 12.dp),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-            } else {
-                AsyncImage(
-                    model = item.cardFaceUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .fillMaxSize()
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 220.dp)
+                    .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (item.cardFaceUrl.isNullOrBlank()) {
+                    Text(
+                        text = item.productName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                } else {
+                    AsyncImage(
+                        model = item.cardFaceUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
+            Text(
+                text = if (item.annualFee > 0) "$${floor(item.annualFee).toInt()} annual fee" else "No annual fee",
+                style = MaterialTheme.typography.titleMedium.copy(fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            )
+            Text(
+                text = "Benefits",
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                item.benefits.forEach { benefit ->
+                    Text(
+                        text = "- ${formatBenefit(benefit)}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
             }
         }
-        Text(
-            text = if (item.annualFee > 0) "$${floor(item.annualFee).toInt()} annual fee" else "No annual fee",
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp)
-        )
-        Text(
-            text = "Benefits",
-            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
-        )
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            item.benefits.forEach { benefit ->
-                Text(
-                    text = "• ${formatBenefit(benefit)}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-        TextButton(
-            onClick = onClose,
-            modifier = Modifier.align(Alignment.End)
-        ) {
-            Text("Close")
-        }
+//        TextButton(onClick = onClose, modifier = Modifier.align(Alignment.End)) {
+//            Text("Close")
+//        }
     }
 }
 
