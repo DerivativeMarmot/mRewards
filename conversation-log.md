@@ -554,3 +554,4 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-13 15:30:00 -08:00] Assistant: Fixed filter sheet with a non-scrollable header and scrollable body; added card result plus-icon add action and a preview bottom sheet showing card face, fee, and benefit bullets; repository/test adjustments; tests pass.
 [2026-01-12 11:51:21 -08:00] User: set open date to current date, set status to `pending`.
 [2026-01-12 11:51:21 -08:00] Assistant: Updated the plan to default open date to today and status to `pending` on immediate card creation; logged in feature_implementation, progress, and architecture docs.
+2026-01-15 11:37:31 - Refactored CardCreateScreen into separate component files (SortSheet, FilterSheet, CardResultRow, CardPreviewSheet); updated progress log.

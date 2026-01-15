@@ -195,3 +195,4 @@
 - Scaled card face thumbnails down in result rows while keeping the three-row layout; plus icon still adds directly while row taps open the preview sheet.
 - Preview bottom sheet now caps at 80% screen height with a scrolling body, pinned header (title/add), larger annual fee text, and benefit bullets showing title/amount/cadence; uses card title fallback and keeps the close action outside the scrollable area.
 - Tests: `./gradlew testDebugUnitTest --tests com.example.rewardsrader.ui.cardcreate.CardCreateViewModelTest`.
+- Refactored `CardCreateScreen` into smaller files (`SortSheet`, `FilterSheet`, `CardResultRow`, `CardPreviewSheet`) to reduce file size and isolate UI components; main screen now only wires state/events and delegates rendering to the new components.

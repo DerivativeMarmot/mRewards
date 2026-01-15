@@ -259,8 +259,7 @@ class CardCreateViewModel(
         if (query.isNotBlank()) {
             val q = query.lowercase(Locale.US)
             filtered = filtered.filter {
-                it.productName.lowercase(Locale.US).contains(q) ||
-                    it.issuerName.lowercase(Locale.US).contains(q)
+                it.productName.lowercase(Locale.US).contains(q)
             }
         }
         if (filters.issuerIds.isNotEmpty()) {
