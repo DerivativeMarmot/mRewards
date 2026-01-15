@@ -173,3 +173,6 @@
 - Issuer filter chips now render leading icons from drawable assets (amex/chase/citi/bofa/capital one/discover/barclays/hsbc/us bank) for quicker visual scanning.
 - Card search list items redesigned: three rows with product title, a scaled-down default card face thumbnail plus annual fee, and benefit category chips; default face URLs are pulled when available with a text fallback otherwise.
 - CardCreateScreen now supports a preview bottom sheet when tapping a search result, showing card name, full-size face, annual fee, and benefits (title/amount/cadence). A top-right plus icon on each list item triggers immediate card creation; row tap only opens the preview. Repository exposes preferred card face URL/ID for list/preview use.
+
+## 2026-01-15 - Card list FAB
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Moved the Add card action into the Scaffold floating action button and removed inline Add card buttons from list/empty states.

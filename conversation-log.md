@@ -556,3 +556,6 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-12 11:51:21 -08:00] Assistant: Updated the plan to default open date to today and status to `pending` on immediate card creation; logged in feature_implementation, progress, and architecture docs.
 2026-01-15 11:37:31 - Refactored CardCreateScreen into separate component files (SortSheet, FilterSheet, CardResultRow, CardPreviewSheet); updated progress log.
 2026-01-15 12:12:40 - Ensured card search list scrolls to top on query change.
+[2026-01-15 13:54:15 -08:00] User: in my card list screen, move the `add card` button to bottom right of the screen.
+[2026-01-15 13:54:15 -08:00] User: in my card list screen, move the `add card` button to bottom right of the screen. make the `add card` button the floating action button.
+[2026-01-15 13:54:15 -08:00] Assistant: Moved the Add card action to a Material 3 floating action button on the card list screen and removed inline Add card buttons from list/empty states; logged updates.

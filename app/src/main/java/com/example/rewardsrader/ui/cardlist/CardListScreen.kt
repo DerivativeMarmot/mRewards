@@ -10,10 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -65,6 +66,9 @@ fun CardListScreen(
                 }
             )
         },
+        floatingActionButton = {
+            AddCardFab(onAddCard = onAddCard)
+        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         when {
@@ -74,7 +78,6 @@ fun CardListScreen(
                 cards = state.cards,
                 onSelectCard = onSelectCard,
                 onDeleteCard = onDeleteCard,
-                onAddCard = onAddCard,
                 modifier = Modifier.padding(padding)
             )
         }
@@ -86,11 +89,10 @@ private fun CardListContent(
     cards: List<CardSummaryUi>,
     onSelectCard: (String) -> Unit,
     onDeleteCard: (String) -> Unit,
-    onAddCard: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (cards.isEmpty()) {
-        EmptyMessage(onAddCard = onAddCard, modifier = modifier)
+        EmptyMessage(modifier = modifier)
     } else {
         Column(modifier = modifier.fillMaxSize()) {
             LazyColumn(
@@ -126,7 +128,6 @@ private fun CardListContent(
                     }
                 }
             }
-            AddCardButton(onAddCard = onAddCard)
         }
     }
 }
@@ -153,36 +154,21 @@ private fun ErrorMessage(message: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun EmptyMessage(onAddCard: () -> Unit, modifier: Modifier = Modifier) {
+private fun EmptyMessage(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text("No cards yet. Add one from a template.")
-        Button(
-            onClick = onAddCard,
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text("Add card")
-        }
     }
 }
 
 @Composable
-private fun AddCardButton(onAddCard: () -> Unit, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        Button(
-            onClick = onAddCard,
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text("Add card")
-        }
-    }
+private fun AddCardFab(onAddCard: () -> Unit) {
+    ExtendedFloatingActionButton(
+        onClick = onAddCard,
+        icon = { Icon(Icons.Default.Add, contentDescription = null) },
+        text = { Text("Add card") }
+    )
 }

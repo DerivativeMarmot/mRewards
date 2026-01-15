@@ -199,3 +199,6 @@
 
 ## 2026-01-15 - Card creation search UX tweak
 - Keep card search results scrolled to the top whenever the search query changes to avoid mid-list positions while typing.
+
+## 2026-01-15 - Card list FAB
+- Updated `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt` to use a Material 3 floating action button for Add card and removed inline Add card buttons from list/empty states.
