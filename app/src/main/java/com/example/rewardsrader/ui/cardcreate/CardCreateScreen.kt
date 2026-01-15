@@ -84,6 +84,9 @@ fun CardCreateScreen(
     val previewSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(Unit) { onLoad() }
+    LaunchedEffect(state.query) {
+        listState.scrollToItem(0)
+    }
     LaunchedEffect(events) {
         events.collect { event ->
             when (event) {
