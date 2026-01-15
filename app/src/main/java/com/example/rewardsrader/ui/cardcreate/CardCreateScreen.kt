@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
@@ -77,6 +78,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.rewardsrader.data.local.entity.BenefitEntity
+import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.R
 import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.SharedFlow
@@ -113,6 +117,8 @@ fun CardCreateScreen(
     var showFilterSheet by remember { mutableStateOf(false) }
     val sortSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var previewItem by remember { mutableStateOf<CardSearchItem?>(null) }
+    val previewSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(Unit) { onLoad() }
     LaunchedEffect(events) {
@@ -223,7 +229,15 @@ fun CardCreateScreen(
                         items(state.filteredResults, key = { it.id }) { item ->
                             CardResultRow(
                                 item = item,
-                                onClick = { onSelectCard(item.id) },
+                                onOpen = {
+                                    coroutineScope.launch {
+                                        previewItem = item
+                                        previewSheetState.show()
+                                    }
+                                },
+                                onAdd = {
+                                    onSelectCard(item.id)
+                                },
                                 enabled = !state.isSaving
                             )
                         }
@@ -282,11 +296,38 @@ fun CardCreateScreen(
                             filterSheetState.hide()
                             showFilterSheet = false
                         }
-                    }
-                )
-            }
+                }
+            )
         }
     }
+
+    previewItem?.let { selected ->
+        LaunchedEffect(selected) {
+            previewSheetState.show()
+        }
+        ModalBottomSheet(
+            onDismissRequest = { previewItem = null },
+            sheetState = previewSheetState
+        ) {
+            CardPreviewSheet(
+                item = selected,
+                onAdd = {
+                    coroutineScope.launch {
+                        onSelectCard(selected.id)
+                        previewSheetState.hide()
+                        previewItem = null
+                    }
+                },
+                onClose = {
+                    coroutineScope.launch {
+                        previewSheetState.hide()
+                        previewItem = null
+                    }
+                }
+            )
+        }
+    }
+}
 }
 
 @Composable
@@ -506,33 +547,47 @@ private fun FlowChips(
 @Composable
 private fun CardResultRow(
     item: CardSearchItem,
-    onClick: () -> Unit,
+    onOpen: () -> Unit,
+    onAdd: () -> Unit,
     enabled: Boolean
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(),
-        onClick = onClick,
+        onClick = onOpen,
         enabled = enabled
     ) {
-        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(
-                text = item.productName,
-                fontWeight = FontWeight.SemiBold,
-            )
+        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-
+            ) {
+                Text(
+                    text = item.productName,
+                    fontWeight = FontWeight.SemiBold
+                )
+                IconButton(onClick = onAdd,
+                    modifier = Modifier.size(20.dp).padding(0.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add card",
+                        tint = MaterialTheme.colorScheme.suc
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 CardFacePreview(
                     url = item.cardFaceUrl,
                     label = item.productName
                 )
                 Text(
-                    text = if (item.annualFee > 0) "$${floor(item.annualFee).toInt()}" else "No annual fee",
+                    text = "$${floor(item.annualFee).toInt()}",
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -599,6 +654,107 @@ private fun CardFacePreview(url: String?, label: String) {
             )
         }
     }
+}
+
+@Composable
+private fun CardPreviewSheet(
+    item: CardSearchItem,
+    onAdd: () -> Unit,
+    onClose: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = item.productName,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+            IconButton(onClick = onAdd) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add card")
+            }
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(190.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center
+        ) {
+            if (item.cardFaceUrl.isNullOrBlank()) {
+                Text(
+                    text = item.productName,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            } else {
+                AsyncImage(
+                    model = item.cardFaceUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp)
+                )
+            }
+        }
+        Text(
+            text = if (item.annualFee > 0) "$${floor(item.annualFee).toInt()} annual fee" else "No annual fee",
+            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp)
+        )
+        Text(
+            text = "Benefits",
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            item.benefits.forEach { benefit ->
+                Text(
+                    text = "• ${formatBenefit(benefit)}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+        TextButton(
+            onClick = onClose,
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Text("Close")
+        }
+    }
+}
+
+private fun formatBenefit(benefit: BenefitEntity): String {
+    val categories = benefit.category.joinToString(", ") { cat ->
+        cat.name.replace(Regex("([a-z])([A-Z])"), "$1 $2")
+    }
+    return when (benefit.type) {
+        BenefitType.Credit -> {
+            val amountText = benefit.amount?.let { "$${trimAmount(it)}" } ?: ""
+            val cadence = benefit.frequency.name.lowercase().replaceFirstChar { it.uppercase() }
+            listOf(amountText, categories, cadence).filter { it.isNotBlank() }.joinToString(" ")
+        }
+        BenefitType.Multiplier -> {
+            val rate = benefit.amount?.let { trimAmount(it) } ?: ""
+            val rateText = if (rate.isNotBlank()) "${rate}x" else ""
+            listOf(rateText, categories).filter { it.isNotBlank() }.joinToString(" ")
+        }
+    }
+}
+
+private fun trimAmount(value: Double): String {
+    val formatted = String.format("%.2f", value)
+    return formatted.trimEnd('0').trimEnd('.')
 }
 
 private fun SortMode.label(): String = when (this) {

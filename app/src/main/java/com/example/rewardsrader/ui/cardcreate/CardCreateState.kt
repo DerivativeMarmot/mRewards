@@ -16,7 +16,8 @@ data class CardSearchItem(
     val paymentInstrument: String,
     val annualFee: Double,
     val benefitTypes: Set<String> = emptySet(),
-    val benefitCategories: Set<String> = emptySet()
+    val benefitCategories: Set<String> = emptySet(),
+    val benefits: List<com.example.rewardsrader.data.local.entity.BenefitEntity> = emptyList()
 )
 
 data class CardCreateFilters(

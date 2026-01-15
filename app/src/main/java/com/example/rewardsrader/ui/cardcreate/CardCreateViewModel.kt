@@ -243,7 +243,8 @@ class CardCreateViewModel(
                 paymentInstrument = card.paymentInstrument.name,
                 annualFee = card.annualFee,
                 benefitTypes = benefitTypes,
-                benefitCategories = benefitCategories
+                benefitCategories = benefitCategories,
+                benefits = template?.benefits ?: emptyList()
             )
         }
     }

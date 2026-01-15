@@ -71,6 +71,8 @@ class CardCreateViewModelTest {
                 )
 
             override suspend fun getPreferredCardFaceUrl(cardId: String): String? = null
+
+            override suspend fun getPreferredCardFaceId(cardId: String): String? = null
         }
         val importer = object : CardTemplateImporterContract {
             override suspend fun importFromConfig(

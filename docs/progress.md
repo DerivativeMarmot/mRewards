@@ -188,3 +188,4 @@
 - Added a slim scroll indicator on the filter sheet to show scroll position.
 - Issuer chips in the filter sheet now show leading issuer icons pulled from `res/drawable` (amex/chase/citi/bofa/capital one/discover/barclays/hsbc/us bank).
 - Card search results now use a three-row layout: product title on top; middle row with a scaled-down card face thumbnail on the left and annual fee on the right; bottom row with benefit category chips. Card faces use default URLs when available and fall back to text.
+- Added card preview bottom sheet triggered by tapping a search result: shows card name, full-size card face, large annual fee, and benefit bullet points (title/amount/cadence). Plus icon on list items now adds the card directly; row tap opens the preview.
