@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -326,8 +327,34 @@ fun CardCreateScreen(
                 }
             )
         }
+        }
     }
-}
+    previewItem?.let { selected ->
+        LaunchedEffect(selected) {
+            previewSheetState.show()
+        }
+        ModalBottomSheet(
+            onDismissRequest = { previewItem = null },
+            sheetState = previewSheetState
+        ) {
+            CardPreviewSheet(
+                item = selected,
+                onAdd = {
+                    coroutineScope.launch {
+                        onSelectCard(selected.id)
+                        previewSheetState.hide()
+                        previewItem = null
+                    }
+                },
+                onClose = {
+                    coroutineScope.launch {
+                        previewSheetState.hide()
+                        previewItem = null
+                    }
+                }
+            )
+        }
+    }
 }
 
 @Composable
@@ -572,8 +599,7 @@ private fun CardResultRow(
                     modifier = Modifier.size(20.dp).padding(0.dp)) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add card",
-                        tint = MaterialTheme.colorScheme.suc
+                        contentDescription = "Add card"
                     )
                 }
             }
@@ -685,9 +711,9 @@ private fun CardPreviewSheet(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(190.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+            .heightIn(min = 200.dp)
+            .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
+            .clip(RoundedCornerShape(12.dp)),
             contentAlignment = Alignment.Center
         ) {
             if (item.cardFaceUrl.isNullOrBlank()) {
@@ -705,7 +731,6 @@ private fun CardPreviewSheet(
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(10.dp)
                 )
             }
         }
@@ -735,19 +760,17 @@ private fun CardPreviewSheet(
 }
 
 private fun formatBenefit(benefit: BenefitEntity): String {
-    val categories = benefit.category.joinToString(", ") { cat ->
-        cat.name.replace(Regex("([a-z])([A-Z])"), "$1 $2")
-    }
+    val title = benefit.title?.takeIf { it.isNotBlank() }
     return when (benefit.type) {
         BenefitType.Credit -> {
             val amountText = benefit.amount?.let { "$${trimAmount(it)}" } ?: ""
             val cadence = benefit.frequency.name.lowercase().replaceFirstChar { it.uppercase() }
-            listOf(amountText, categories, cadence).filter { it.isNotBlank() }.joinToString(" ")
+            listOfNotNull(amountText, title, cadence).filter { it.isNotBlank() }.joinToString(" ")
         }
         BenefitType.Multiplier -> {
             val rate = benefit.amount?.let { trimAmount(it) } ?: ""
             val rateText = if (rate.isNotBlank()) "${rate}x" else ""
-            listOf(rateText, categories).filter { it.isNotBlank() }.joinToString(" ")
+            listOfNotNull(rateText, title).filter { it.isNotBlank() }.joinToString(" ")
         }
     }
 }
