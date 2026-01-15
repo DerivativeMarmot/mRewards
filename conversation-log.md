@@ -559,3 +559,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-15 13:54:15 -08:00] User: in my card list screen, move the `add card` button to bottom right of the screen.
 [2026-01-15 13:54:15 -08:00] User: in my card list screen, move the `add card` button to bottom right of the screen. make the `add card` button the floating action button.
 [2026-01-15 13:54:15 -08:00] Assistant: Moved the Add card action to a Material 3 floating action button on the card list screen and removed inline Add card buttons from list/empty states; logged updates.
+[2026-01-15 14:07:43 -08:00] User: in my card list screen, make the snackbar shows at the very bottom, but when snackbar shows, shift the `add card` button up. just like the snackbar and FAB behaviors in the card detail benefit or offer tab content
+[2026-01-15 14:07:43 -08:00] Assistant: Matched card list snackbar/FAB behavior to card detail by anchoring the FAB in content with animated bottom padding when a snackbar is visible and added list bottom padding to prevent overlap; logged updates.

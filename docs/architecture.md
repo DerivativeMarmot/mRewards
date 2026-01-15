@@ -176,3 +176,6 @@
 
 ## 2026-01-15 - Card list FAB
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Moved the Add card action into the Scaffold floating action button and removed inline Add card buttons from list/empty states.
+
+## 2026-01-15 - Card list snackbar/FAB spacing
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Aligned the card list FAB/snackbar behavior with card detail by anchoring the FAB in content, shifting it upward when a snackbar is visible, and padding list content to stay clear of the FAB/snackbar.

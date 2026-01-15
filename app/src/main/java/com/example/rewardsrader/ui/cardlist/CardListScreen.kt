@@ -1,7 +1,9 @@
 package com.example.rewardsrader.ui.cardlist
 
 import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.StateFlow
 
@@ -48,6 +51,12 @@ fun CardListScreen(
     val state by stateFlow.collectAsState()
     val error = state.error
     val snackbarHostState = remember { SnackbarHostState() }
+    val isSnackbarVisible = snackbarHostState.currentSnackbarData != null
+    val fabBottomPadding by animateDpAsState(
+        targetValue = if (isSnackbarVisible) 80.dp else 16.dp,
+        label = "cardListFabBottomPadding"
+    )
+    val listBottomPadding: Dp = if (isSnackbarVisible) 144.dp else 96.dp
 
     LaunchedEffect(state.snackbarMessage) {
         val message = state.snackbarMessage ?: return@LaunchedEffect
@@ -66,19 +75,29 @@ fun CardListScreen(
                 }
             )
         },
-        floatingActionButton = {
-            AddCardFab(onAddCard = onAddCard)
-        },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
-        when {
-            state.isLoading -> LoadingMessage(modifier = Modifier.padding(padding))
-            error != null -> ErrorMessage(error, Modifier.padding(padding))
-            else -> CardListContent(
-                cards = state.cards,
-                onSelectCard = onSelectCard,
-                onDeleteCard = onDeleteCard,
-                modifier = Modifier.padding(padding)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            when {
+                state.isLoading -> LoadingMessage(modifier = Modifier.fillMaxSize())
+                error != null -> ErrorMessage(error, Modifier.fillMaxSize())
+                else -> CardListContent(
+                    cards = state.cards,
+                    onSelectCard = onSelectCard,
+                    onDeleteCard = onDeleteCard,
+                    listBottomPadding = listBottomPadding,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+            AddCardFab(
+                onAddCard = onAddCard,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 16.dp, bottom = fabBottomPadding)
             )
         }
     }
@@ -89,6 +108,7 @@ private fun CardListContent(
     cards: List<CardSummaryUi>,
     onSelectCard: (String) -> Unit,
     onDeleteCard: (String) -> Unit,
+    listBottomPadding: Dp,
     modifier: Modifier = Modifier
 ) {
     if (cards.isEmpty()) {
@@ -99,7 +119,12 @@ private fun CardListContent(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    top = 16.dp,
+                    end = 16.dp,
+                    bottom = listBottomPadding
+                ),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(cards) { card ->
@@ -165,9 +190,13 @@ private fun EmptyMessage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AddCardFab(onAddCard: () -> Unit) {
+private fun AddCardFab(
+    onAddCard: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     ExtendedFloatingActionButton(
         onClick = onAddCard,
+        modifier = modifier,
         icon = { Icon(Icons.Default.Add, contentDescription = null) },
         text = { Text("Add card") }
     )

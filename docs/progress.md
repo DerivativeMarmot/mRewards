@@ -202,3 +202,6 @@
 
 ## 2026-01-15 - Card list FAB
 - Updated `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt` to use a Material 3 floating action button for Add card and removed inline Add card buttons from list/empty states.
+
+## 2026-01-15 - Card list snackbar/FAB behavior
+- Updated `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt` so the snackbar sits at the bottom while the Add card FAB animates upward when a snackbar is visible, with list padding adjusted to avoid overlap.
