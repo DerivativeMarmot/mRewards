@@ -3,11 +3,11 @@
 ## Card (step-by-step, pending unless checked)
 - [x] Creation flow: Select issuer then card product; app loads the correct template based on selection (single template for now). Add minimal form for open date, statement cut, status, welcome-offer progress.
 - [x] Card index page
-- [ ] Card face display: Show built-in card face on list/detail (placeholder asset now; replace later).
+- [x] Card face display: Show built-in card face on list/detail (placeholder asset now; replace later).
 - [x] Editable fields: Allow editing all fields except issuer (fixed after creation); no validation initially.
 - [x] Delete behavior: Delete card and all attached data (benefits, applications, usage, notifications) with an undo snackbar.
 - [ ] Welcome offer UI: Show spending progress bar and deadline (reminder integration deferred).
-- [ ] Card management: Update card details; confirm destructive actions and refresh state.
+- [x] Card management: Update card details; confirm destructive actions and refresh state.
 
 ### Card creation search experience (implementation plan)
 1) State & data: extend `CardCreateViewModel` to expose a searchable list of template cards from Room (id, issuer name, product, network, segment, payment instrument, annual fee, benefit tags). Track search query, sort mode, filter selections, and derived filtered/sorted list plus counts. Persist open date as UTC while formatting/displaying in the device’s local time.
@@ -60,8 +60,8 @@
 ## UI
 - Card faces: Display built-in card face images on list/detail; start with placeholder/fake assets, replace with official later.
 - Visual polish: (Discuss later) layout refinements, typography, and component styles once assets are chosen.
-- [ ] Selection UI: Use modal dialogs for option selection (type, frequency, status, etc.) with radio-button rows that accept taps on the entire row/label. Do not add a close button.
-- [ ] After entity creation or editing, clear the input fields or set them to default value.
+- Selection UI: Use modal dialogs for option selection (type, frequency, status, etc.) with radio-button rows that accept taps on the entire row/label. Do not add a close button.
+- After entity creation or editing, clear the input fields or set them to default value.
 - 12dp is the smallest acceptable font size.
 
 ## Card Configuration
@@ -77,10 +77,18 @@ Default page when page starts. Displays all user added cards.
 
 ## All Card List
 Displays all card products. Used as templates
-- [ ] Filters: Combined filters for issuer, benefit type, and annual fee on the card list.
-- [ ] Search: Add search bar on the card list.
+- [x] Filters: Combined filters for issuer, benefit type, and annual fee on the card list.
+- [x] Search: Add search bar on the card list.
 
 ## Firebase Cloud Firestore support
+- local to cloud
+  - [ ] Upload user data to cloud storage. like profiles, cards, benefits, and more
+- cloud to local
+  - [x] Load card templates
+  - [ ] Load user data after logging in.
 
-- [ ] Sync users' data on cloud storage. like profiles, cards, benefits, and more
-- [ ] Sync card templates
+## Authentication
+- [ ] use google account to login.
+
+## Tracker Screen (access thru bottom navigation bar)
+- [ ] Track incomplete benefits or offers 
