@@ -184,3 +184,8 @@
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Added card face URL, last four, and open date to the list UI model for richer card list rendering.
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Redesigned card list rows with a cropped card-face strip, an overlapping name/last-four row with delete action, and an approval-duration plus status row.
 - `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated card list/detail test fixtures to match the new list model and detail UI signatures.
+
+## 2026-01-15 - Card list refresh on return
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Added a lifecycle resume hook so the list refreshes when returning from detail.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires the resume refresh to reload cards without showing the loading state.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated the list screen call signature for the new resume callback.

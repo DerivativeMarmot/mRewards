@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
                     onSelectCard = { id -> navController.navigate("detail/$id") },
                     onAddCard = { navController.navigate("create") },
                     onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
+                    onResume = { cardListViewModel.loadCards(showLoading = false) },
                     onSnackbarShown = { cardListViewModel.snackbarShown() },
                     onSync = { cardListViewModel.syncFromCloud() }
                 )

@@ -31,6 +31,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,10 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import java.time.LocalDate
 import java.time.Period
@@ -57,6 +61,7 @@ fun CardListScreen(
     onSelectCard: (String) -> Unit,
     onAddCard: () -> Unit,
     onDeleteCard: (String) -> Unit,
+    onResume: () -> Unit,
     onSnackbarShown: () -> Unit,
     onSync: () -> Unit
 ) {
@@ -69,6 +74,17 @@ fun CardListScreen(
         label = "cardListFabBottomPadding"
     )
     val listBottomPadding: Dp = if (isSnackbarVisible) 144.dp else 96.dp
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner, onResume) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                onResume()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     LaunchedEffect(state.snackbarMessage) {
         val message = state.snackbarMessage ?: return@LaunchedEffect
@@ -242,7 +258,8 @@ private fun CardListItem(
                         Text(
                             text = buildApprovalDurationLabel(card.openDate),
                             style = MaterialTheme.typography.bodyMedium,
-                            fontStyle = FontStyle.Italic
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.SemiBold,
                         )
                     }
 
