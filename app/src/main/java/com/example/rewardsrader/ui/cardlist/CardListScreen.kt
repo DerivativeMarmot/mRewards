@@ -1,16 +1,20 @@
 package com.example.rewardsrader.ui.cardlist
 
-import androidx.compose.foundation.clickable
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -33,9 +37,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import java.time.LocalDate
+import java.time.Period
+import java.time.format.DateTimeFormatter
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,29 +140,11 @@ private fun CardListContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(cards) { card ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { onSelectCard(card.id) }
-                    ) {
-                        androidx.compose.foundation.layout.Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(card.productName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                                Text(card.issuer, style = MaterialTheme.typography.bodyMedium)
-                                Text("Status: ${card.status}", style = MaterialTheme.typography.bodySmall)
-                            }
-                            IconButton(onClick = { onDeleteCard(card.id) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete card")
-                            }
-                        }
-                    }
+                    CardListItem(
+                        card = card,
+                        onSelectCard = onSelectCard,
+                        onDeleteCard = onDeleteCard
+                    )
                 }
             }
         }
@@ -187,6 +181,132 @@ private fun EmptyMessage(modifier: Modifier = Modifier) {
     ) {
         Text("No cards yet. Add one from a template.")
     }
+}
+
+@Composable
+private fun CardListItem(
+    card: CardSummaryUi,
+    onSelectCard: (String) -> Unit,
+    onDeleteCard: (String) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onSelectCard(card.id) }
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            val fullHeight = maxWidth / 1.6f
+            val visibleHeight = fullHeight * 0.33f
+            val overlap = 16.dp
+            val overlayTopPadding = if (visibleHeight > overlap) visibleHeight - overlap else 0.dp
+
+            Box(modifier = Modifier.fillMaxWidth()) {
+                CardFaceStrip(
+                    cardFaceUrl = card.cardFaceUrl,
+                    visibleHeight = visibleHeight,
+                    fullHeight = fullHeight
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = 16.dp,
+                            top = overlayTopPadding + 12.dp,
+                            bottom = 12.dp
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = buildCardTitle(card.productName, card.lastFour),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = { onDeleteCard(card.id) }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete card")
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        Text(
+                            text = "Status: ${card.status}",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        Text(
+                            text = buildApprovalDurationLabel(card.openDate),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontStyle = FontStyle.Italic
+                        )
+                    }
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CardFaceStrip(
+    cardFaceUrl: String?,
+    visibleHeight: Dp,
+    fullHeight: Dp
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(visibleHeight)
+            .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+            .clipToBounds()
+    ) {
+        if (!cardFaceUrl.isNullOrBlank()) {
+            AsyncImage(
+                model = cardFaceUrl,
+                contentDescription = "Card face",
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(fullHeight)
+            )
+        } else {
+            Text(
+                text = "No card face",
+                modifier = Modifier.align(Alignment.Center),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
+}
+
+private fun buildCardTitle(productName: String, lastFour: String?): String {
+    val trimmedLastFour = lastFour?.trim().orEmpty()
+    return if (trimmedLastFour.isBlank()) {
+        productName
+    } else {
+        "${productName} (...${trimmedLastFour})"
+    }
+}
+
+private fun buildApprovalDurationLabel(openDate: String?): String {
+    if (openDate.isNullOrBlank()) return "Approval date unknown"
+    val startDate = runCatching {
+        LocalDate.parse(openDate, DateTimeFormatter.ofPattern("MM/dd/yyyy"))
+    }.getOrNull() ?: return "Approval date unknown"
+    val today = LocalDate.now()
+    val period = if (startDate.isAfter(today)) Period.ZERO else Period.between(startDate, today)
+    return "${formatUnit(period.years, "y")} ${formatUnit(period.months, "mo")} ${formatUnit(period.days, "d")}"
+}
+
+private fun formatUnit(value: Int, unit: String): String {
+    if (value == 0) return ""
+    return "${value}${unit}"
 }
 
 @Composable

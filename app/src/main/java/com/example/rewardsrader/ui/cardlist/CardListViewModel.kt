@@ -17,7 +17,10 @@ data class CardSummaryUi(
     val id: String,
     val productName: String,
     val issuer: String,
-    val status: String
+    val status: String,
+    val lastFour: String?,
+    val openDate: String?,
+    val cardFaceUrl: String?
 )
 
 data class CardListUiState(
@@ -96,7 +99,10 @@ class CardListViewModel(
             id = card.profileCard.id,
             productName = card.card?.productName ?: card.profileCard.nickname.orEmpty(),
             issuer = card.card?.issuerId ?: "",
-            status = card.profileCard.status.name
+            status = card.profileCard.status.name,
+            lastFour = card.profileCard.lastFour,
+            openDate = card.profileCard.openDateUtc,
+            cardFaceUrl = card.cardFace?.remoteUrl
         )
 
     companion object {

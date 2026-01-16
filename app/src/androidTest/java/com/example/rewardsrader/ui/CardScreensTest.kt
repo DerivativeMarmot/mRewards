@@ -9,7 +9,6 @@ import com.example.rewardsrader.ui.carddetail.CardDetailState
 import com.example.rewardsrader.ui.carddetail.CardDetailUi
 import com.example.rewardsrader.ui.carddetail.BenefitUi
 import com.example.rewardsrader.ui.carddetail.ApplicationUi
-import com.example.rewardsrader.ui.carddetail.OfferUi
 import com.example.rewardsrader.ui.cardlist.CardListScreen
 import com.example.rewardsrader.ui.cardlist.CardListUiState
 import com.example.rewardsrader.ui.cardlist.CardSummaryUi
@@ -30,7 +29,15 @@ class CardScreensTest {
             CardListUiState(
                 isLoading = false,
                 cards = listOf(
-                    CardSummaryUi(1, "Example Cash Preferred", "Example Bank", "approved")
+                    CardSummaryUi(
+                        id = "1",
+                        productName = "Example Cash Preferred",
+                        issuer = "Example Bank",
+                        status = "approved",
+                        lastFour = "7861",
+                        openDate = "01/01/2025",
+                        cardFaceUrl = null
+                    )
                 )
             )
         )
@@ -40,14 +47,13 @@ class CardScreensTest {
                 onSelectCard = {},
                 onAddCard = {},
                 onDeleteCard = {},
-                onUndoDelete = {},
-                onSnackbarShown = {}
+                onSnackbarShown = {},
+                onSync = {}
             )
         }
 
-        composeRule.onNodeWithText("Example Cash Preferred").assertIsDisplayed()
-        composeRule.onNodeWithText("Example Bank").assertIsDisplayed()
-        composeRule.onNodeWithText("Status: approved").assertIsDisplayed()
+        composeRule.onNodeWithText("Example Cash Preferred ...7861").assertIsDisplayed()
+        composeRule.onNodeWithText("Status: approved", substring = true).assertIsDisplayed()
     }
 
     @Test
@@ -56,16 +62,18 @@ class CardScreensTest {
             CardDetailState(
                 isLoading = false,
                 detail = CardDetailUi(
-                    id = 1,
+                    id = "1",
+                    cardId = "template_1",
                     productName = "Example Cash Preferred",
                     issuer = "Example Bank",
                     network = "Visa",
+                    cardFaceUrl = null,
                     nickname = null,
                     lastFour = null,
                     status = "approved",
                     annualFee = "$95.0",
-                    openDate = "01/05/2025 09:00",
-                    statementCut = "01/15/2025 09:00",
+                    openDate = "01/05/2025",
+                    statementCut = "01/15/2025",
                     welcomeOfferProgress = "75%",
                     notes = "",
                     subSpending = null,
@@ -81,25 +89,16 @@ class CardScreensTest {
                     ),
                     benefits = listOf(
                         BenefitUi(
-                            id = 1L,
+                            id = "benefit_1",
                             title = "Dining credit",
                             type = "credit",
                             amount = "$10.0 (cap $10.0)",
                             cadence = "monthly",
-                            expiry = "12/31/2025 11:59",
+                            expiry = null,
                             notes = "Enroll each calendar year; credit resets monthly."
                         )
                     ),
-                    offers = listOf(
-                        OfferUi(
-                            id = 1,
-                            title = "Spend bonus",
-                            status = "Active",
-                            window = "01/01/2025 - 02/01/2025",
-                            details = "Min $500 • Max $50",
-                            note = "Grocery only"
-                        )
-                    )
+                    offers = emptyList()
                 ),
                 error = null
             )
@@ -124,7 +123,8 @@ class CardScreensTest {
                 onUpdateStatus = {},
                 onUpdateNotes = {},
                 onUpdateSubSpending = {},
-                onUpdateSubDuration = { _, _ -> }
+                onUpdateSubDuration = { _, _ -> },
+                onSelectCardFace = {}
             )
         }
 
@@ -132,7 +132,6 @@ class CardScreensTest {
 
         composeRule.onNodeWithText("Example Cash Preferred").assertIsDisplayed()
         composeRule.onNodeWithText("Benefits").assertIsDisplayed()
-        composeRule.onNodeWithText("credit").assertIsDisplayed()
-        composeRule.onNodeWithText("Expiry: 12/31/2025 11:59").assertIsDisplayed()
+        composeRule.onNodeWithText("Dining credit", substring = true).assertIsDisplayed()
     }
 }

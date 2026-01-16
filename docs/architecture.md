@@ -179,3 +179,8 @@
 
 ## 2026-01-15 - Card list snackbar/FAB spacing
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Aligned the card list FAB/snackbar behavior with card detail by anchoring the FAB in content, shifting it upward when a snackbar is visible, and padding list content to stay clear of the FAB/snackbar.
+
+## 2026-01-15 - Card list item layout
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Added card face URL, last four, and open date to the list UI model for richer card list rendering.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Redesigned card list rows with a cropped card-face strip, an overlapping name/last-four row with delete action, and an approval-duration plus status row.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated card list/detail test fixtures to match the new list model and detail UI signatures.
