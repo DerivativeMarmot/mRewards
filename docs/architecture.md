@@ -189,3 +189,6 @@
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Added a lifecycle resume hook so the list refreshes when returning from detail.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires the resume refresh to reload cards without showing the loading state.
 - `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated the list screen call signature for the new resume callback.
+
+## 2026-01-15 - Card list layout no overlap
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Removed the overlapping layout so the card face strip and text rows render as separate stacked rows for long titles.

@@ -214,3 +214,6 @@
 ## 2026-01-15 - Card list refresh on return
 - Added an on-resume refresh in `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt` and wired it in `app/src/main/java/com/example/rewardsrader/MainActivity.kt` so list items reflect detail edits after navigating back.
 - Updated `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt` for the new CardListScreen parameter.
+
+## 2026-01-15 - Card list layout no overlap
+- Updated `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt` to stack the card face strip and text rows instead of overlapping them to avoid title wrap misalignment.

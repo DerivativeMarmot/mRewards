@@ -213,10 +213,7 @@ private fun CardListItem(
         BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
             val fullHeight = maxWidth / 1.6f
             val visibleHeight = fullHeight * 0.33f
-            val overlap = 16.dp
-            val overlayTopPadding = if (visibleHeight > overlap) visibleHeight - overlap else 0.dp
-
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 CardFaceStrip(
                     cardFaceUrl = card.cardFaceUrl,
                     visibleHeight = visibleHeight,
@@ -225,12 +222,7 @@ private fun CardListItem(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = overlayTopPadding + 12.dp,
-                            bottom = 12.dp
-                        ),
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Row(
@@ -250,7 +242,7 @@ private fun CardListItem(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
-                    ){
+                    ) {
                         Text(
                             text = "Status: ${card.status}",
                             style = MaterialTheme.typography.bodyMedium
@@ -259,10 +251,9 @@ private fun CardListItem(
                             text = buildApprovalDurationLabel(card.openDate),
                             style = MaterialTheme.typography.bodyMedium,
                             fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
-
                 }
             }
         }

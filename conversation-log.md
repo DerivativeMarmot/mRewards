@@ -570,3 +570,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-15 16:14:57 -08:00] Assistant: Identified that the list does not refresh on return and proposed adding an on-resume reload; confirmed to keep user tweaks in the list UI.
 [2026-01-15 16:14:57 -08:00] User: yes i made those changes, you should keep the changes. proceed with refresh fix.
 [2026-01-15 16:14:57 -08:00] Assistant: Added a lifecycle resume hook to reload the card list on return and wired it from MainActivity; updated tests and logs.
+[2026-01-16 11:58:06 -08:00] User: it looks ok, but when card name gets longer and takes 2 lines, the placement is off. I do not want the overlap style anymore, make them separate rows.
+[2026-01-16 11:58:06 -08:00] Assistant: Removed the overlap layout in card list items so the card face strip and text rows stack cleanly; logged updates.
