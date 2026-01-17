@@ -228,3 +228,6 @@
 
 ## 2026-01-16 - Card list menu icons
 - Added Duplicate/Delete icons to the long-press menu items in `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`.
+
+## 2026-01-17 - Tracker spec update
+- Updated the `Tracker` section in `docs/feature_implementation.md` with bottom navigation access, tracker sources, status rules, period generation, and edit flow details.

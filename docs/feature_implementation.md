@@ -1,5 +1,9 @@
 # Feature Implementations
 
+## App
+- [ ] App name
+- [ ] Package name
+
 ## Card (step-by-step, pending unless checked)
 - [x] Creation flow: Select issuer then card product; app loads the correct template based on selection (single template for now). Add minimal form for open date, statement cut, status, welcome-offer progress.
 - [x] Card index page
@@ -91,5 +95,27 @@ Displays all card products. Used as templates
 ## Authentication
 - [ ] use google account to login.
 
-## Tracker Screen (access thru bottom navigation bar)
-- [ ] Track incomplete benefits or offers 
+## Profile
+- [ ] multiple profiles for each user
+
+## Tracker
+- [ ] Access through bottom navigation bar with two entries: Cards (default) and Tracker.
+- [ ] Tracker data sources:
+  - Credit-type benefits from profile cards (ignore multiplier benefits).
+  - Offers from profile cards (ignore offer status; use tracker completion instead).
+- [ ] Tracker model:
+  - Each benefit or offer generates one tracker per period window.
+  - Trackers own their own transaction list; do not reuse benefit transactions.
+  - Display per tracker: card name, benefit/offer name, amount, and time left until end date.
+- [ ] Status rules:
+  - Active: transaction total < tracker amount and before end date.
+  - Complete: transaction total >= tracker amount; for offers, user can also mark complete via a checkbox.
+  - Expired: end date passed with transaction total < tracker amount.
+  - Example: a monthly benefit for Jan that is not used before Feb is marked Expired.
+- [ ] Period window generation:
+  - For credit benefits, create trackers based on benefit frequency (monthly/quarterly/annual/anniversary/etc) within the profile benefit start/end dates.
+  - For offers, create a single tracker using offer start/end dates.
+- [ ] UI:
+  - Tracker screen shows three lists: Active, Complete, Expired.
+  - Tapping a tracker opens a Tracker Edit screen where users add transactions (amount/date/notes) and manage completion for offers.
+  - Tracker screen uses the default profile (`default_profile`).
