@@ -192,3 +192,16 @@
 
 ## 2026-01-15 - Card list layout no overlap
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Removed the overlapping layout so the card face strip and text rows render as separate stacked rows for long titles.
+
+## 2026-01-16 - Card list long-press actions
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Added a long-press overflow menu on card items with Duplicate/Delete actions via combinedClickable.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`: Added duplicate action handling and snackbar feedback.
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Implemented profile card duplication (card, benefits, notifications, offers, applications).
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wired duplicate action into the list screen.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated list screen call signature for the new duplicate callback.
+
+## 2026-01-16 - Card list menu styling
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Right-aligned the card list long-press menu and forced a white menu background with black text for clarity.
+
+## 2026-01-16 - Card list menu icons
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Added icons for Duplicate and Delete actions in the card list long-press menu.

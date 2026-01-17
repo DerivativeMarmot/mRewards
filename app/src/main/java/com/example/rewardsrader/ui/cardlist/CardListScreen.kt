@@ -1,7 +1,8 @@
 package com.example.rewardsrader.ui.cardlist
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -12,14 +13,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,11 +41,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontStyle
@@ -61,6 +70,7 @@ fun CardListScreen(
     onSelectCard: (String) -> Unit,
     onAddCard: () -> Unit,
     onDeleteCard: (String) -> Unit,
+    onDuplicateCard: (String) -> Unit,
     onResume: () -> Unit,
     onSnackbarShown: () -> Unit,
     onSync: () -> Unit
@@ -117,6 +127,7 @@ fun CardListScreen(
                     cards = state.cards,
                     onSelectCard = onSelectCard,
                     onDeleteCard = onDeleteCard,
+                    onDuplicateCard = onDuplicateCard,
                     listBottomPadding = listBottomPadding,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -136,6 +147,7 @@ private fun CardListContent(
     cards: List<CardSummaryUi>,
     onSelectCard: (String) -> Unit,
     onDeleteCard: (String) -> Unit,
+    onDuplicateCard: (String) -> Unit,
     listBottomPadding: Dp,
     modifier: Modifier = Modifier
 ) {
@@ -159,7 +171,8 @@ private fun CardListContent(
                     CardListItem(
                         card = card,
                         onSelectCard = onSelectCard,
-                        onDeleteCard = onDeleteCard
+                        onDeleteCard = onDeleteCard,
+                        onDuplicateCard = onDuplicateCard
                     )
                 }
             }
@@ -181,7 +194,9 @@ private fun LoadingMessage(modifier: Modifier = Modifier) {
 @Composable
 private fun ErrorMessage(message: String, modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier.fillMaxSize().padding(16.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Text("Error: $message", color = MaterialTheme.colorScheme.error)
@@ -203,57 +218,104 @@ private fun EmptyMessage(modifier: Modifier = Modifier) {
 private fun CardListItem(
     card: CardSummaryUi,
     onSelectCard: (String) -> Unit,
-    onDeleteCard: (String) -> Unit
+    onDeleteCard: (String) -> Unit,
+    onDuplicateCard: (String) -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onSelectCard(card.id) }
-    ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-            val fullHeight = maxWidth / 1.6f
-            val visibleHeight = fullHeight * 0.33f
-            Column(modifier = Modifier.fillMaxWidth()) {
-                CardFaceStrip(
-                    cardFaceUrl = card.cardFaceUrl,
-                    visibleHeight = visibleHeight,
-                    fullHeight = fullHeight
+    var menuExpanded by remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = LocalIndication.current,
+                    onClick = { onSelectCard(card.id) },
+                    onLongClick = { menuExpanded = true }
                 )
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+        ) {
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                val fullHeight = maxWidth / 1.6f
+                val visibleHeight = fullHeight * 0.33f
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    CardFaceStrip(
+                        cardFaceUrl = card.cardFaceUrl,
+                        visibleHeight = visibleHeight,
+                        fullHeight = fullHeight
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Text(
-                            text = buildCardTitle(card.productName, card.lastFour),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(onClick = { onDeleteCard(card.id) }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete card")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = buildCardTitle(card.productName, card.lastFour),
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Status: ${card.status}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = buildApprovalDurationLabel(card.openDate),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontStyle = FontStyle.Italic,
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                     }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Status: ${card.status}",
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = buildApprovalDurationLabel(card.openDate),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(1.dp)
+        ) {
+            MaterialTheme(
+                colorScheme = MaterialTheme.colorScheme.copy(
+                    surface = Color.White,
+                    onSurface = Color.Black
+                )
+            ) {
+                DropdownMenu(
+                    expanded = menuExpanded,
+                    onDismissRequest = { menuExpanded = false }
+                ) {
+                    DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(Icons.Default.ContentCopy, contentDescription = null)
+                        },
+                        text = { Text("Duplicate") },
+                        onClick = {
+                            menuExpanded = false
+                            onDuplicateCard(card.id)
+                        }
+                    )
+                    DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(Icons.Default.Delete, contentDescription = null)
+                        },
+                        text = { Text("Delete") },
+                        onClick = {
+                            menuExpanded = false
+                            onDeleteCard(card.id)
+                        }
+                    )
                 }
             }
         }

@@ -572,3 +572,9 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-15 16:14:57 -08:00] Assistant: Added a lifecycle resume hook to reload the card list on return and wired it from MainActivity; updated tests and logs.
 [2026-01-16 11:58:06 -08:00] User: it looks ok, but when card name gets longer and takes 2 lines, the placement is off. I do not want the overlap style anymore, make them separate rows.
 [2026-01-16 11:58:06 -08:00] Assistant: Removed the overlap layout in card list items so the card face strip and text rows stack cleanly; logged updates.
+[2026-01-16 14:05:12 -08:00] User: make each card item receive long press action. when user long press on card item, a option menu pops, which includes actions of delete the card and duplicate the card.
+[2026-01-16 14:05:12 -08:00] Assistant: Added a long-press menu to card items with duplicate/delete actions, wired duplicate logic through repository/viewmodel/UI, and logged updates.
+[2026-01-16 14:50:14 -08:00] User: align the dropdown menu to right and make the dropdown menu background white
+[2026-01-16 14:50:14 -08:00] Assistant: Right-aligned the card list long-press menu anchor and forced a white menu background with black text; logged updates.
+[2026-01-16 14:50:55 -08:00] User: also add icons to each dropdown menu item
+[2026-01-16 14:50:55 -08:00] Assistant: Added Duplicate/Delete icons to the card list long-press menu items; logged updates.

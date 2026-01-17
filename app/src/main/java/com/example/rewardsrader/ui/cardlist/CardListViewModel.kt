@@ -69,6 +69,18 @@ class CardListViewModel(
         }
     }
 
+    fun duplicateCard(cardId: String) {
+        viewModelScope.launch {
+            runCatching {
+                repository.duplicateProfileCard(cardId)
+                loadCards(showLoading = false)
+                _state.value = _state.value.copy(snackbarMessage = "Card duplicated")
+            }.onFailure {
+                _state.value = _state.value.copy(error = it.message)
+            }
+        }
+    }
+
     fun notifyCardAdded(message: String = "Card added") {
         _state.value = _state.value.copy(snackbarMessage = message)
     }

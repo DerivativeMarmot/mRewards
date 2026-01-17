@@ -208,6 +208,53 @@ class CardRepository(
         profileCardDao.deleteById(profileCardId)
     }
 
+    suspend fun duplicateProfileCard(profileCardId: String): String {
+        val source = getProfileCardWithRelations(profileCardId)
+            ?: throw IllegalArgumentException("Card not found")
+        val newProfileCardId = newId()
+        val copiedProfileCard = source.profileCard.copy(id = newProfileCardId)
+        profileCardDao.insertAll(listOf(copiedProfileCard))
+
+        val benefitIdMap = mutableMapOf<String, String>()
+        source.benefits.forEach { entry ->
+            val newBenefitId = newId()
+            val copiedBenefit = entry.benefit.copy(id = newBenefitId)
+            benefitDao.insert(copiedBenefit)
+            val copiedLink = entry.link.copy(
+                id = newId(),
+                profileCardId = newProfileCardId,
+                benefitId = newBenefitId
+            )
+            profileCardBenefitDao.insert(copiedLink)
+            benefitIdMap[entry.benefit.id] = newBenefitId
+        }
+
+        if (benefitIdMap.isNotEmpty()) {
+            val rules = notificationRuleDao.getForBenefits(benefitIdMap.keys.toList())
+            val copiedRules = rules.mapNotNull { rule ->
+                val newBenefitId = benefitIdMap[rule.benefitId] ?: return@mapNotNull null
+                rule.copy(id = newId(), benefitId = newBenefitId)
+            }
+            if (copiedRules.isNotEmpty()) {
+                notificationRuleDao.insertAll(copiedRules)
+            }
+        }
+
+        val offers = offerDao.getForProfileCard(profileCardId)
+        offers.forEach { offer ->
+            offerDao.insert(offer.copy(id = newId(), profileCardId = newProfileCardId))
+        }
+
+        val applications = applicationDao.getForProfileCard(profileCardId)
+        if (applications.isNotEmpty()) {
+            applicationDao.insertAll(applications.map {
+                it.copy(id = newId(), profileCardId = newProfileCardId)
+            })
+        }
+
+        return newProfileCardId
+    }
+
     suspend fun deleteBenefit(benefitId: String) {
         benefitDao.deleteById(benefitId)
     }
