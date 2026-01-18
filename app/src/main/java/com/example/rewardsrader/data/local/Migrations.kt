@@ -347,3 +347,61 @@ val MIGRATION_16_17 = object : Migration(16, 17) {
         database.execSQL("CREATE INDEX IF NOT EXISTS index_profile_cards_cardFaceId ON profile_cards(cardFaceId)")
     }
 }
+
+// Migration 17->18 adds trackers and tracker_transactions tables.
+val MIGRATION_17_18 = object : Migration(17, 18) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS trackers (
+                id TEXT NOT NULL PRIMARY KEY,
+                profileCardId TEXT NOT NULL,
+                profileCardBenefitId TEXT,
+                offerId TEXT,
+                type TEXT NOT NULL,
+                startDateUtc TEXT NOT NULL,
+                endDateUtc TEXT NOT NULL,
+                manualCompleted INTEGER NOT NULL DEFAULT 0,
+                FOREIGN KEY(profileCardId) REFERENCES profile_cards(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+                FOREIGN KEY(profileCardBenefitId) REFERENCES profile_card_benefits(id) ON DELETE CASCADE ON UPDATE NO ACTION,
+                FOREIGN KEY(offerId) REFERENCES offers(id) ON DELETE CASCADE ON UPDATE NO ACTION
+            )
+            """.trimIndent()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_trackers_profileCardId ON trackers(profileCardId)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_trackers_profileCardBenefitId ON trackers(profileCardBenefitId)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_trackers_offerId ON trackers(offerId)")
+        database.execSQL(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS uniq_trackers_benefit_period
+            ON trackers(profileCardBenefitId, startDateUtc, endDateUtc)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS uniq_trackers_offer_period
+            ON trackers(offerId, startDateUtc, endDateUtc)
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS tracker_transactions (
+                id TEXT NOT NULL PRIMARY KEY,
+                trackerId TEXT NOT NULL,
+                amount REAL NOT NULL,
+                dateUtc TEXT NOT NULL,
+                notes TEXT,
+                FOREIGN KEY(trackerId) REFERENCES trackers(id) ON DELETE CASCADE ON UPDATE NO ACTION
+            )
+            """.trimIndent()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_tracker_transactions_trackerId ON tracker_transactions(trackerId)")
+    }
+}
+
+// Migration 18->19 adds notes to trackers.
+val MIGRATION_18_19 = object : Migration(18, 19) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE trackers ADD COLUMN notes TEXT")
+    }
+}

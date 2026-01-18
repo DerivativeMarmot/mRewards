@@ -231,3 +231,48 @@
 
 ## 2026-01-17 - Tracker spec update
 - Updated the `Tracker` section in `docs/feature_implementation.md` with bottom navigation access, tracker sources, status rules, period generation, and edit flow details.
+
+## 2026-01-18 - Tracker feature
+- Added tracker persistence: `TrackerEntity`, `TrackerTransactionEntity`, DAOs, and migration 17->18; Room DB bumped to v18 with converters and repository helpers.
+- Implemented tracker UI flows: list screen with Active/Complete/Expired filter chips and edit screen for transactions and offer completion.
+- Navigation updated with bottom bar tabs (Cards/Tracker) and tracker routes in `app/src/main/java/com/example/rewardsrader/MainActivity.kt`.
+- Schema docs updated to include tracker tables/enums (`docs/schema/schema.prisma`, `docs/schema/schema.md`).
+- Tests updated for repository constructor signature (`app/src/test/java/com/example/rewardsrader/data/CardRepositoryTest.kt`, `app/src/test/java/com/example/rewardsrader/template/CardTemplateImporterTest.kt`).
+
+## 2026-01-18 - NavHost padding
+- Removed top padding from the NavHost by only applying the bottom bar inset in `app/src/main/java/com/example/rewardsrader/MainActivity.kt`.
+
+## 2026-01-18 - Tracker flash fix
+- Avoided repeated tracker loads by skipping loading state on resume and using `LaunchedEffect` for tracker detail in `app/src/main/java/com/example/rewardsrader/MainActivity.kt`.
+- Added a `showLoading` flag to `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt` to keep the list from flashing when refreshing.
+
+## 2026-01-18 - Tracker calendar periods
+- Aligned monthly/quarterly/semi-annual/annual tracker windows to calendar boundaries with partial first periods while keeping anniversary/offer dates dynamic in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`.
+
+## 2026-01-18 - Offer tracker notes
+- Added tracker notes storage with migration 18->19 and DB v19 (`app/src/main/java/com/example/rewardsrader/data/local/entity/TrackerEntity.kt`, `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`, `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`).
+- Offer trackers now hide transactions and show notes + save flow (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`, `app/src/main/java/com/example/rewardsrader/MainActivity.kt`).
+
+## 2026-01-18 - Offer tracker save navigation
+- Saving an offer tracker now returns to the tracker list via callback wiring in `app/src/main/java/com/example/rewardsrader/MainActivity.kt` and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`.
+
+## 2026-01-18 - Tracker add transaction modal
+- Benefit tracker transactions now use a plus-button modal instead of inline inputs in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`.
+
+## 2026-01-18 - Tracker list grouping
+- Grouped trackers by card in the list and redesigned tracker rows with a two-line layout in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`.
+
+## 2026-01-18 - Tracker list spacing
+- Reduced spacing between tracker items and added rounded corners to first/last items per card group in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`.
+
+## 2026-01-18 - Tracker list background
+- Matched tracker item background to the theme background color in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`.
+
+## 2026-01-18 - Tracker card faces
+- Added partial card faces to tracker card groups and grouped by profile card ID in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt` and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerState.kt`.
+
+## 2026-01-18 - Tracker scroll restore
+- Added a remembered list state so the tracker list keeps its scroll position after returning from detail in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`.
+
+## 2026-01-18 - Tracker single item rounding
+- Made single tracker items fully rounded within card groups in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`.

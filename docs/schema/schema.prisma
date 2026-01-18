@@ -124,6 +124,43 @@ model Transaction {
   @@map("transactions")
 }
 
+model Tracker {
+  id                   String            @id
+  profileCardId         String            @map("profile_card_id")
+  profileCardBenefitId  String?           @map("profile_card_benefit_id")
+  offerId               String?           @map("offer_id")
+  type                 TrackerSourceType
+  startDateUtc          String            @map("start_date_utc")
+  endDateUtc            String            @map("end_date_utc")
+  manualCompleted       Boolean           @default(false) @map("manual_completed")
+  notes                String?
+
+  profileCard        ProfileCard         @relation(fields: [profileCardId], references: [id], onDelete: Cascade)
+  profileCardBenefit ProfileCardBenefit? @relation(fields: [profileCardBenefitId], references: [id], onDelete: Cascade)
+  offer              Offer?              @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  transactions       TrackerTransaction[]
+
+  @@index([profileCardId])
+  @@index([profileCardBenefitId])
+  @@index([offerId])
+  @@unique([profileCardBenefitId, startDateUtc, endDateUtc])
+  @@unique([offerId, startDateUtc, endDateUtc])
+  @@map("trackers")
+}
+
+model TrackerTransaction {
+  id        String  @id
+  trackerId String  @map("tracker_id")
+  amount    Float
+  dateUtc   String  @map("date_utc")
+  notes     String?
+
+  tracker Tracker @relation(fields: [trackerId], references: [id], onDelete: Cascade)
+
+  @@index([trackerId])
+  @@map("tracker_transactions")
+}
+
 model Offer {
   id             String  @id @default(cuid())
   profileCardId  String  @map("profile_card_id")
@@ -272,4 +309,9 @@ enum BenefitFrequency {
 enum BenefitType {
   Credit
   Multiplier
+}
+
+enum TrackerSourceType {
+  Benefit
+  Offer
 }

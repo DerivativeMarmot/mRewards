@@ -47,6 +47,8 @@ class CardTemplateImporterTest {
             db.profileCardBenefitDao(),
             db.benefitDao(),
             db.transactionDao(),
+            db.trackerDao(),
+            db.trackerTransactionDao(),
             db.notificationRuleDao(),
             db.offerDao(),
             db.applicationDao(),

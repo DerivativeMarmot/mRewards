@@ -9,6 +9,7 @@ import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.entity.CardSubDurationUnit
 import com.example.rewardsrader.data.local.entity.PaymentInstrument
+import com.example.rewardsrader.data.local.entity.TrackerSourceType
 
 class EnumConverters {
     @TypeConverter
@@ -66,4 +67,11 @@ class EnumConverters {
             ?.split(",")
             ?.mapNotNull { runCatching { BenefitCategory.valueOf(it) }.getOrNull() }
             ?: emptyList()
+
+    @TypeConverter
+    fun fromTrackerSourceType(value: TrackerSourceType?): String? = value?.name
+
+    @TypeConverter
+    fun toTrackerSourceType(value: String?): TrackerSourceType? =
+        value?.let { TrackerSourceType.valueOf(it) }
 }

@@ -60,3 +60,8 @@ enum class BenefitCategory {
     Supermarket,
     RetailStore
 }
+
+enum class TrackerSourceType {
+    Benefit,
+    Offer
+}

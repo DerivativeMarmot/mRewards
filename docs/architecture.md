@@ -205,3 +205,65 @@
 
 ## 2026-01-16 - Card list menu icons
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Added icons for Duplicate and Delete actions in the card list long-press menu.
+
+## 2026-01-18 - Tracker feature
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/TrackerEntity.kt`: Stores tracker periods tied to profile benefits/offers.
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/TrackerTransactionEntity.kt`: Stores tracker-specific transactions.
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/TrackerDao.kt`: Reads/inserts tracker periods for profile cards.
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/TrackerTransactionDao.kt`: CRUD for tracker transaction entries.
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/Enums.kt`: Added `TrackerSourceType` to describe tracker sources.
+- `app/src/main/java/com/example/rewardsrader/data/local/EnumConverters.kt`: Converts tracker source enums for Room storage.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Migration 17->18 creates tracker tables and indexes.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: DB version bump and tracker DAO registration.
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Tracker query/insert/update helpers for UI flows.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerState.kt`: Tracker list state and UI models.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditState.kt`: Tracker edit state and transaction UI models.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerUtils.kt`: Shared date/amount formatting helpers for tracker UI.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`: Builds tracker lists from profile benefits/offers with status logic.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Loads tracker detail, manages transactions and offer completion.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Tracker list UI with filter chips for status.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Tracker edit UI for transactions and completion.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Adds bottom navigation and tracker routes.
+- `app/src/main/java/com/example/rewardsrader/AppContainer.kt`: Wires tracker DAOs and migration.
+- `docs/schema/schema.prisma`: Documents tracker tables and enums.
+- `docs/schema/schema.md`: Documents tracker tables and enums in markdown.
+
+## 2026-01-18 - Tracker flash fix
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`: Added load options to refresh without toggling the loading state.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Uses `LaunchedEffect` for tracker detail loading and refreshes tracker lists without flashing.
+
+## 2026-01-18 - Tracker calendar periods
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`: Generates monthly/quarterly/semi-annual/annual trackers on calendar boundaries with partial first periods.
+
+## 2026-01-18 - Offer tracker notes
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/TrackerEntity.kt`: Adds tracker notes to persist offer notes.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Migration 18->19 adds tracker notes column.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: DB version bumped to 19.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Saves offer completion + notes via tracker updates.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Hides transactions for offers and adds notes + save action.
+
+## 2026-01-18 - Offer tracker save navigation
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Added save callback support for offer tracker updates.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Navigates back to the tracker list after saving offer trackers.
+
+## 2026-01-18 - Tracker add transaction modal
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Adds a plus-action modal for benefit tracker transaction entry.
+
+## 2026-01-18 - Tracker list grouping
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Groups trackers by card and uses a two-row tracker item layout with amount usage and time left.
+
+## 2026-01-18 - Tracker list spacing
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Tightened spacing and rounded only the first/last tracker items in each card group.
+
+## 2026-01-18 - Tracker list background
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Uses the theme background color for tracker item cards.
+
+## 2026-01-18 - Tracker card faces
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Adds cropped card faces to tracker card groups and groups by profile card ID.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerState.kt`: Carries profile card IDs and card face URLs in tracker UI models.
+
+## 2026-01-18 - Tracker scroll restore
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Remembers the list scroll state across navigation.
+
+## 2026-01-18 - Tracker single item rounding
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Fully rounds single tracker items inside card groups.

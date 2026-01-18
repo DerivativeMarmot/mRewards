@@ -49,6 +49,14 @@ enum BenefitType {
 }
 ```
 
+### TrackerSourceType
+```prisma
+enum TrackerSourceType {
+  Benefit
+  Offer
+}
+```
+
 ### CardNetwork
 ```prisma
 enum CardNetwork {
@@ -253,3 +261,29 @@ enum CardSubDurationUnit {
 | `dateUtc` | String? | |
 | `amount` | Float | |
 | `benefit` | Benefit? | @relation(fields: [benefitId], references: [id]) |
+
+### Tracker
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | String | @id |
+| `profileCardId` | String | @map("profile_card_id") |
+| `profileCardBenefitId` | String? | @map("profile_card_benefit_id") |
+| `offerId` | String? | @map("offer_id") |
+| `type` | TrackerSourceType | |
+| `startDateUtc` | String | @map("start_date_utc") |
+| `endDateUtc` | String | @map("end_date_utc") |
+| `manualCompleted` | Boolean | @default(false) @map("manual_completed") |
+| `notes` | String? | |
+| `profileCard` | ProfileCard | @relation(fields: [profileCardId], references: [id], onDelete: Cascade) |
+| `profileCardBenefit` | ProfileCardBenefit? | @relation(fields: [profileCardBenefitId], references: [id], onDelete: Cascade) |
+| `offer` | Offer? | @relation(fields: [offerId], references: [id], onDelete: Cascade) |
+
+### TrackerTransaction
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | String | @id |
+| `trackerId` | String | @map("tracker_id") |
+| `amount` | Float | |
+| `dateUtc` | String | @map("date_utc") |
+| `notes` | String? | |
+| `tracker` | Tracker | @relation(fields: [trackerId], references: [id], onDelete: Cascade) |

@@ -16,6 +16,8 @@ import com.example.rewardsrader.data.local.dao.ProfileDao
 import com.example.rewardsrader.data.local.dao.TemplateCardBenefitDao
 import com.example.rewardsrader.data.local.dao.TemplateCardDao
 import com.example.rewardsrader.data.local.dao.TransactionDao
+import com.example.rewardsrader.data.local.dao.TrackerDao
+import com.example.rewardsrader.data.local.dao.TrackerTransactionDao
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
@@ -29,6 +31,8 @@ import com.example.rewardsrader.data.local.entity.ProfileEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import com.example.rewardsrader.data.local.entity.TransactionEntity
+import com.example.rewardsrader.data.local.entity.TrackerEntity
+import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
 
 @Database(
     entities = [
@@ -40,13 +44,15 @@ import com.example.rewardsrader.data.local.entity.TransactionEntity
         ProfileCardBenefitEntity::class,
         BenefitEntity::class,
         TransactionEntity::class,
+        TrackerEntity::class,
+        TrackerTransactionEntity::class,
         NotificationRuleEntity::class,
         OfferEntity::class,
         ApplicationEntity::class,
         TemplateCardEntity::class,
         TemplateCardBenefitEntity::class
     ],
-    version = 17,
+    version = 19,
     exportSchema = false
 )
 @TypeConverters(EnumConverters::class)
@@ -60,6 +66,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun applicationDao(): ApplicationDao
     abstract fun benefitDao(): BenefitDao
     abstract fun transactionDao(): TransactionDao
+    abstract fun trackerDao(): TrackerDao
+    abstract fun trackerTransactionDao(): TrackerTransactionDao
     abstract fun notificationRuleDao(): NotificationRuleDao
     abstract fun offerDao(): OfferDao
     abstract fun templateCardDao(): TemplateCardDao

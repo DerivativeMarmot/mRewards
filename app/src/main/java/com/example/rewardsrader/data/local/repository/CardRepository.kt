@@ -13,6 +13,8 @@ import com.example.rewardsrader.data.local.dao.ProfileDao
 import com.example.rewardsrader.data.local.dao.TemplateCardBenefitDao
 import com.example.rewardsrader.data.local.dao.TemplateCardDao
 import com.example.rewardsrader.data.local.dao.TransactionDao
+import com.example.rewardsrader.data.local.dao.TrackerDao
+import com.example.rewardsrader.data.local.dao.TrackerTransactionDao
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
 import com.example.rewardsrader.data.local.entity.BenefitEntity
 import com.example.rewardsrader.data.local.entity.CardEntity
@@ -27,6 +29,8 @@ import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardEntity
 import com.example.rewardsrader.data.local.entity.TransactionEntity
+import com.example.rewardsrader.data.local.entity.TrackerEntity
+import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardWithBenefits
 import java.util.UUID
 
@@ -51,6 +55,8 @@ class CardRepository(
     private val profileCardBenefitDao: ProfileCardBenefitDao,
     private val benefitDao: BenefitDao,
     private val transactionDao: TransactionDao,
+    private val trackerDao: TrackerDao,
+    private val trackerTransactionDao: TrackerTransactionDao,
     private val notificationRuleDao: NotificationRuleDao,
     private val offerDao: OfferDao,
     private val applicationDao: ApplicationDao,
@@ -126,6 +132,37 @@ class CardRepository(
 
     suspend fun addTransactions(transactions: List<TransactionEntity>) {
         if (transactions.isNotEmpty()) transactionDao.insertAll(transactions)
+    }
+
+    suspend fun insertTrackers(trackers: List<TrackerEntity>) {
+        if (trackers.isNotEmpty()) trackerDao.insertAll(trackers)
+    }
+
+    suspend fun getTrackersForProfileCards(profileCardIds: List<String>): List<TrackerEntity> {
+        if (profileCardIds.isEmpty()) return emptyList()
+        return trackerDao.getForProfileCards(profileCardIds)
+    }
+
+    suspend fun getTracker(trackerId: String): TrackerEntity? = trackerDao.getById(trackerId)
+
+    suspend fun updateTracker(tracker: TrackerEntity) {
+        trackerDao.update(tracker)
+    }
+
+    suspend fun addTrackerTransaction(transaction: TrackerTransactionEntity) {
+        trackerTransactionDao.insert(transaction)
+    }
+
+    suspend fun deleteTrackerTransaction(transactionId: String) {
+        trackerTransactionDao.deleteById(transactionId)
+    }
+
+    suspend fun getTrackerTransactions(trackerId: String): List<TrackerTransactionEntity> =
+        trackerTransactionDao.getForTracker(trackerId)
+
+    suspend fun getTrackerTransactionsForTrackers(trackerIds: List<String>): List<TrackerTransactionEntity> {
+        if (trackerIds.isEmpty()) return emptyList()
+        return trackerTransactionDao.getForTrackers(trackerIds)
     }
 
     suspend fun addNotificationRules(rules: List<NotificationRuleEntity>) {
