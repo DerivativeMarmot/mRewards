@@ -616,3 +616,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-18 13:46:25 -08:00] Assistant: Remembered the tracker list state to preserve scroll position after returning from detail.
 [2026-01-18 13:56:58 -08:00] User: for the tracker list in each card, if there is just one tracker, make the tracker fully rounded corner
 [2026-01-18 13:56:58 -08:00] Assistant: Updated tracker item rounding to fully round single-item groups.
+[2026-01-18 14:29:49 -08:00] User: besides on screen resume, make the tracker be generated or expired in the background.
+[2026-01-18 14:29:49 -08:00] Assistant: Added WorkManager background refresh to generate trackers periodically and shared generation logic between UI and worker.

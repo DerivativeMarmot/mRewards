@@ -3,15 +3,12 @@ package com.example.rewardsrader.ui.tracker
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.rewardsrader.data.local.entity.BenefitFrequency
-import com.example.rewardsrader.data.local.entity.BenefitType
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.entity.TrackerEntity
 import com.example.rewardsrader.data.local.entity.TrackerSourceType
 import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
 import com.example.rewardsrader.data.local.repository.CardRepository
 import java.time.LocalDate
-import java.time.Period
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -23,6 +20,7 @@ class TrackerViewModel(
     private val defaultProfileId = "default_profile"
     private val _state = MutableStateFlow(TrackerUiState())
     val state: StateFlow<TrackerUiState> = _state
+    private val trackerGenerator = TrackerGenerator { repository.newId() }
 
     fun loadTrackers(showLoading: Boolean = true) {
         viewModelScope.launch {
@@ -37,7 +35,7 @@ class TrackerViewModel(
                 val cards = repository.getProfileCardsWithRelations(defaultProfileId)
                 val cardIds = cards.map { it.profileCard.id }
                 val existing = repository.getTrackersForProfileCards(cardIds)
-                val newTrackers = generateMissingTrackers(cards, existing)
+                val newTrackers = trackerGenerator.generateMissingTrackers(cards, existing)
                 repository.insertTrackers(newTrackers)
                 val trackers = repository.getTrackersForProfileCards(cardIds)
                 val transactions = repository.getTrackerTransactionsForTrackers(trackers.map { it.id })
@@ -116,137 +114,6 @@ class TrackerViewModel(
         )
     }
 
-    private fun generateMissingTrackers(
-        cards: List<ProfileCardWithRelations>,
-        existing: List<TrackerEntity>
-    ): List<TrackerEntity> {
-        val existingKeys = existing.mapTo(mutableSetOf()) { trackerKey(it) }
-        val today = LocalDate.now()
-        val newTrackers = mutableListOf<TrackerEntity>()
-
-        cards.forEach { card ->
-            val profileCardId = card.profileCard.id
-            val fallbackStart = parseTrackerDate(card.profileCard.openDateUtc) ?: today
-            card.benefits.forEach { entry ->
-                if (entry.benefit.type != BenefitType.Credit) return@forEach
-                val startDate = parseTrackerDate(entry.link.startDateUtc) ?: fallbackStart
-                val endDate = parseTrackerDate(entry.link.endDateUtc)
-                val frequency = entry.benefit.frequency
-                if (frequency == BenefitFrequency.EveryTransaction) {
-                    val safeEnd = endDate?.takeIf { !it.isBefore(startDate) } ?: startDate
-                    val key = TrackerKey(
-                        profileCardBenefitId = entry.link.id,
-                        offerId = null,
-                        startDate = formatTrackerDate(startDate),
-                        endDate = formatTrackerDate(safeEnd)
-                    )
-                    if (existingKeys.add(key)) {
-                        newTrackers.add(
-                            TrackerEntity(
-                                id = repository.newId(),
-                                profileCardId = profileCardId,
-                                profileCardBenefitId = entry.link.id,
-                                offerId = null,
-                                type = TrackerSourceType.Benefit,
-                                startDateUtc = key.startDate,
-                                endDateUtc = key.endDate
-                            )
-                        )
-                    }
-                    return@forEach
-                }
-                val safeEnd = endDate?.let { if (it.isBefore(startDate)) startDate else it }
-                val generationEnd = safeEnd ?: maxOf(today, startDate)
-                if (isCalendarFrequency(frequency)) {
-                    var periodStart = startDate
-                    var periodEnd = calendarPeriodEnd(periodStart, frequency)
-                    var nextPeriodStart = nextCalendarPeriodStart(periodStart, frequency)
-                    while (!periodStart.isAfter(generationEnd)) {
-                        val finalEnd = safeEnd?.let { if (periodEnd.isAfter(it)) it else periodEnd } ?: periodEnd
-                        val key = TrackerKey(
-                            profileCardBenefitId = entry.link.id,
-                            offerId = null,
-                            startDate = formatTrackerDate(periodStart),
-                            endDate = formatTrackerDate(finalEnd)
-                        )
-                        if (existingKeys.add(key)) {
-                            newTrackers.add(
-                                TrackerEntity(
-                                    id = repository.newId(),
-                                    profileCardId = profileCardId,
-                                    profileCardBenefitId = entry.link.id,
-                                    offerId = null,
-                                    type = TrackerSourceType.Benefit,
-                                    startDateUtc = key.startDate,
-                                    endDateUtc = key.endDate
-                                )
-                            )
-                        }
-                        periodStart = nextPeriodStart
-                        periodEnd = calendarPeriodEnd(periodStart, frequency)
-                        nextPeriodStart = nextCalendarPeriodStart(periodStart, frequency)
-                    }
-                } else {
-                    val period = periodForFrequency(frequency)
-                    if (period != null) {
-                        var periodStart = startDate
-                        while (!periodStart.isAfter(generationEnd)) {
-                            val periodEnd = periodStart.plus(period).minusDays(1)
-                            val finalEnd = safeEnd?.let { if (periodEnd.isAfter(it)) it else periodEnd } ?: periodEnd
-                            val key = TrackerKey(
-                                profileCardBenefitId = entry.link.id,
-                                offerId = null,
-                                startDate = formatTrackerDate(periodStart),
-                                endDate = formatTrackerDate(finalEnd)
-                            )
-                            if (existingKeys.add(key)) {
-                                newTrackers.add(
-                                    TrackerEntity(
-                                        id = repository.newId(),
-                                        profileCardId = profileCardId,
-                                        profileCardBenefitId = entry.link.id,
-                                        offerId = null,
-                                        type = TrackerSourceType.Benefit,
-                                        startDateUtc = key.startDate,
-                                        endDateUtc = key.endDate
-                                    )
-                                )
-                            }
-                            periodStart = periodStart.plus(period)
-                        }
-                    }
-                }
-            }
-
-            card.offers.forEach { offer ->
-                val startDate = parseTrackerDate(offer.startDateUtc) ?: today
-                val endDate = parseTrackerDate(offer.endDateUtc) ?: startDate
-                val safeEnd = if (endDate.isBefore(startDate)) startDate else endDate
-                val key = TrackerKey(
-                    profileCardBenefitId = null,
-                    offerId = offer.id,
-                    startDate = formatTrackerDate(startDate),
-                    endDate = formatTrackerDate(safeEnd)
-                )
-                if (existingKeys.add(key)) {
-                    newTrackers.add(
-                        TrackerEntity(
-                            id = repository.newId(),
-                            profileCardId = profileCardId,
-                            profileCardBenefitId = null,
-                            offerId = offer.id,
-                            type = TrackerSourceType.Offer,
-                            startDateUtc = key.startDate,
-                            endDateUtc = key.endDate
-                        )
-                    )
-                }
-            }
-        }
-
-        return newTrackers
-    }
-
     private fun resolveStatus(
         tracker: TrackerEntity,
         usedAmount: Double,
@@ -265,73 +132,6 @@ class TrackerViewModel(
         }
         return TrackerStatus.Active
     }
-
-    private fun periodForFrequency(frequency: BenefitFrequency): Period? =
-        when (frequency) {
-            BenefitFrequency.EveryAnniversary -> Period.ofYears(1)
-            BenefitFrequency.EveryTransaction -> null
-            else -> null
-        }
-
-    private fun isCalendarFrequency(frequency: BenefitFrequency): Boolean =
-        when (frequency) {
-            BenefitFrequency.Monthly,
-            BenefitFrequency.Quarterly,
-            BenefitFrequency.SemiAnnually,
-            BenefitFrequency.Annually -> true
-            else -> false
-        }
-
-    private fun calendarPeriodStart(date: LocalDate, frequency: BenefitFrequency): LocalDate =
-        when (frequency) {
-            BenefitFrequency.Monthly -> date.withDayOfMonth(1)
-            BenefitFrequency.Quarterly -> {
-                val startMonth = ((date.monthValue - 1) / 3) * 3 + 1
-                LocalDate.of(date.year, startMonth, 1)
-            }
-            BenefitFrequency.SemiAnnually -> {
-                val startMonth = if (date.monthValue <= 6) 1 else 7
-                LocalDate.of(date.year, startMonth, 1)
-            }
-            BenefitFrequency.Annually -> LocalDate.of(date.year, 1, 1)
-            else -> date
-        }
-
-    private fun calendarPeriodEnd(date: LocalDate, frequency: BenefitFrequency): LocalDate {
-        val start = calendarPeriodStart(date, frequency)
-        return when (frequency) {
-            BenefitFrequency.Monthly -> start.plusMonths(1).minusDays(1)
-            BenefitFrequency.Quarterly -> start.plusMonths(3).minusDays(1)
-            BenefitFrequency.SemiAnnually -> start.plusMonths(6).minusDays(1)
-            BenefitFrequency.Annually -> start.plusYears(1).minusDays(1)
-            else -> start
-        }
-    }
-
-    private fun nextCalendarPeriodStart(date: LocalDate, frequency: BenefitFrequency): LocalDate {
-        val start = calendarPeriodStart(date, frequency)
-        return when (frequency) {
-            BenefitFrequency.Monthly -> start.plusMonths(1)
-            BenefitFrequency.Quarterly -> start.plusMonths(3)
-            BenefitFrequency.SemiAnnually -> start.plusMonths(6)
-            BenefitFrequency.Annually -> start.plusYears(1)
-            else -> start
-        }
-    }
-
-    private fun trackerKey(tracker: TrackerEntity) = TrackerKey(
-        profileCardBenefitId = tracker.profileCardBenefitId,
-        offerId = tracker.offerId,
-        startDate = tracker.startDateUtc,
-        endDate = tracker.endDateUtc
-    )
-
-    private data class TrackerKey(
-        val profileCardBenefitId: String?,
-        val offerId: String?,
-        val startDate: String,
-        val endDate: String
-    )
 
     companion object {
         fun factory(repository: CardRepository): ViewModelProvider.Factory =

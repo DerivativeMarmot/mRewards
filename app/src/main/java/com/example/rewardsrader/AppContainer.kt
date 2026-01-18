@@ -8,6 +8,7 @@ import com.example.rewardsrader.config.DefaultCardConfigProvider
 import com.example.rewardsrader.data.local.AppDatabase
 import com.example.rewardsrader.data.local.repository.CardRepository
 import com.example.rewardsrader.data.remote.FirestoreSyncer
+import com.example.rewardsrader.data.worker.TrackerWorkScheduler
 import com.example.rewardsrader.template.CardTemplateImporter
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -36,6 +37,10 @@ class AppContainer(context: Context) {
             com.example.rewardsrader.data.local.MIGRATION_18_19
         )
         .build()
+
+    init {
+        TrackerWorkScheduler.schedule(context)
+    }
 
     val cardRepository: CardRepository = CardRepository(
         issuerDao = db.issuerDao(),

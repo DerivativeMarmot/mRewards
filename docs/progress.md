@@ -276,3 +276,8 @@
 
 ## 2026-01-18 - Tracker single item rounding
 - Made single tracker items fully rounded within card groups in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`.
+
+## 2026-01-18 - Tracker background refresh
+- Added WorkManager background refresh to generate new trackers daily (`app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`, `app/src/main/java/com/example/rewardsrader/data/worker/TrackerWorkScheduler.kt`).
+- Extracted tracker generation into a shared helper for UI and worker (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`).
+- Scheduled tracker refresh from `app/src/main/java/com/example/rewardsrader/AppContainer.kt` and added WorkManager dependency.
