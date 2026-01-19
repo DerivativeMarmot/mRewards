@@ -655,3 +655,7 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-19 11:13:44 -08:00] Assistant: Added the everyanniversary option to the benefit frequency selector.
 [2026-01-19 11:21:14 -08:00] User: add card SUB tracker
 [2026-01-19 11:21:14 -08:00] Assistant: Added SUB trackers for sign-up bonus spending/duration and wired the new tracker source type through generator, viewmodels, and docs.
+[2026-01-19 11:36:12 -08:00] User: organize tracker list in each card with tracker type as title. sub be the first one, offers be the second one and benefits be the last one. do not give sub tracker a title.
+[2026-01-19 11:36:12 -08:00] Assistant: Grouped tracker lists by type with ordered section headers and removed SUB tracker titles in list and detail.
+[2026-01-19 11:41:52 -08:00] User: for sub tracker, show tracker item title, but do not show tracker group title SUB
+[2026-01-19 11:41:52 -08:00] Assistant: Restored SUB item titles and hid the SUB section header.

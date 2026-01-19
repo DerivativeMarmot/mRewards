@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
+import com.example.rewardsrader.data.local.entity.TrackerSourceType
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -177,19 +178,49 @@ private fun TrackerCardGroup(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    trackers.forEachIndexed { index, tracker ->
-                    val shape = when {
-                        trackers.size == 1 -> RoundedCornerShape(12.dp)
-                        index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
-                        index == trackers.lastIndex -> RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
-                        else -> RoundedCornerShape(0.dp)
-                    }
-                        TrackerListItem(
-                            tracker = tracker,
-                            onSelect = onSelect,
-                            shape = shape
-                        )
+                val sections = listOf(
+                    TrackerSectionUi(
+                        type = TrackerSourceType.Sub,
+                        label = null,
+                        trackers = trackers.filter { it.sourceType == TrackerSourceType.Sub }
+                    ),
+                    TrackerSectionUi(
+                        type = TrackerSourceType.Offer,
+                        label = "Offers",
+                        trackers = trackers.filter { it.sourceType == TrackerSourceType.Offer }
+                    ),
+                    TrackerSectionUi(
+                        type = TrackerSourceType.Benefit,
+                        label = "Benefits",
+                        trackers = trackers.filter { it.sourceType == TrackerSourceType.Benefit }
+                    )
+                ).filter { it.trackers.isNotEmpty() }
+
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    sections.forEach { section ->
+                        section.label?.let { label ->
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            section.trackers.forEachIndexed { index, tracker ->
+                                val shape = when {
+                                    section.trackers.size == 1 -> RoundedCornerShape(12.dp)
+                                    index == 0 -> RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)
+                                    index == section.trackers.lastIndex ->
+                                        RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                                    else -> RoundedCornerShape(0.dp)
+                                }
+                                TrackerListItem(
+                                    tracker = tracker,
+                                    onSelect = onSelect,
+                                    shape = shape
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -209,15 +240,18 @@ private fun TrackerListItem(
         shape = shape,
         onClick = { onSelect(tracker.id) }
     ) {
+        val showTitle = tracker.title.isNotBlank()
         Column(
             modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(if (showTitle) 6.dp else 0.dp)
         ) {
-            Text(
-                text = tracker.title,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold
-            )
+            if (showTitle) {
+                Text(
+                    text = tracker.title,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -274,4 +308,10 @@ private data class TrackerGroupUi(
     val cardName: String,
     val cardFaceUrl: String?,
     val trackers: MutableList<TrackerItemUi>
+)
+
+private data class TrackerSectionUi(
+    val type: TrackerSourceType,
+    val label: String?,
+    val trackers: List<TrackerItemUi>
 )

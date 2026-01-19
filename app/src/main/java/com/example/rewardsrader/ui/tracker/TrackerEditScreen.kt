@@ -307,7 +307,9 @@ private fun TrackerSummaryCard(tracker: TrackerDetailUi) {
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
-            Text(text = tracker.title, style = MaterialTheme.typography.bodyMedium)
+            if (tracker.title.isNotBlank()) {
+                Text(text = tracker.title, style = MaterialTheme.typography.bodyMedium)
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween

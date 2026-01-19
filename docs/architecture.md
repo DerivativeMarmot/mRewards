@@ -352,3 +352,12 @@
 - `app/src/main/java/com/example/rewardsrader/data/local/entity/Enums.kt`: Adds `Sub` to `TrackerSourceType`.
 - `docs/schema/schema.prisma` and `docs/schema/schema.md`: Update tracker source enum to include `Sub`.
 - `docs/feature_implementation.md`: Notes SUB as a tracker data source.
+
+## 2026-01-19 - Tracker grouping by type
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Groups trackers by type within each card section and labels sections in order (SUB, Offers, Benefits).
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt` and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Clears SUB tracker titles to avoid showing them in list/detail.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Hides the tracker title row when empty.
+
+## 2026-01-19 - SUB tracker header tweak
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Hides the SUB section header while keeping item titles.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt` and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Restores SUB tracker titles for list/detail display.

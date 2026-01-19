@@ -347,3 +347,10 @@
 - Added SUB tracker generation and display using profile card sub-spending/duration in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`, and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`.
 - Extended tracker source enum to include SUB and updated schema docs in `app/src/main/java/com/example/rewardsrader/data/local/entity/Enums.kt`, `docs/schema/schema.prisma`, and `docs/schema/schema.md`.
 - Documented SUB as a tracker data source in `docs/feature_implementation.md` and added a card display name formatter in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerUtils.kt`.
+
+## 2026-01-19 - Tracker grouping by type
+- Grouped tracker lists per card by type (SUB, Offers, Benefits) and hid SUB tracker titles in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`, and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`.
+- Suppressed empty tracker titles in the tracker detail summary card in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`.
+
+## 2026-01-19 - SUB tracker header tweak
+- Restored SUB tracker item titles and removed the SUB section header in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`, and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`.
