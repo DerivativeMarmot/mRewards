@@ -160,6 +160,13 @@ fun BenefitCreateScreen(
                 label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
             )
+
+            OutlinedTextField(
+                value = state.notes,
+                onValueChange = onNotesChange,
+                label = { Text("Notes/terms") },
+                modifier = Modifier.fillMaxWidth()
+            )
             HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
 
             InlineSelectionRow(
@@ -261,6 +268,16 @@ fun BenefitCreateScreen(
             HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
 
             InlineSelectionRow(
+                label = "Effective date",
+                value = state.effectiveDate.ifBlank { "Select date" },
+                onClick = { showEffectivePicker = true }
+            )
+            InlineSelectionRow(
+                label = "Expiration date",
+                value = state.expiryDate.ifBlank { "Select date" },
+                onClick = { showExpiryPicker = true }
+            )
+            InlineSelectionRow(
                 label = "Frequency",
                 value = state.cadence,
                 onClick = { showFrequencyDialog = true }
@@ -283,26 +300,6 @@ fun BenefitCreateScreen(
                 categories = allCategories,
                 selected = state.categories,
                 onToggle = onToggleCategory
-            )
-            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
-
-            InlineSelectionRow(
-                label = "Effective date",
-                value = state.effectiveDate.ifBlank { "Select date" },
-                onClick = { showEffectivePicker = true }
-            )
-            InlineSelectionRow(
-                label = "Expiration date",
-                value = state.expiryDate.ifBlank { "Select date" },
-                onClick = { showExpiryPicker = true }
-            )
-            HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
-
-            OutlinedTextField(
-                value = state.notes,
-                onValueChange = onNotesChange,
-                label = { Text("Notes/terms") },
-                modifier = Modifier.fillMaxWidth()
             )
 
             state.error?.let { Text("Error: $it") }
