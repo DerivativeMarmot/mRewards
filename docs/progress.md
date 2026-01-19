@@ -304,3 +304,6 @@
 
 ## 2026-01-18 - Card detail per-tab scrolling
 - Reworked card detail layout so the header and tabs are fixed while each tab content scrolls independently in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`.
+
+## 2026-01-18 - Card detail tab padding
+- Increased benefits and offers tab content padding in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`.

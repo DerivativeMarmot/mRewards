@@ -298,3 +298,6 @@
 
 ## 2026-01-18 - Card detail per-tab scrolling
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Pins the card header and tabs while each tab renders its own scrollable list.
+
+## 2026-01-18 - Card detail tab padding
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Increases benefits/offers tab content padding for a looser layout.

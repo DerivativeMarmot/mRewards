@@ -421,9 +421,9 @@ private fun DetailContent(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(6.dp),
                             contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                start = 12.dp,
-                                end = 12.dp,
-                                top = 12.dp,
+                                start = 24.dp,
+                                end = 24.dp,
+                                top = 24.dp,
                                 bottom = listBottomPadding
                             )
                         ) {
@@ -444,9 +444,9 @@ private fun DetailContent(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(6.dp),
                             contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                start = 12.dp,
-                                end = 12.dp,
-                                top = 12.dp,
+                                start = 24.dp,
+                                end = 24.dp,
+                                top = 24.dp,
                                 bottom = listBottomPadding
                             )
                         ) {
