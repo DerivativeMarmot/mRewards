@@ -334,3 +334,6 @@
 - `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateState.kt` and `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateViewModel.kt`: Remove status from offer creation state and persistence.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt` and `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/BenefitOfferCards.kt`: Drop status display in offer detail UI.
 - `docs/schema/schema.prisma` and `docs/schema/schema.md`: Remove the status field from the Offer model.
+
+## 2026-01-19 - Card detail offer filtering
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Hides offers that have completed trackers when building card detail state.

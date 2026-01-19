@@ -332,3 +332,6 @@
 - Updated offer create/edit state and persistence to drop status in `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateState.kt` and `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateViewModel.kt`.
 - Added migration 21->22 to remove the status column and bumped the DB to v22 in `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt` and `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`.
 - Wired the migration in `app/src/main/java/com/example/rewardsrader/AppContainer.kt` and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`, updated tests in `app/src/test/java/com/example/rewardsrader/data/CardRepositoryTest.kt`, and removed status from the schema docs (`docs/schema/schema.prisma`, `docs/schema/schema.md`) and `docs/feature_implementation.md`.
+
+## 2026-01-19 - Card detail offer filtering
+- Filtered card detail offers to hide those with completed trackers (manual completion or full usage) in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`.

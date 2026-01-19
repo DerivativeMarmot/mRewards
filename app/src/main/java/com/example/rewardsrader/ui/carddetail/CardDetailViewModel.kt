@@ -13,6 +13,7 @@ import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.repository.CardRepository
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitWithBenefit
+import com.example.rewardsrader.data.local.entity.TrackerSourceType
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -113,13 +114,17 @@ class CardDetailViewModel(
                 templateIssuer = relations.card?.issuerId.orEmpty()
                 templateNetwork = relations.card?.network?.name ?: ""
                 val faces = loadCardFaces(relations.profileCard.cardId, relations.profileCard.cardFaceId)
+                val completedOfferIds = runCatching {
+                    getCompletedOfferIds(relations.profileCard.id, relations.offers)
+                }.getOrDefault(emptySet())
+                val visibleOffers = relations.offers.filterNot { completedOfferIds.contains(it.id) }
                 _state.value = CardDetailState(
                     isLoading = false,
                     detail = mapDetail(
                         relations,
                         relations.applications,
                         relations.benefits,
-                        relations.offers
+                        visibleOffers
                     ),
                     cardFaces = faces
                 )
@@ -316,6 +321,27 @@ class CardDetailViewModel(
 
     private fun trimAmount(value: Double): String {
         return if (value % 1.0 == 0.0) value.toInt().toString() else value.toString()
+    }
+
+    private suspend fun getCompletedOfferIds(
+        profileCardId: String,
+        offers: List<OfferEntity>
+    ): Set<String> {
+        if (offers.isEmpty()) return emptySet()
+        val trackers = repository.getTrackersForProfileCards(listOf(profileCardId))
+            .filter { it.type == TrackerSourceType.Offer && !it.offerId.isNullOrBlank() }
+        if (trackers.isEmpty()) return emptySet()
+        val offersById = offers.associateBy { it.id }
+        val transactions = repository.getTrackerTransactionsForTrackers(trackers.map { it.id })
+        val usedByTracker = transactions.groupBy { it.trackerId }
+            .mapValues { entry -> entry.value.sumOf { it.amount } }
+        return trackers.mapNotNull { tracker ->
+            val offerId = tracker.offerId ?: return@mapNotNull null
+            val offer = offersById[offerId] ?: return@mapNotNull null
+            val target = offer.maxCashBack ?: offer.minSpend ?: 0.0
+            val used = usedByTracker[tracker.id] ?: 0.0
+            if (tracker.manualCompleted || used >= target) offerId else null
+        }.toSet()
     }
 
     fun upsertBenefit(benefit: BenefitEntity) {
