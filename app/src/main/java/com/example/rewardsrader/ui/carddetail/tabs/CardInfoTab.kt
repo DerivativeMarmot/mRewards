@@ -42,7 +42,7 @@ fun CardInfoTab(
         )
         HorizontalDivider()
         InfoRow(
-            label = "Last 4 digits",
+            label = "Last 4-6 digits",
             value = detail.lastFour.orEmpty(),
             onClick = { onStartEdit(CardField.LastFour, detail.lastFour.orEmpty()) }
         )

@@ -166,7 +166,7 @@ class CardDetailViewModel(
 
     fun updateNickname(value: String) = updateCard { it.copy(nickname = value.ifBlank { null }) }
 
-    fun updateLastFour(value: String) = updateCard { it.copy(lastFour = value.take(4).ifBlank { null }) }
+    fun updateLastFour(value: String) = updateCard { it.copy(lastFour = value.take(6).ifBlank { null }) }
 
     fun updateOpenDate(value: String) = updateCard { it.copy(openDateUtc = value.ifBlank { null }) }
 
