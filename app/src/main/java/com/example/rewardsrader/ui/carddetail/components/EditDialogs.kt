@@ -55,7 +55,7 @@ fun StatusDialog(
     onSelect: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val options = listOf("Pending", "Approved", "Denied", "Open", "Closed")
+    val options = listOf("Pending", "Active", "Closed")
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Select status") },
@@ -65,13 +65,13 @@ fun StatusDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onSelect(option.lowercase()) }
+                            .clickable { onSelect(option) }
                             .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
                             selected = option.equals(current, ignoreCase = true),
-                            onClick = { onSelect(option.lowercase()) }
+                            onClick = { onSelect(option) }
                         )
                         Text(option, style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
                     }

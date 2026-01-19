@@ -281,3 +281,9 @@
 - Added WorkManager background refresh to generate new trackers daily (`app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`, `app/src/main/java/com/example/rewardsrader/data/worker/TrackerWorkScheduler.kt`).
 - Extracted tracker generation into a shared helper for UI and worker (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`).
 - Scheduled tracker refresh from `app/src/main/java/com/example/rewardsrader/AppContainer.kt` and added WorkManager dependency.
+
+## 2026-01-18 - Card status options
+- Simplified card status selection to Pending/Active/Closed in `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`.
+
+## 2026-01-18 - Card status save fix
+- Fixed status selection to persist the chosen value instead of lowercasing in `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`.

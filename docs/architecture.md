@@ -273,3 +273,9 @@
 - `app/src/main/java/com/example/rewardsrader/data/worker/TrackerWorkScheduler.kt`: Schedules periodic tracker refresh work.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`: Shared tracker generation logic used by UI and worker.
 - `app/src/main/java/com/example/rewardsrader/AppContainer.kt`: Schedules the tracker refresh when the app container initializes.
+
+## 2026-01-18 - Card status options
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`: Limits card status selection to Pending, Active, and Closed.
+
+## 2026-01-18 - Card status save fix
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`: Persists selected status without lowercasing enum values.

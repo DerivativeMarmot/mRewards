@@ -618,3 +618,7 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-18 13:56:58 -08:00] Assistant: Updated tracker item rounding to fully round single-item groups.
 [2026-01-18 14:29:49 -08:00] User: besides on screen resume, make the tracker be generated or expired in the background.
 [2026-01-18 14:29:49 -08:00] Assistant: Added WorkManager background refresh to generate trackers periodically and shared generation logic between UI and worker.
+[2026-01-18 16:30:05 -08:00] User: in card detail screen, in info tab content. for card status, make it three options: `Pending`, `Active` and `Closed`
+[2026-01-18 16:30:05 -08:00] Assistant: Updated the card status dialog to only show Pending, Active, and Closed.
+[2026-01-18 16:32:12 -08:00] User: card status does not saved correctly when user clicks one of the options
+[2026-01-18 16:32:12 -08:00] Assistant: Fixed status selection to pass enum-cased values so updates persist.
