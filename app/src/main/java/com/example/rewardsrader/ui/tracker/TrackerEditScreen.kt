@@ -78,7 +78,7 @@ fun TrackerEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tracker") },
+                title = { Text("Tracker Detail") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")

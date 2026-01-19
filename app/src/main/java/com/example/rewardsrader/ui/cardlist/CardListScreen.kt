@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -72,8 +71,7 @@ fun CardListScreen(
     onDeleteCard: (String) -> Unit,
     onDuplicateCard: (String) -> Unit,
     onResume: () -> Unit,
-    onSnackbarShown: () -> Unit,
-    onSync: () -> Unit
+    onSnackbarShown: () -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val error = state.error
@@ -105,12 +103,7 @@ fun CardListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Cards") },
-                actions = {
-                    IconButton(onClick = onSync) {
-                        Icon(imageVector = Icons.Default.Sync, contentDescription = "Sync cards")
-                    }
-                }
+                title = { Text("Cards") }
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }

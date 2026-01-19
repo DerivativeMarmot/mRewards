@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -57,6 +58,7 @@ fun CardCreateScreen(
     stateFlow: StateFlow<CardCreateState>,
     events: SharedFlow<CardCreateEvent>,
     onLoad: () -> Unit,
+    onSync: () -> Unit,
     onQueryChange: (String) -> Unit,
     onSelectSort: (SortMode) -> Unit,
     onToggleIssuer: (String) -> Unit,
@@ -92,6 +94,8 @@ fun CardCreateScreen(
             when (event) {
                 CardCreateEvent.Created -> onCreated()
                 is CardCreateEvent.Error -> snackbarHostState.showSnackbar(event.message)
+                CardCreateEvent.SyncSuccess -> snackbarHostState.showSnackbar("Synced card templates")
+                is CardCreateEvent.SyncError -> snackbarHostState.showSnackbar(event.message)
             }
         }
     }
@@ -103,6 +107,11 @@ fun CardCreateScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onSync, enabled = !state.isSyncing) {
+                        Icon(imageVector = Icons.Default.Sync, contentDescription = "Sync cards")
                     }
                 }
             )

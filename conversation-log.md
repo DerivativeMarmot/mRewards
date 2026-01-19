@@ -659,3 +659,7 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-19 11:36:12 -08:00] Assistant: Grouped tracker lists by type with ordered section headers and removed SUB tracker titles in list and detail.
 [2026-01-19 11:41:52 -08:00] User: for sub tracker, show tracker item title, but do not show tracker group title SUB
 [2026-01-19 11:41:52 -08:00] Assistant: Restored SUB item titles and hid the SUB section header.
+[2026-01-19 11:55:42 -08:00] User: move current sync button in my card list screen to card creation screen.
+[2026-01-19 11:55:42 -08:00] Assistant: Moved the sync button from card list to card creation and updated wiring/tests.
+[2026-01-19 12:02:12 -08:00] User: it doesn't seem to work when i click on sync button in card creation screen, and when i return to card list it showed me the snackbar saying synced. i want the syncing operation happens entirely in card creation screen.
+[2026-01-19 12:02:12 -08:00] Assistant: Moved sync logic into the card creation viewmodel, added sync events/snackbar there, and updated wiring/tests.

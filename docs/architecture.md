@@ -361,3 +361,15 @@
 ## 2026-01-19 - SUB tracker header tweak
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerScreen.kt`: Hides the SUB section header while keeping item titles.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt` and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Restores SUB tracker titles for list/detail display.
+
+## 2026-01-19 - Sync button relocation
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Removes the sync action from the card list top bar.
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateScreen.kt`: Adds the sync action to the card creation top bar.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires the sync callback to the card creation screen instead of the list.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updates the card list screen call signature.
+
+## 2026-01-19 - Card create sync handling
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModel.kt`: Adds sync support and events for the card creation screen.
+- `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateScreen.kt`: Displays sync feedback and disables sync while running.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Supplies a Firestore-backed syncer to the card create viewmodel.
+- `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`: Updates constructor usage for the new syncer dependency.

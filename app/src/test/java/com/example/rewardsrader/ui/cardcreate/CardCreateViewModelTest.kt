@@ -93,7 +93,7 @@ class CardCreateViewModelTest {
             ): ImportResult = ImportResult.Success("profile_1")
         }
 
-        val vm = CardCreateViewModel(templateSource, importer)
+        val vm = CardCreateViewModel(templateSource, importer, CardSyncer { })
         vm.loadTemplates()
         advanceUntilIdle()
         assertEquals(1, vm.state.value.filteredResults.size)

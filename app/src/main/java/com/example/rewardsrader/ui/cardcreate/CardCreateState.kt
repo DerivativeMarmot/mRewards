@@ -54,5 +54,6 @@ data class CardCreateState(
     val results: List<CardSearchItem> = emptyList(),
     val filteredResults: List<CardSearchItem> = emptyList(),
     val isSaving: Boolean = false,
+    val isSyncing: Boolean = false,
     val error: String? = null
 )

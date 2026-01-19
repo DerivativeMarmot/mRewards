@@ -49,8 +49,7 @@ class CardScreensTest {
                 onDeleteCard = {},
                 onDuplicateCard = {},
                 onResume = {},
-                onSnackbarShown = {},
-                onSync = {}
+                onSnackbarShown = {}
             )
         }
 

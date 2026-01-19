@@ -10,7 +10,7 @@
 - [x] Card face display: Show built-in card face on list/detail (placeholder asset now; replace later).
 - [x] Editable fields: Allow editing all fields except issuer (fixed after creation); no validation initially.
 - [x] Delete behavior: Delete card and all attached data (benefits, applications, usage, notifications) with an undo snackbar.
-- [ ] Welcome offer UI: Show spending progress bar and deadline (reminder integration deferred).
+- [x] Welcome offer UI: Show spending progress bar and deadline (reminder integration deferred).
 - [x] Card management: Update card details; confirm destructive actions and refresh state.
 
 ### Card creation search experience (implementation plan)
@@ -32,7 +32,6 @@
   - Multiplier: decimal rate (e.g., 0.05 for 5%/5x), optional cap on spend only; refresh cadence; category/merchant; effective/expiry; notes/terms.
 - [x] Categories: Store issuer-scoped categories (e.g., “Dining (Chase)”, “Online Shopping (Amex)”) from a selectable list of common types (Dining, Grocery, Online Shopping, Travel, Gas, Drugstore, Streaming, Transit, Utilities) with ability to add custom types; support multi-select per benefit and only show categories for the benefit’s issuer.
 - [x] Usage tracking UI: Multiplier tracks spend amount and derived rewards per transaction; credits track checkbox for single-use or per-use amounts for multi-use; history with `MM/dd/yyyy hh:mm` UTC stored, local display.
-- [ ] Status display: Show benefit status (active/expired/paused).
 
 ## Offers
 - [x] Offer management: Free-form per user with its own Room entity; add/update from a dedicated screen; delete from the offer item.
@@ -51,7 +50,7 @@
 ## SUB (sign-up bonus)
 - [x] done
 
-## Notification
+## Push Notification
 - [ ] Notification scheduling: Add triggers (days-before-expiry, statement cut offset, spend remaining thresholds); schedule/dispatch with UTC storage and local display.
 
 ## App Settings / Platform

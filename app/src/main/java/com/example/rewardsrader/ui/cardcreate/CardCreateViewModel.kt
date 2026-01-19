@@ -24,7 +24,8 @@ import kotlinx.coroutines.launch
 
 class CardCreateViewModel(
     private val cardTemplates: CardTemplateSource,
-    private val importer: CardTemplateImporterContract
+    private val importer: CardTemplateImporterContract,
+    private val syncer: CardSyncer
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CardCreateState())
@@ -36,8 +37,8 @@ class CardCreateViewModel(
     private val dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy", Locale.US)
     private var cachedResults: List<CardSearchItem> = emptyList()
 
-    fun loadTemplates() {
-        if (!_state.value.isLoading && cachedResults.isNotEmpty()) {
+    fun loadTemplates(force: Boolean = false) {
+        if (!force && !_state.value.isLoading && cachedResults.isNotEmpty()) {
             return
         }
         _state.update { it.copy(isLoading = true, error = null) }
@@ -205,6 +206,23 @@ class CardCreateViewModel(
         }
     }
 
+    fun syncFromCloud() {
+        if (_state.value.isSyncing) return
+        _state.update { it.copy(isSyncing = true, error = null) }
+        viewModelScope.launch {
+            runCatching { syncer.sync() }
+                .onSuccess {
+                    _state.update { it.copy(isSyncing = false) }
+                    _events.emit(CardCreateEvent.SyncSuccess)
+                    loadTemplates(force = true)
+                }
+                .onFailure { error ->
+                    _state.update { it.copy(isSyncing = false, error = error.message) }
+                    _events.emit(CardCreateEvent.SyncError(error.message ?: "Sync failed"))
+                }
+        }
+    }
+
     private fun updateFilters(transform: (CardCreateFilters) -> CardCreateFilters) {
         _state.update { current ->
             val nextFilters = transform(current.filters)
@@ -318,11 +336,15 @@ class CardCreateViewModel(
         if (contains(value)) this - value else this + value
 
     companion object {
-        fun factory(repository: CardTemplateSource, importer: CardTemplateImporterContract): ViewModelProvider.Factory {
+        fun factory(
+            repository: CardTemplateSource,
+            importer: CardTemplateImporterContract,
+            syncer: CardSyncer
+        ): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     @Suppress("UNCHECKED_CAST")
-                    return CardCreateViewModel(repository, importer) as T
+                    return CardCreateViewModel(repository, importer, syncer) as T
                 }
             }
         }
@@ -332,4 +354,10 @@ class CardCreateViewModel(
 sealed class CardCreateEvent {
     object Created : CardCreateEvent()
     data class Error(val message: String) : CardCreateEvent()
+    object SyncSuccess : CardCreateEvent()
+    data class SyncError(val message: String) : CardCreateEvent()
+}
+
+fun interface CardSyncer {
+    suspend fun sync()
 }

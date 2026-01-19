@@ -78,7 +78,13 @@ class MainActivity : ComponentActivity() {
             OfferCreateViewModel.factory(appContainer.cardRepository)
         }
         val cardCreateViewModel: CardCreateViewModel by viewModels {
-            CardCreateViewModel.factory(appContainer.cardRepository, appContainer.cardTemplateImporter)
+            CardCreateViewModel.factory(
+                appContainer.cardRepository,
+                appContainer.cardTemplateImporter,
+                com.example.rewardsrader.ui.cardcreate.CardSyncer {
+                    appContainer.firestoreSyncer.syncIssuersAndCards()
+                }
+            )
         }
         val trackerViewModel: TrackerViewModel by viewModels {
             TrackerViewModel.factory(appContainer.cardRepository)
@@ -134,8 +140,7 @@ class MainActivity : ComponentActivity() {
                         onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
                         onDuplicateCard = { id -> cardListViewModel.duplicateCard(id) },
                         onResume = { cardListViewModel.loadCards(showLoading = false) },
-                        onSnackbarShown = { cardListViewModel.snackbarShown() },
-                        onSync = { cardListViewModel.syncFromCloud() }
+                        onSnackbarShown = { cardListViewModel.snackbarShown() }
                     )
                 }
 
@@ -234,6 +239,7 @@ class MainActivity : ComponentActivity() {
                         stateFlow = cardCreateViewModel.state,
                         events = cardCreateViewModel.events,
                         onLoad = { cardCreateViewModel.loadTemplates() },
+                        onSync = { cardCreateViewModel.syncFromCloud() },
                         onQueryChange = { cardCreateViewModel.updateQuery(it) },
                         onSelectSort = { cardCreateViewModel.setSortMode(it) },
                         onToggleIssuer = { cardCreateViewModel.toggleIssuerFilter(it) },
