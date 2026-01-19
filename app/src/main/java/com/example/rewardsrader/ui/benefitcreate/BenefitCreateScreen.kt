@@ -187,7 +187,7 @@ fun BenefitCreateScreen(
             )
             InlineSelectionRow(
                 label = "Frequency",
-                value = state.cadence,
+                value = state.cadence.toDisplayLabel(),
                 onClick = { showFrequencyDialog = true }
             )
             HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
@@ -230,7 +230,7 @@ fun BenefitCreateScreen(
     if (showFrequencyDialog) {
         RadioSelectionDialog(
             title = "Select frequency",
-            options = listOf("once", "monthly", "quarterly", "annually", "everytransaction"),
+            options = listOf("once", "monthly", "quarterly", "semiannually", "annually", "everytransaction"),
             selected = state.cadence,
             onSelect = {
                 onCadenceChange(it)
@@ -289,7 +289,8 @@ private fun SimpleSelectionDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 options.forEach { option ->
-                    val label = if (option == selected) "$option (selected)" else option
+                    val display = option.toDisplayLabel()
+                    val label = if (option == selected) "$display (selected)" else display
                     Button(onClick = { onSelect(option) }, modifier = Modifier.fillMaxWidth()) {
                         Text(label)
                     }
@@ -328,7 +329,7 @@ private fun RadioSelectionDialog(
                             selected = option == selected,
                             onClick = { onSelect(option) }
                         )
-                        Text(option)
+                        Text(option.toDisplayLabel())
                     }
                 }
             }
@@ -402,6 +403,19 @@ private fun FlowCategoryChips(
 }
 
 private val benefitDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+
+private fun String.toDisplayLabel(): String = when (lowercase()) {
+    "everytransaction", "every_transaction" -> "Every transaction"
+    "everyanniversary", "every_anniversary" -> "Every anniversary"
+    "semiannually", "semi_annual", "semi-annual", "semi-annually" -> "Semi-annually"
+    "annually", "annual" -> "Annually"
+    "quarterly" -> "Quarterly"
+    "monthly" -> "Monthly"
+    "once" -> "Once"
+    "credit" -> "Credit"
+    "multiplier" -> "Multiplier"
+    else -> replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+}
 
 private fun String.toMillis(): Long? {
     if (isBlank()) return null

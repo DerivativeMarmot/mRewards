@@ -301,3 +301,9 @@
 
 ## 2026-01-18 - Card detail tab padding
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Increases benefits/offers tab content padding for a looser layout.
+
+## 2026-01-18 - Benefit frequency option
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Adds the missing `semiannually` option to the frequency selector.
+
+## 2026-01-18 - Benefit frequency labels
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Formats frequency and type options with human-readable labels.
