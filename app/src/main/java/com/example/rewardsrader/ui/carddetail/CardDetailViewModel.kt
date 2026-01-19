@@ -253,15 +253,13 @@ class CardDetailViewModel(
         return when (benefit.type) {
             BenefitType.Multiplier -> {
                 val rate = benefit.amount?.let {
-                    if (it % 1.0 == 0.0) "${it.toInt()}%" else "${it}%"
+                    if (it % 1.0 == 0.0) "${it.toInt()}x" else "${it}x"
                 } ?: ""
                 rate.ifBlank { "" }
             }
             else -> {
                 when {
-                    benefit.amount != null && benefit.cap != null ->
-                        "${'$'}${benefit.amount} (cap ${'$'}${benefit.cap})"
-                    benefit.amount != null -> "${'$'}${benefit.amount}"
+                    benefit.amount != null -> "${'$'}${trimAmount(benefit.amount)}"
                     benefit.cap != null -> "Cap ${'$'}${benefit.cap}"
                     else -> ""
                 }

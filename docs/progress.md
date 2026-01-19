@@ -287,3 +287,7 @@
 
 ## 2026-01-18 - Card status save fix
 - Fixed status selection to persist the chosen value instead of lowercasing in `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`.
+
+## 2026-01-18 - Card detail benefit/offer list rounding
+- Reduced spacing between benefit/offer list items and applied rounded corners only to first/last (fully rounded for single items) in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`.
+- Updated benefit/offer cards to accept explicit shapes from the list in `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/BenefitOfferCards.kt`.

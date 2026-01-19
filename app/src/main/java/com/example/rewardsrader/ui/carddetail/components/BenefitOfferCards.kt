@@ -15,17 +15,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.rewardsrader.ui.carddetail.BenefitUi
 import com.example.rewardsrader.ui.carddetail.OfferUi
 
 @Composable
-fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> Unit) {
+fun BenefitCard(
+    benefit: BenefitUi,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    shape: Shape
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onEdit() }
+            .clickable { onEdit() },
+        shape = shape
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -34,7 +41,7 @@ fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> Unit) {
             Column(modifier = Modifier.weight(1f)) {
                 val primaryLine = listOf(benefit.amount, benefit.title.orEmpty())
                     .filter { it.isNotBlank() }
-                    .joinToString(" ? ")
+                    .joinToString(" ")
                 if (primaryLine.isNotBlank()) {
                     Text(primaryLine, fontWeight = FontWeight.SemiBold)
                 }
@@ -47,11 +54,17 @@ fun BenefitCard(benefit: BenefitUi, onEdit: () -> Unit, onDelete: () -> Unit) {
 }
 
 @Composable
-fun OfferCard(offer: OfferUi, onEdit: () -> Unit, onDelete: () -> Unit) {
+fun OfferCard(
+    offer: OfferUi,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+    shape: Shape
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onEdit() }
+            .clickable { onEdit() },
+        shape = shape
     ) {
         Row(
             modifier = Modifier.padding(12.dp),

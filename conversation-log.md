@@ -622,3 +622,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-18 16:30:05 -08:00] Assistant: Updated the card status dialog to only show Pending, Active, and Closed.
 [2026-01-18 16:32:12 -08:00] User: card status does not saved correctly when user clicks one of the options
 [2026-01-18 16:32:12 -08:00] Assistant: Fixed status selection to pass enum-cased values so updates persist.
+[2026-01-18 16:46:33 -08:00] User: refine card benefit and offer list UI, make only the first and last item rounded corner. reduce the spacing between items. if there is only one item, make it fully rounded corner.
+[2026-01-18 16:46:33 -08:00] Assistant: Reduced benefit/offer list spacing and rounded only first/last (fully rounded single items) with explicit shapes passed into the cards.

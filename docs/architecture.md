@@ -279,3 +279,7 @@
 
 ## 2026-01-18 - Card status save fix
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`: Persists selected status without lowercasing enum values.
+
+## 2026-01-18 - Card detail benefit/offer list rounding
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Adjusts benefits/offers list spacing and computes per-item shapes for first/last/only rounding.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/BenefitOfferCards.kt`: Benefit/offer cards now accept explicit shapes from the parent list.

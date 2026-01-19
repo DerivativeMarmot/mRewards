@@ -403,12 +403,14 @@ private fun DetailContent(
                         }
                         2 -> {
                             Column(
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
                             ) {
-                                detail.benefits.forEach { benefit ->
+                                detail.benefits.forEachIndexed { index, benefit ->
+                                    val shape = listItemShape(index, detail.benefits.size)
                                     BenefitCard(
                                         benefit = benefit,
+                                        shape = shape,
                                         onEdit = { onEditBenefit(benefit.id) },
                                         onDelete = { onDeleteBenefit(benefit.id) }
                                     )
@@ -417,15 +419,17 @@ private fun DetailContent(
                         }
                         3 -> {
                             Column(
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
                             ) {
                                 if (detail.offers.isEmpty()) {
                                     DetailMessage("No offers yet.")
                                 } else {
-                                    detail.offers.forEach { offer ->
+                                    detail.offers.forEachIndexed { index, offer ->
+                                        val shape = listItemShape(index, detail.offers.size)
                                         OfferCard(
                                             offer = offer,
+                                            shape = shape,
                                             onEdit = { onEditOffer(offer.id) },
                                             onDelete = { onDeleteOffer(offer.id) }
                                         )
@@ -563,6 +567,18 @@ private fun DetailMessage(message: String, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(message)
+    }
+}
+
+private fun listItemShape(index: Int, size: Int): RoundedCornerShape {
+    val radius = 12.dp
+    if (size <= 1) {
+        return RoundedCornerShape(radius)
+    }
+    return when (index) {
+        0 -> RoundedCornerShape(topStart = radius, topEnd = radius)
+        size - 1 -> RoundedCornerShape(bottomStart = radius, bottomEnd = radius)
+        else -> RoundedCornerShape(0.dp)
     }
 }
 
