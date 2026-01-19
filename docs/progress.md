@@ -319,3 +319,7 @@
 - Bumped the database to v21 and wired the migration in `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`, `app/src/main/java/com/example/rewardsrader/AppContainer.kt`, and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`.
 - Updated benefit category parsing to map `restaurant` into Dining in `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateViewModel.kt`.
 - Updated schema docs to drop `Restaurant` in `docs/schema/schema.prisma` and `docs/schema/schema.md`.
+
+## 2026-01-18 - Card detail delete action
+- Added a delete button to the card detail top bar and wired deletion via the viewmodel in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`, and `app/src/main/java/com/example/rewardsrader/MainActivity.kt`.
+- Updated card detail UI tests for the new delete callback in `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`.

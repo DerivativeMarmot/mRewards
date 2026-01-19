@@ -219,7 +219,13 @@ class MainActivity : ComponentActivity() {
                         onUpdateNotes = { cardDetailViewModel.updateNotes(it) },
                         onUpdateSubSpending = { cardDetailViewModel.updateSubSpending(it) },
                         onUpdateSubDuration = { value, unit -> cardDetailViewModel.updateSubDuration(value, unit) },
-                        onSelectCardFace = { cardDetailViewModel.selectCardFace(it) }
+                        onSelectCardFace = { cardDetailViewModel.selectCardFace(it) },
+                        onDeleteCard = {
+                            cardDetailViewModel.deleteCard {
+                                cardListViewModel.loadCards(showLoading = false)
+                                navController.popBackStack()
+                            }
+                        }
                     )
                 }
 

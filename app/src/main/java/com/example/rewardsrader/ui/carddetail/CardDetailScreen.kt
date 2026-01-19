@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.MoreVert
@@ -105,7 +106,8 @@ fun CardDetailScreen(
     onUpdateNotes: (String) -> Unit,
     onUpdateSubSpending: (String) -> Unit,
     onUpdateSubDuration: (String, String) -> Unit,
-    onSelectCardFace: (String) -> Unit
+    onSelectCardFace: (String) -> Unit,
+    onDeleteCard: () -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val detail = state.detail
@@ -128,6 +130,9 @@ fun CardDetailScreen(
                 },
                 actions = {
                     var showMenu by remember { mutableStateOf(false) }
+                    IconButton(onClick = onDeleteCard) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete card")
+                    }
                     IconButton(onClick = { showMenu = true }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More actions")
                     }

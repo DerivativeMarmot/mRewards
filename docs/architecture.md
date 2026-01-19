@@ -315,3 +315,9 @@
 - `app/src/main/java/com/example/rewardsrader/AppContainer.kt` and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`: Wire the 20->21 migration.
 - `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateViewModel.kt`: Maps `restaurant` inputs to `Dining`.
 - `docs/schema/schema.prisma` and `docs/schema/schema.md`: Remove the `Restaurant` enum entry.
+
+## 2026-01-18 - Card detail delete action
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Adds a delete icon to the top app bar.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Deletes the current profile card and emits a snackbar message.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires the delete action to pop back to the list after deletion.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updates the card detail test signature for the delete callback.

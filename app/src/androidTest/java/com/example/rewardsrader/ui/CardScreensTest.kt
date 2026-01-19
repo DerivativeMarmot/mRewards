@@ -126,7 +126,8 @@ class CardScreensTest {
                 onUpdateNotes = {},
                 onUpdateSubSpending = {},
                 onUpdateSubDuration = { _, _ -> },
-                onSelectCardFace = {}
+                onSelectCardFace = {},
+                onDeleteCard = {}
             )
         }
 

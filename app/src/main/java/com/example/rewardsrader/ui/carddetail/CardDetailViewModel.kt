@@ -152,6 +152,19 @@ class CardDetailViewModel(
         }
     }
 
+    fun deleteCard(onDeleted: () -> Unit) {
+        val cardId = currentCardId ?: _state.value.detail?.id ?: return
+        viewModelScope.launch {
+            runCatching { repository.deleteProfileCard(cardId) }
+                .onSuccess {
+                    _state.value = CardDetailState(isLoading = false, detail = null, error = null)
+                    _events.emit("Card deleted")
+                    onDeleted()
+                }
+                .onFailure { _state.value = _state.value.copy(error = it.message) }
+        }
+    }
+
     fun updateNickname(value: String) = updateCard { it.copy(nickname = value.ifBlank { null }) }
 
     fun updateLastFour(value: String) = updateCard { it.copy(lastFour = value.take(4).ifBlank { null }) }
