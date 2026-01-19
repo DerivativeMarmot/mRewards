@@ -339,3 +339,6 @@
 ## 2026-01-19 - Tracker active cards and last four
 - Tracker list now formats card names with last four digits when present and filters tracker data to active cards only in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt` and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerUtils.kt`.
 - Tracker detail header uses the same card name formatting in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`.
+
+## 2026-01-19 - Benefit frequency anniversary
+- Added the `everyanniversary` option to the benefit frequency selector in `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`.

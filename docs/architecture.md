@@ -342,3 +342,6 @@
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`: Filters tracker generation/listing to active cards and formats card names with last four digits.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerUtils.kt`: Adds a helper to format card display names with last four digits.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Uses the formatted card display name in tracker detail.
+
+## 2026-01-19 - Benefit frequency anniversary
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Adds the `everyanniversary` option to the frequency selector.
