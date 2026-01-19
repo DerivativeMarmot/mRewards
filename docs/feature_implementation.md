@@ -102,6 +102,7 @@ Displays all card products. Used as templates
 - [x] Tracker data sources:
   - Credit-type benefits from profile cards (ignore multiplier benefits).
   - Offers from profile cards (use tracker completion instead).
+  - SUB (sign-up bonus) from profile cards with spending + duration configured.
 - [x] Tracker model:
   - Each benefit or offer generates one tracker per period window.
   - Trackers own their own transaction list; do not reuse benefit transactions.

@@ -190,6 +190,11 @@ class TrackerEditViewModel(
                 val value = offer?.maxCashBack ?: offer?.minSpend ?: 0.0
                 name to value
             }
+            TrackerSourceType.Sub -> {
+                val name = "Sign-up bonus"
+                val value = profileCard?.profileCard?.subSpending ?: 0.0
+                name to value
+            }
         }
         return TrackerDetailUi(
             id = tracker.id,

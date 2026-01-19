@@ -342,3 +342,8 @@
 
 ## 2026-01-19 - Benefit frequency anniversary
 - Added the `everyanniversary` option to the benefit frequency selector in `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`.
+
+## 2026-01-19 - SUB tracker
+- Added SUB tracker generation and display using profile card sub-spending/duration in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`, and `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`.
+- Extended tracker source enum to include SUB and updated schema docs in `app/src/main/java/com/example/rewardsrader/data/local/entity/Enums.kt`, `docs/schema/schema.prisma`, and `docs/schema/schema.md`.
+- Documented SUB as a tracker data source in `docs/feature_implementation.md` and added a card display name formatter in `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerUtils.kt`.

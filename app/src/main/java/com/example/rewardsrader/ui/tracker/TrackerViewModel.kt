@@ -86,6 +86,11 @@ class TrackerViewModel(
                     val value = offer?.maxCashBack ?: offer?.minSpend ?: 0.0
                     name to value
                 }
+                TrackerSourceType.Sub -> {
+                    val name = "Sign-up bonus"
+                    val value = card?.profileCard?.subSpending ?: 0.0
+                    name to value
+                }
             }
             val endDate = parseTrackerDate(tracker.endDateUtc) ?: today
             val usedAmount = transactionsByTracker[tracker.id]?.sumOf { it.amount } ?: 0.0

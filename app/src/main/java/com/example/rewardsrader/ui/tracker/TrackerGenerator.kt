@@ -2,6 +2,7 @@ package com.example.rewardsrader.ui.tracker
 
 import com.example.rewardsrader.data.local.entity.BenefitFrequency
 import com.example.rewardsrader.data.local.entity.BenefitType
+import com.example.rewardsrader.data.local.entity.CardSubDurationUnit
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.entity.TrackerEntity
 import com.example.rewardsrader.data.local.entity.TrackerSourceType
@@ -35,6 +36,7 @@ class TrackerGenerator(
                         profileCardId = profileCardId,
                         profileCardBenefitId = entry.link.id,
                         offerId = null,
+                        sourceType = TrackerSourceType.Benefit,
                         startDate = startDate,
                         endDate = safeEnd
                     )
@@ -55,6 +57,7 @@ class TrackerGenerator(
                             profileCardId = profileCardId,
                             profileCardBenefitId = entry.link.id,
                             offerId = null,
+                            sourceType = TrackerSourceType.Benefit,
                             startDate = periodStart,
                             endDate = finalEnd
                         )
@@ -75,6 +78,7 @@ class TrackerGenerator(
                                 profileCardId = profileCardId,
                                 profileCardBenefitId = entry.link.id,
                                 offerId = null,
+                                sourceType = TrackerSourceType.Benefit,
                                 startDate = periodStart,
                                 endDate = finalEnd
                             )
@@ -82,6 +86,28 @@ class TrackerGenerator(
                         }
                     }
                 }
+            }
+
+            val subSpending = card.profileCard.subSpending
+            val subDuration = card.profileCard.subDuration
+            if (subSpending != null && subSpending > 0.0 && subDuration != null && subDuration > 0) {
+                val startDate = parseTrackerDate(card.profileCard.openDateUtc) ?: today
+                val unit = card.profileCard.subDurationUnit ?: CardSubDurationUnit.Month
+                val endDate = when (unit) {
+                    CardSubDurationUnit.Day -> startDate.plusDays(subDuration.toLong()).minusDays(1)
+                    CardSubDurationUnit.Month -> startDate.plusMonths(subDuration.toLong()).minusDays(1)
+                }
+                val safeEnd = if (endDate.isBefore(startDate)) startDate else endDate
+                addTracker(
+                    existingKeys = existingKeys,
+                    newTrackers = newTrackers,
+                    profileCardId = profileCardId,
+                    profileCardBenefitId = null,
+                    offerId = null,
+                    sourceType = TrackerSourceType.Sub,
+                    startDate = startDate,
+                    endDate = safeEnd
+                )
             }
 
             card.offers.forEach { offer ->
@@ -94,6 +120,7 @@ class TrackerGenerator(
                     profileCardId = profileCardId,
                     profileCardBenefitId = null,
                     offerId = offer.id,
+                    sourceType = TrackerSourceType.Offer,
                     startDate = startDate,
                     endDate = safeEnd
                 )
@@ -109,10 +136,13 @@ class TrackerGenerator(
         profileCardId: String,
         profileCardBenefitId: String?,
         offerId: String?,
+        sourceType: TrackerSourceType,
         startDate: LocalDate,
         endDate: LocalDate
     ) {
         val key = TrackerKey(
+            profileCardId = profileCardId,
+            sourceType = sourceType,
             profileCardBenefitId = profileCardBenefitId,
             offerId = offerId,
             startDate = formatTrackerDate(startDate),
@@ -125,7 +155,7 @@ class TrackerGenerator(
                     profileCardId = profileCardId,
                     profileCardBenefitId = profileCardBenefitId,
                     offerId = offerId,
-                    type = if (offerId == null) TrackerSourceType.Benefit else TrackerSourceType.Offer,
+                    type = sourceType,
                     startDateUtc = key.startDate,
                     endDateUtc = key.endDate
                 )
@@ -187,6 +217,8 @@ class TrackerGenerator(
     }
 
     private fun trackerKey(tracker: TrackerEntity) = TrackerKey(
+        profileCardId = tracker.profileCardId,
+        sourceType = tracker.type,
         profileCardBenefitId = tracker.profileCardBenefitId,
         offerId = tracker.offerId,
         startDate = tracker.startDateUtc,
@@ -194,6 +226,8 @@ class TrackerGenerator(
     )
 
     private data class TrackerKey(
+        val profileCardId: String,
+        val sourceType: TrackerSourceType,
         val profileCardBenefitId: String?,
         val offerId: String?,
         val startDate: String,

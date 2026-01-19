@@ -62,5 +62,6 @@ enum class BenefitCategory {
 
 enum class TrackerSourceType {
     Benefit,
-    Offer
+    Offer,
+    Sub
 }
