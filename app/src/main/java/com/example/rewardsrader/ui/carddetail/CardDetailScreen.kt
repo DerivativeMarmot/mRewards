@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -50,7 +51,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -292,88 +292,92 @@ private fun DetailContent(
         16.dp
     }
 
+    val infoListState = rememberLazyListState()
+    val subListState = rememberLazyListState()
+    val benefitListState = rememberLazyListState()
+    val offerListState = rememberLazyListState()
+
     Box(modifier = modifier.fillMaxSize()) {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = listBottomPadding
-            )
-        ) {
-            item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        if (!detail.cardFaceUrl.isNullOrBlank()) {
-                            AsyncImage(
-                                model = detail.cardFaceUrl,
-                                contentDescription = "Card face",
-                                contentScale = ContentScale.Fit,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .heightIn(min = 200.dp)
-                                    .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
-                                    .clip(RoundedCornerShape(12.dp))
+        Column(modifier = Modifier.fillMaxSize()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    if (!detail.cardFaceUrl.isNullOrBlank()) {
+                        AsyncImage(
+                            model = detail.cardFaceUrl,
+                            contentDescription = "Card face",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 200.dp)
+                                .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
+                                .clip(RoundedCornerShape(12.dp))
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 200.dp)
+                                .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
+                                .clip(RoundedCornerShape(12.dp))
+                                .padding(4.dp)
+                        ) {
+                            Text(
+                                "No card face",
+                                modifier = Modifier.align(Alignment.Center),
+                                style = MaterialTheme.typography.bodyMedium
                             )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .heightIn(min = 200.dp)
-                                    .aspectRatio(1.6f, matchHeightConstraintsFirst = false)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .padding(4.dp)
-                            ) {
-                                Text(
-                                    "No card face",
-                                    modifier = Modifier.align(Alignment.Center),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
                         }
                     }
                 }
             }
 
-            item {
-                TabRow(selectedTabIndex = currentPage) {
-                    tabs.forEachIndexed { index, tab ->
-                        Tab(
-                            selected = currentPage == index,
-                            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
-                            text = {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(tab.icon, contentDescription = tab.label)
-                                    Text(tab.label)
-                                }
+            Spacer(modifier = Modifier.height(12.dp))
+
+            TabRow(selectedTabIndex = currentPage) {
+                tabs.forEachIndexed { index, tab ->
+                    Tab(
+                        selected = currentPage == index,
+                        onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } },
+                        text = {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(tab.icon, contentDescription = tab.label)
+                                Text(tab.label)
                             }
-                        )
-                    }
+                        }
+                    )
                 }
             }
 
-            item {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 300.dp),
-                    verticalAlignment = Alignment.Top
-                ) { page ->
-                    when (page) {
-                        0 -> {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                verticalAlignment = Alignment.Top
+            ) { page ->
+                when (page) {
+                    0 -> {
+                        LazyColumn(
+                            state = infoListState,
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 16.dp,
+                                bottom = listBottomPadding
+                            )
+                        ) {
+                            item {
                                 CardInfoTab(
                                     detail = detail,
                                     onStartEdit = { field, value ->
@@ -386,11 +390,20 @@ private fun DetailContent(
                                 )
                             }
                         }
-                        1 -> {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(12.dp),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
+                    }
+                    1 -> {
+                        LazyColumn(
+                            state = subListState,
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 16.dp,
+                                bottom = listBottomPadding
+                            )
+                        ) {
+                            item {
                                 SignupBonusTab(
                                     spending = detail.subSpending,
                                     duration = detail.subDuration,
@@ -401,39 +414,59 @@ private fun DetailContent(
                                 )
                             }
                         }
-                        2 -> {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(6.dp),
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
-                            ) {
-                                detail.benefits.forEachIndexed { index, benefit ->
-                                    val shape = listItemShape(index, detail.benefits.size)
-                                    BenefitCard(
-                                        benefit = benefit,
-                                        shape = shape,
-                                        onEdit = { onEditBenefit(benefit.id) },
-                                        onDelete = { onDeleteBenefit(benefit.id) }
-                                    )
-                                }
+                    }
+                    2 -> {
+                        LazyColumn(
+                            state = benefitListState,
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                start = 12.dp,
+                                end = 12.dp,
+                                top = 12.dp,
+                                bottom = listBottomPadding
+                            )
+                        ) {
+                            itemsIndexed(detail.benefits, key = { _, benefit -> benefit.id }) { index, benefit ->
+                                val shape = listItemShape(index, detail.benefits.size)
+                                BenefitCard(
+                                    benefit = benefit,
+                                    shape = shape,
+                                    onEdit = { onEditBenefit(benefit.id) },
+                                    onDelete = { onDeleteBenefit(benefit.id) }
+                                )
                             }
                         }
-                        3 -> {
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(6.dp),
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp)
-                            ) {
-                                if (detail.offers.isEmpty()) {
-                                    DetailMessage("No offers yet.")
-                                } else {
-                                    detail.offers.forEachIndexed { index, offer ->
-                                        val shape = listItemShape(index, detail.offers.size)
-                                        OfferCard(
-                                            offer = offer,
-                                            shape = shape,
-                                            onEdit = { onEditOffer(offer.id) },
-                                            onDelete = { onDeleteOffer(offer.id) }
-                                        )
-                                    }
+                    }
+                    3 -> {
+                        LazyColumn(
+                            state = offerListState,
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                start = 12.dp,
+                                end = 12.dp,
+                                top = 12.dp,
+                                bottom = listBottomPadding
+                            )
+                        ) {
+                            if (detail.offers.isEmpty()) {
+                                item {
+                                    Text(
+                                        "No offers yet.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+                                    )
+                                }
+                            } else {
+                                itemsIndexed(detail.offers, key = { _, offer -> offer.id }) { index, offer ->
+                                    val shape = listItemShape(index, detail.offers.size)
+                                    OfferCard(
+                                        offer = offer,
+                                        shape = shape,
+                                        onEdit = { onEditOffer(offer.id) },
+                                        onDelete = { onDeleteOffer(offer.id) }
+                                    )
                                 }
                             }
                         }

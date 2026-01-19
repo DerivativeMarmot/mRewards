@@ -301,3 +301,6 @@
 - Dropped legacy transaction storage from the repository and database wiring in `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`, `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`, `app/src/main/java/com/example/rewardsrader/AppContainer.kt`, and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`.
 - Added migration 19->20 to remove the legacy `transactions` table and bumped the database to v20 in `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt` and `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`.
 - Updated schema docs to remove the benefit `Transaction` model in `docs/schema/schema.prisma` and `docs/schema/schema.md`.
+
+## 2026-01-18 - Card detail per-tab scrolling
+- Reworked card detail layout so the header and tabs are fixed while each tab content scrolls independently in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`.

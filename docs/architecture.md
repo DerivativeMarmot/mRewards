@@ -295,3 +295,6 @@
 - `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Drops the legacy transaction table from Room entities and bumps the DB to v20.
 - `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Adds migration 19->20 to remove the legacy `transactions` table.
 - `docs/schema/schema.prisma` and `docs/schema/schema.md`: Remove the benefit `Transaction` model and its relation from the documented schema.
+
+## 2026-01-18 - Card detail per-tab scrolling
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Pins the card header and tabs while each tab renders its own scrollable list.
