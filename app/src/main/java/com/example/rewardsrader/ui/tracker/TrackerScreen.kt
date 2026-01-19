@@ -257,8 +257,9 @@ private fun TrackerListItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val label = if (tracker.sourceType == TrackerSourceType.Sub) "spent"  else "used"
                 Text(
-                    text = "${formatTrackerAmount(tracker.usedAmount)} used / ${formatTrackerAmount(tracker.amount)}",
+                    text = "${formatTrackerAmount(tracker.usedAmount)} $label / ${formatTrackerAmount(tracker.amount)}",
                     style = MaterialTheme.typography.bodySmall
                 )
                 Text(
