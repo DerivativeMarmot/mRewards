@@ -373,3 +373,8 @@
 - `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateScreen.kt`: Displays sync feedback and disables sync while running.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Supplies a Firestore-backed syncer to the card create viewmodel.
 - `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`: Updates constructor usage for the new syncer dependency.
+
+## 2026-01-19 - Sync upsert safety
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/IssuerDao.kt`: Uses Room upserts to avoid REPLACE deletes during sync.
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/CardDao.kt`: Uses upserts to preserve profile card references when syncing cards.
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/CardFaceDao.kt`: Uses upserts to prevent card face deletes from nulling profile card face IDs.

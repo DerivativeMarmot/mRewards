@@ -2,15 +2,14 @@ package com.example.rewardsrader.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.example.rewardsrader.data.local.entity.CardEntity
 
 @Dao
 interface CardDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insert(card: CardEntity)
 
     @Delete

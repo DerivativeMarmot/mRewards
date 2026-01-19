@@ -362,3 +362,6 @@
 ## 2026-01-19 - Card create sync handling
 - Moved Firestore sync logic into the card creation viewmodel and show sync feedback there in `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModel.kt` and `app/src/main/java/com/example/rewardsrader/ui/cardcreate/CardCreateScreen.kt`.
 - Updated the card create viewmodel factory wiring in `app/src/main/java/com/example/rewardsrader/MainActivity.kt` and tests in `app/src/test/java/com/example/rewardsrader/ui/cardcreate/CardCreateViewModelTest.kt`.
+
+## 2026-01-19 - Sync upsert safety
+- Switched issuer/card/card-face inserts to Room upserts to avoid REPLACE deletes nulling `profile_cards.cardId` and `profile_cards.cardFaceId` during sync (`app/src/main/java/com/example/rewardsrader/data/local/dao/IssuerDao.kt`, `app/src/main/java/com/example/rewardsrader/data/local/dao/CardDao.kt`, `app/src/main/java/com/example/rewardsrader/data/local/dao/CardFaceDao.kt`).

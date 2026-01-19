@@ -663,3 +663,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-19 11:55:42 -08:00] Assistant: Moved the sync button from card list to card creation and updated wiring/tests.
 [2026-01-19 12:02:12 -08:00] User: it doesn't seem to work when i click on sync button in card creation screen, and when i return to card list it showed me the snackbar saying synced. i want the syncing operation happens entirely in card creation screen.
 [2026-01-19 12:02:12 -08:00] Assistant: Moved sync logic into the card creation viewmodel, added sync events/snackbar there, and updated wiring/tests.
+2026-01-19 15:07:08 User: question: i just checked the database, so the cardid and cardfaceid turns out to be null after the syncing
+2026-01-19 15:07:10 Assistant: Found REPLACE upserts during Firestore sync were deleting issuers/cards/card_faces and triggering FK SET_NULL on profile_cards cardId/cardFaceId; switched IssuerDao/CardDao/CardFaceDao to Room @Upsert to preserve links and noted existing nulls need manual relink.
