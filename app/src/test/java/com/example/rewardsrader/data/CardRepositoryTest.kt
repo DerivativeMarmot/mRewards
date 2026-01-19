@@ -166,18 +166,16 @@ class CardRepositoryTest {
                 type = "credit",
                 multiplierRate = null,
                 minSpend = 500.0,
-                maxCashBack = 50.0,
-                status = "active"
+                maxCashBack = 50.0
             )
         )
         val offers = repository.getOffersForProfileCard(profileCardId)
         assertEquals(1, offers.size)
         assertEquals(offerId, offers.first().id)
 
-        val updatedOffer = offers.first().copy(status = "used", title = "Updated")
+        val updatedOffer = offers.first().copy(title = "Updated")
         repository.updateOffer(updatedOffer)
         val fetchedOffer = repository.getOffer(offerId)
-        assertEquals("used", fetchedOffer?.status)
         assertEquals("Updated", fetchedOffer?.title)
 
         repository.deleteOffer(offerId)

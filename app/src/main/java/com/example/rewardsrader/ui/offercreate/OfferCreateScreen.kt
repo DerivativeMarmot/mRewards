@@ -16,13 +16,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -50,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
@@ -64,7 +61,6 @@ fun OfferCreateScreen(
     onNoteChange: (String) -> Unit,
     onTypeChange: (String) -> Unit,
     onMultiplierChange: (String) -> Unit,
-    onStatusChange: (String) -> Unit,
     onMinSpendChange: (String) -> Unit,
     onMaxCashBackChange: (String) -> Unit,
     onStartDateChange: (String) -> Unit,
@@ -72,7 +68,6 @@ fun OfferCreateScreen(
 ) {
     val state by stateFlow.collectAsState()
     var showTypeDialog by remember { mutableStateOf(false) }
-    var showStatusDialog by remember { mutableStateOf(false) }
     var showStartPicker by remember { mutableStateOf(false) }
     var showEndPicker by remember { mutableStateOf(false) }
     val startDatePickerState = rememberDatePickerState()
@@ -167,22 +162,6 @@ fun OfferCreateScreen(
                 )
             }
 
-            Box {
-                OutlinedTextField(
-                    value = state.status.replaceFirstChar { it.uppercase() },
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Status") },
-                    trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = "Select status") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .clickable { showStatusDialog = true }
-                )
-            }
-
             OutlinedTextField(
                 value = state.minSpend,
                 onValueChange = onMinSpendChange,
@@ -268,19 +247,6 @@ fun OfferCreateScreen(
                 showTypeDialog = false
             },
             onDismiss = { showTypeDialog = false }
-        )
-    }
-
-    if (showStatusDialog) {
-        RadioDialog(
-            title = "Select status",
-            options = listOf("active" to "Active", "expired" to "Expired", "used" to "Used"),
-            selected = state.status,
-            onSelect = {
-                onStatusChange(it)
-                showStatusDialog = false
-            },
-            onDismiss = { showStatusDialog = false }
         )
     }
 

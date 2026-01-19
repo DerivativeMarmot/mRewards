@@ -23,6 +23,7 @@ import com.example.rewardsrader.data.local.MIGRATION_17_18
 import com.example.rewardsrader.data.local.MIGRATION_18_19
 import com.example.rewardsrader.data.local.MIGRATION_19_20
 import com.example.rewardsrader.data.local.MIGRATION_20_21
+import com.example.rewardsrader.data.local.MIGRATION_21_22
 import com.example.rewardsrader.data.local.repository.CardRepository
 import com.example.rewardsrader.ui.tracker.TrackerGenerator
 import java.time.LocalDate
@@ -56,7 +57,8 @@ class TrackerRefreshWorker(
                 MIGRATION_17_18,
                 MIGRATION_18_19,
                 MIGRATION_19_20,
-                MIGRATION_20_21
+                MIGRATION_20_21,
+                MIGRATION_21_22
             )
             .build()
 

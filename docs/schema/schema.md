@@ -194,7 +194,6 @@ enum CardSubDurationUnit {
 | `multiplierRate` | Float? | @map("multiplier_rate") |
 | `minSpend` | Float? | @map("min_spend") |
 | `maxCashBack` | Float? | @map("max_cash_back") |
-| `status` | String | @default("active") |
 | `profileCard` | ProfileCard | @relation(fields: [profileCardId], references: [id], onDelete: Cascade) |
 
 ### Profile

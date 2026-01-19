@@ -323,3 +323,12 @@
 ## 2026-01-18 - Card detail delete action
 - Added a delete button to the card detail top bar and wired deletion via the viewmodel in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`, and `app/src/main/java/com/example/rewardsrader/MainActivity.kt`.
 - Updated card detail UI tests for the new delete callback in `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`.
+
+## 2026-01-19 - Offer status removal
+- Removed the status field from the offer create/edit UI and wiring in `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateScreen.kt` and `app/src/main/java/com/example/rewardsrader/MainActivity.kt`.
+
+## 2026-01-19 - Offer status architecture removal
+- Removed offer status from the Room entity and card detail UI in `app/src/main/java/com/example/rewardsrader/data/local/entity/OfferEntity.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`, and `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/BenefitOfferCards.kt`.
+- Updated offer create/edit state and persistence to drop status in `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateState.kt` and `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateViewModel.kt`.
+- Added migration 21->22 to remove the status column and bumped the DB to v22 in `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt` and `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`.
+- Wired the migration in `app/src/main/java/com/example/rewardsrader/AppContainer.kt` and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`, updated tests in `app/src/test/java/com/example/rewardsrader/data/CardRepositoryTest.kt`, and removed status from the schema docs (`docs/schema/schema.prisma`, `docs/schema/schema.md`) and `docs/feature_implementation.md`.

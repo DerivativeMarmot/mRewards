@@ -27,6 +27,5 @@ data class OfferEntity(
     val type: String,
     val multiplierRate: Double? = null,
     val minSpend: Double? = null,
-    val maxCashBack: Double? = null,
-    val status: String = "active"
+    val maxCashBack: Double? = null
 )

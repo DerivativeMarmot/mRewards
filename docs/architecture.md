@@ -321,3 +321,16 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Deletes the current profile card and emits a snackbar message.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires the delete action to pop back to the list after deletion.
 - `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updates the card detail test signature for the delete callback.
+
+## 2026-01-19 - Offer status removal
+- `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateScreen.kt`: Removes the status field and selection dialog from the offer create/edit UI.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Drops the status callback wiring for offer creation/editing.
+
+## 2026-01-19 - Offer status architecture removal
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/OfferEntity.kt`: Removes the status column from offers.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Adds migration 21->22 to drop the status column from the offers table.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Bumps the database version to 22.
+- `app/src/main/java/com/example/rewardsrader/AppContainer.kt` and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`: Wire the 21->22 migration.
+- `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateState.kt` and `app/src/main/java/com/example/rewardsrader/ui/offercreate/OfferCreateViewModel.kt`: Remove status from offer creation state and persistence.
+- `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt` and `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/BenefitOfferCards.kt`: Drop status display in offer detail UI.
+- `docs/schema/schema.prisma` and `docs/schema/schema.md`: Remove the status field from the Offer model.

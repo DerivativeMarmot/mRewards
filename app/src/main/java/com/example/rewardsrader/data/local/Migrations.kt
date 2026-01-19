@@ -425,3 +425,57 @@ val MIGRATION_20_21 = object : Migration(20, 21) {
         )
     }
 }
+
+// Migration 21->22 removes offer status column.
+val MIGRATION_21_22 = object : Migration(21, 22) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS offers_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                profileCardId TEXT NOT NULL,
+                title TEXT NOT NULL,
+                note TEXT,
+                startDateUtc TEXT,
+                endDateUtc TEXT,
+                type TEXT NOT NULL,
+                multiplierRate REAL,
+                minSpend REAL,
+                maxCashBack REAL,
+                FOREIGN KEY(profileCardId) REFERENCES profile_cards(id) ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            INSERT INTO offers_new (
+                id,
+                profileCardId,
+                title,
+                note,
+                startDateUtc,
+                endDateUtc,
+                type,
+                multiplierRate,
+                minSpend,
+                maxCashBack
+            )
+            SELECT
+                id,
+                profileCardId,
+                title,
+                note,
+                startDateUtc,
+                endDateUtc,
+                type,
+                multiplierRate,
+                minSpend,
+                maxCashBack
+            FROM offers
+            """.trimIndent()
+        )
+        database.execSQL("DROP TABLE offers")
+        database.execSQL("ALTER TABLE offers_new RENAME TO offers")
+        database.execSQL("CREATE INDEX IF NOT EXISTS index_offers_profileCardId ON offers(profileCardId)")
+    }
+}

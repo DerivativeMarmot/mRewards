@@ -12,7 +12,6 @@ data class OfferCreateState(
     val maxCashBack: String = "",
     val startDate: String = "",
     val endDate: String = "",
-    val status: String = "active",
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null

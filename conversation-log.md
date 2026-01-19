@@ -641,3 +641,9 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-18 21:22:01 -08:00] Assistant: Removed the Restaurant benefit category, mapped it to Dining, and added a migration to update stored values.
 [2026-01-18 21:34:46 -08:00] User: add delete button to delete the card at card detail top bar
 [2026-01-18 21:34:46 -08:00] Assistant: Added a delete action in the card detail top bar and wired it to delete the profile card and return to the list.
+[2026-01-19 01:04:47 -08:00] User: in offer creation / editing, remove status field.
+[2026-01-19 01:04:47 -08:00] Assistant: Removed the offer status field from the create/edit UI and wiring while keeping status internal for edits and defaulting new offers to active.
+[2026-01-19 01:10:51 -08:00] User: do a full removal
+[2026-01-19 01:10:51 -08:00] Assistant: Fully removed offer status from the entity, UI, migrations, tests, and schema docs.
+[2026-01-19 01:11:49 -08:00] User: do a full removal
+[2026-01-19 01:11:49 -08:00] Assistant: Fully removed offer status from the entity, UI, migrations, tests, and docs.

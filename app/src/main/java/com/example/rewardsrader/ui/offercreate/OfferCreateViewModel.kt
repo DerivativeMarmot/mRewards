@@ -38,7 +38,6 @@ class OfferCreateViewModel(
                         maxCashBack = offer.maxCashBack?.toString().orEmpty(),
                         startDate = offer.startDateUtc.orEmpty(),
                         endDate = offer.endDateUtc.orEmpty(),
-                        status = offer.status,
                         isEditing = true
                     )
                 }
@@ -51,7 +50,6 @@ class OfferCreateViewModel(
     fun setTitle(value: String) { _state.value = _state.value.copy(title = value) }
     fun setNote(value: String) { _state.value = _state.value.copy(note = value) }
     fun setType(value: String) { _state.value = _state.value.copy(type = value) }
-    fun setStatus(value: String) { _state.value = _state.value.copy(status = value) }
     fun setMultiplier(value: String) { _state.value = _state.value.copy(multiplier = value.trimToScale(2)) }
     fun setMinSpend(value: String) { _state.value = _state.value.copy(minSpend = value.trimToScale(2)) }
     fun setMaxCashBack(value: String) { _state.value = _state.value.copy(maxCashBack = value.trimToScale(2)) }
@@ -80,8 +78,7 @@ class OfferCreateViewModel(
             type = _state.value.type,
             multiplierRate = if (_state.value.type == "multiplier") multiplierRate else null,
             minSpend = minSpend,
-            maxCashBack = maxCash,
-            status = _state.value.status
+            maxCashBack = maxCash
         )
 
         _state.value = _state.value.copy(isSaving = true, error = null)
@@ -114,7 +111,6 @@ class OfferCreateViewModel(
         val title = _state.value.title.trim()
         if (title.isBlank()) return "Title is required"
         if (_state.value.type !in validTypes) return "Select a type"
-        if (_state.value.status !in validStatuses) return "Select a status"
         if (_state.value.type == "multiplier" && _state.value.multiplier.isNotBlank() && _state.value.multiplier.toDoubleOrNull() == null) {
             return "Multiplier must be a number"
         }
@@ -141,8 +137,6 @@ class OfferCreateViewModel(
 
     companion object {
         val validTypes = listOf("credit", "multiplier")
-        val validStatuses = listOf("active", "expired", "used")
-
         fun factory(repository: CardRepository): ViewModelProvider.Factory {
             return object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {

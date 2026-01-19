@@ -76,7 +76,6 @@ fun OfferCard(
                     Text(offer.window, style = MaterialTheme.typography.bodyMedium)
                 }
                 offer.details?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-                Text(offer.status, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             }
             IconButton(onClick = onDelete) {
                 Icon(Icons.Default.Delete, contentDescription = "Delete offer", tint = MaterialTheme.colorScheme.error)

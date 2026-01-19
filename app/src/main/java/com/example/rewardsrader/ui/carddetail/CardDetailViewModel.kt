@@ -42,7 +42,6 @@ data class BenefitUi(
 data class OfferUi(
     val id: String,
     val title: String,
-    val status: String,
     val window: String,
     val details: String?,
     val note: String?
@@ -309,7 +308,6 @@ class CardDetailViewModel(
         return OfferUi(
             id = offer.id,
             title = offer.title,
-            status = offer.status.replaceFirstChar { it.uppercase() },
             window = window,
             details = details,
             note = offer.note
