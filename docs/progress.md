@@ -313,3 +313,9 @@
 
 ## 2026-01-18 - Benefit frequency labels
 - Made benefit frequency display values human readable in `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`.
+
+## 2026-01-18 - Benefit category merge
+- Removed the `Restaurant` benefit category enum and migrated any stored values to `Dining` in `app/src/main/java/com/example/rewardsrader/data/local/entity/Enums.kt` and `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`.
+- Bumped the database to v21 and wired the migration in `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`, `app/src/main/java/com/example/rewardsrader/AppContainer.kt`, and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`.
+- Updated benefit category parsing to map `restaurant` into Dining in `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateViewModel.kt`.
+- Updated schema docs to drop `Restaurant` in `docs/schema/schema.prisma` and `docs/schema/schema.md`.

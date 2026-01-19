@@ -412,3 +412,16 @@ val MIGRATION_19_20 = object : Migration(19, 20) {
         database.execSQL("DROP TABLE IF EXISTS transactions")
     }
 }
+
+// Migration 20->21 replaces Restaurant with Dining in benefit categories.
+val MIGRATION_20_21 = object : Migration(20, 21) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            UPDATE benefits
+            SET category = REPLACE(category, 'Restaurant', 'Dining')
+            WHERE category LIKE '%Restaurant%'
+            """.trimIndent()
+        )
+    }
+}

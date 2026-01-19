@@ -637,3 +637,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-18 21:06:40 -08:00] Assistant: Added the missing semiannually option to the benefit frequency selector.
 [2026-01-18 21:09:56 -08:00] User: make benefit frequency field human readable
 [2026-01-18 21:09:56 -08:00] Assistant: Formatted benefit frequency (and selection labels) into human-readable text.
+[2026-01-18 21:22:01 -08:00] User: in benefit category, Restaurant and Dining are the same category. remove Restaurant
+[2026-01-18 21:22:01 -08:00] Assistant: Removed the Restaurant benefit category, mapped it to Dining, and added a migration to update stored values.

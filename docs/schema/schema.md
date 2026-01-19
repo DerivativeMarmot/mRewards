@@ -14,7 +14,6 @@ enum BenefitCategory {
   Dining
   OnlineShopping
   Grocery
-  Restaurant
   DrugStore
   Travel
   Gas

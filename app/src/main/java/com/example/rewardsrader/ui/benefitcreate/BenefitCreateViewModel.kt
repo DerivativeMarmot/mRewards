@@ -198,7 +198,7 @@ class BenefitCreateViewModel(
             "grocery", "groceries" -> BenefitCategory.Grocery
             "supermarket", "supermarkets" -> BenefitCategory.Supermarket
             "retailstore", "retail", "store" -> BenefitCategory.RetailStore
-            "restaurant" -> BenefitCategory.Restaurant
+            "restaurant" -> BenefitCategory.Dining
             "drugstore", "drugstores" -> BenefitCategory.DrugStore
             "travel" -> BenefitCategory.Travel
             "gas" -> BenefitCategory.Gas

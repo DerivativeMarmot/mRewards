@@ -176,12 +176,12 @@ fun BenefitCreateScreen(
             HorizontalDivider(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp))
 
             InlineSelectionRow(
-                label = "Effective date",
+                label = "Start date",
                 value = state.effectiveDate.ifBlank { "Select date" },
                 onClick = { showEffectivePicker = true }
             )
             InlineSelectionRow(
-                label = "Expiration date",
+                label = "End date",
                 value = state.expiryDate.ifBlank { "Select date" },
                 onClick = { showExpiryPicker = true }
             )

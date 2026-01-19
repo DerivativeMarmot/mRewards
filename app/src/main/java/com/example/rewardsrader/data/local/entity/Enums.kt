@@ -47,7 +47,6 @@ enum class BenefitCategory {
     Dining,
     OnlineShopping,
     Grocery,
-    Restaurant,
     DrugStore,
     Travel,
     Gas,
