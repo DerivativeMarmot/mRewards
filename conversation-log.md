@@ -649,3 +649,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-19 01:11:49 -08:00] Assistant: Fully removed offer status from the entity, UI, migrations, tests, and docs.
 [2026-01-19 10:25:12 -08:00] User: in card offer list, do not show offers that has a tracker that is complete
 [2026-01-19 10:25:12 -08:00] Assistant: Filtered the card detail offer list to hide offers with completed trackers.
+[2026-01-19 10:35:34 -08:00] User: in tracker, 1. for each card show card last few digits if any after card name. 2. only show Active cards.
+[2026-01-19 10:35:34 -08:00] Assistant: Formatted tracker card names with last four digits and filtered trackers to active cards only.

@@ -32,3 +32,8 @@ internal fun formatTimeLeftLabel(endDate: LocalDate, today: LocalDate = LocalDat
         else -> "$days days left"
     }
 }
+
+internal fun formatCardDisplayName(name: String, lastFour: String?): String {
+    val suffix = lastFour?.takeIf { it.isNotBlank() } ?: return name
+    return "$name (...$suffix)"
+}

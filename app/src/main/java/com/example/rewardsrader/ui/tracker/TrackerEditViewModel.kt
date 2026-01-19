@@ -173,9 +173,10 @@ class TrackerEditViewModel(
         tracker: TrackerEntity,
         profileCard: ProfileCardWithRelations?
     ): TrackerDetailUi {
-        val cardName = profileCard?.profileCard?.nickname?.takeIf { it.isNotBlank() }
+        val baseName = profileCard?.profileCard?.nickname?.takeIf { it.isNotBlank() }
             ?: profileCard?.card?.productName
             ?: "Card"
+        val cardName = formatCardDisplayName(baseName, profileCard?.profileCard?.lastFour)
         val (title, amount) = when (tracker.type) {
             TrackerSourceType.Benefit -> {
                 val entry = profileCard?.benefits?.firstOrNull { it.link.id == tracker.profileCardBenefitId }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
+import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.entity.TrackerEntity
 import com.example.rewardsrader.data.local.entity.TrackerSourceType
 import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
@@ -33,13 +34,14 @@ class TrackerViewModel(
             runCatching {
                 repository.ensureProfile(defaultProfileId, name = "Default Profile")
                 val cards = repository.getProfileCardsWithRelations(defaultProfileId)
-                val cardIds = cards.map { it.profileCard.id }
+                val activeCards = cards.filter { it.profileCard.status == CardStatus.Active }
+                val cardIds = activeCards.map { it.profileCard.id }
                 val existing = repository.getTrackersForProfileCards(cardIds)
-                val newTrackers = trackerGenerator.generateMissingTrackers(cards, existing)
+                val newTrackers = trackerGenerator.generateMissingTrackers(activeCards, existing)
                 repository.insertTrackers(newTrackers)
                 val trackers = repository.getTrackersForProfileCards(cardIds)
                 val transactions = repository.getTrackerTransactionsForTrackers(trackers.map { it.id })
-                buildUiState(cards, trackers, transactions)
+                buildUiState(activeCards, trackers, transactions)
             }.onSuccess { nextState ->
                 _state.value = nextState.copy(selectedFilter = _state.value.selectedFilter)
             }.onFailure { error ->
@@ -67,9 +69,10 @@ class TrackerViewModel(
         }
         val items = trackers.mapNotNull { tracker ->
             val card = cardMap[tracker.profileCardId]
-            val cardName = card?.profileCard?.nickname?.takeIf { it.isNotBlank() }
+            val baseName = card?.profileCard?.nickname?.takeIf { it.isNotBlank() }
                 ?: card?.card?.productName
                 ?: "Card"
+            val cardName = formatCardDisplayName(baseName, card?.profileCard?.lastFour)
             val (title, amount) = when (tracker.type) {
                 TrackerSourceType.Benefit -> {
                     val entry = tracker.profileCardBenefitId?.let { benefitMap[it] }

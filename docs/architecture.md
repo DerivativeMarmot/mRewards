@@ -337,3 +337,8 @@
 
 ## 2026-01-19 - Card detail offer filtering
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`: Hides offers that have completed trackers when building card detail state.
+
+## 2026-01-19 - Tracker active cards and last four
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerViewModel.kt`: Filters tracker generation/listing to active cards and formats card names with last four digits.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerUtils.kt`: Adds a helper to format card display names with last four digits.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Uses the formatted card display name in tracker detail.
