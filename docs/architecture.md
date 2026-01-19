@@ -283,3 +283,15 @@
 ## 2026-01-18 - Card detail benefit/offer list rounding
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Adjusts benefits/offers list spacing and computes per-item shapes for first/last/only rounding.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/BenefitOfferCards.kt`: Benefit/offer cards now accept explicit shapes from the parent list.
+
+## 2026-01-18 - Benefit create transaction removal
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`: Removes the transaction entry section and dialogs from the benefit create/edit UI.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Updates benefit create screen wiring to drop transaction callbacks.
+
+## 2026-01-18 - Benefit transaction storage removal
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateState.kt`: Removes benefit transaction fields and progress tracking from the state model.
+- `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateViewModel.kt`: Drops transaction helpers and state updates tied to benefit transactions.
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Removes benefit transaction repository APIs.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Drops the legacy transaction table from Room entities and bumps the DB to v20.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Adds migration 19->20 to remove the legacy `transactions` table.
+- `docs/schema/schema.prisma` and `docs/schema/schema.md`: Remove the benefit `Transaction` model and its relation from the documented schema.

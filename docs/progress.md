@@ -291,3 +291,13 @@
 ## 2026-01-18 - Card detail benefit/offer list rounding
 - Reduced spacing between benefit/offer list items and applied rounded corners only to first/last (fully rounded for single items) in `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`.
 - Updated benefit/offer cards to accept explicit shapes from the list in `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/BenefitOfferCards.kt`.
+
+## 2026-01-18 - Benefit create transaction removal
+- Removed the transaction section and related dialog controls from the benefit create/edit UI in `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateScreen.kt`.
+- Simplified the benefit create screen wiring in `app/src/main/java/com/example/rewardsrader/MainActivity.kt` by dropping transaction callbacks.
+
+## 2026-01-18 - Benefit transaction storage removal
+- Removed benefit transaction state and helpers from `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateState.kt` and `app/src/main/java/com/example/rewardsrader/ui/benefitcreate/BenefitCreateViewModel.kt`.
+- Dropped legacy transaction storage from the repository and database wiring in `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`, `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`, `app/src/main/java/com/example/rewardsrader/AppContainer.kt`, and `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`.
+- Added migration 19->20 to remove the legacy `transactions` table and bumped the database to v20 in `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt` and `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`.
+- Updated schema docs to remove the benefit `Transaction` model in `docs/schema/schema.prisma` and `docs/schema/schema.md`.

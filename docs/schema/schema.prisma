@@ -111,18 +111,6 @@ model Benefit {
   @@map("benefits")
 }
 
-model Transaction {
-  id        String  @id @default(cuid()) @map("_id")
-  benefitId String? @map("benefit_id")
-  notes     String?
-  dateUtc   String?
-  amount    Float
-
-  profileCardBenefit   ProfileCardBenefit? @relation(fields: [profileCardBenefitId], references: [id])
-  profileCardBenefitId String?
-
-  @@map("transactions")
-}
 
 model Tracker {
   id                   String            @id
@@ -256,7 +244,6 @@ model ProfileCardBenefit {
   benefitId     String        @map("benefit_id")
   startDateUtc  String?       @map("start_date_utc")
   endDateUtc    String?       @map("end_date_utc")
-  transactions  Transaction[]
 
   profileCard ProfileCard @relation(fields: [profileCardId], references: [id], onDelete: Cascade)
   benefit     Benefit     @relation(fields: [benefitId], references: [id], onDelete: Cascade)

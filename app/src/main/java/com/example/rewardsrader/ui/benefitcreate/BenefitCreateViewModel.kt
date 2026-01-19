@@ -55,7 +55,6 @@ class BenefitCreateViewModel(
                         effectiveDate = link?.startDateUtc.orEmpty(),
                         expiryDate = link?.endDateUtc.orEmpty(),
                         notes = benefit.notes.orEmpty(),
-                        transactions = emptyList(),
                         dataSource = null,
                         isEditing = true
                     )
@@ -70,24 +69,6 @@ class BenefitCreateViewModel(
     fun setType(type: String) { _state.value = _state.value.copy(type = type) }
     fun setAmount(value: String) { _state.value = _state.value.copy(amount = value.trimToScale(2)) }
     fun setCap(value: String) { _state.value = _state.value.copy(cap = value.trimToScale(2)) }
-    fun setTransactionAmount(value: String) { _state.value = _state.value.copy(transactionAmount = value.trimToScale(2)) }
-    fun setTransactionDate(value: String) { _state.value = _state.value.copy(transactionDate = value) }
-    fun setProgress(value: String) { _state.value = _state.value.copy(progress = value.trimToScale(2)) }
-    fun startNewTransaction() {
-        _state.value = _state.value.copy(
-            transactionAmount = "",
-            transactionDate = "",
-            editingTransactionIndex = null
-        )
-    }
-    fun startEditTransaction(index: Int) {
-        val entry = _state.value.transactions.getOrNull(index) ?: return
-        _state.value = _state.value.copy(
-            transactionAmount = entry.amount,
-            transactionDate = entry.date,
-            editingTransactionIndex = index
-        )
-    }
     fun setCadence(value: String) { _state.value = _state.value.copy(cadence = value) }
     fun setEffectiveDate(value: String) { _state.value = _state.value.copy(effectiveDate = value) }
     fun setExpiryDate(value: String) { _state.value = _state.value.copy(expiryDate = value) }
@@ -125,33 +106,6 @@ class BenefitCreateViewModel(
 
     fun setCustomCategory(value: String) {
         _state.value = _state.value.copy(customCategory = value)
-    }
-
-    fun saveTransaction() {
-        val amount = _state.value.transactionAmount.trimToScale(2)
-        if (amount.isBlank() || _state.value.transactionDate.isBlank()) return
-        val updated = _state.value.transactions.toMutableList()
-        val editIndex = _state.value.editingTransactionIndex
-        val entry = TransactionEntry(amount = amount, date = _state.value.transactionDate)
-        if (editIndex != null && editIndex in updated.indices) {
-            updated[editIndex] = entry
-        } else {
-            updated.add(entry)
-        }
-        _state.value = _state.value.copy(
-            transactions = updated,
-            transactionAmount = "",
-            transactionDate = "",
-            editingTransactionIndex = null
-        )
-    }
-
-    fun deleteTransaction(index: Int) {
-        val updated = _state.value.transactions.toMutableList()
-        if (index in updated.indices) {
-            updated.removeAt(index)
-            _state.value = _state.value.copy(transactions = updated)
-        }
     }
 
     fun save(onSuccess: (BenefitEntity) -> Unit) {

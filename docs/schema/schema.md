@@ -252,16 +252,6 @@ enum CardSubDurationUnit {
 | `benefit` | Benefit | @relation(fields: [benefitId], references: [id], onDelete: Cascade) |
 | unique | @@unique([benefitId]) |
 
-### Transaction
-| Field | Type | Description |
-| :--- | :--- | :--- |
-| `id` | String | @id @default(cuid()) @map("_id") |
-| `benefitId` | String? | @map("benefit_id") |
-| `notes` | String? | |
-| `dateUtc` | String? | |
-| `amount` | Float | |
-| `benefit` | Benefit? | @relation(fields: [benefitId], references: [id]) |
-
 ### Tracker
 | Field | Type | Description |
 | :--- | :--- | :--- |

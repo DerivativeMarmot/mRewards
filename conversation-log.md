@@ -624,3 +624,8 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-18 16:32:12 -08:00] Assistant: Fixed status selection to pass enum-cased values so updates persist.
 [2026-01-18 16:46:33 -08:00] User: refine card benefit and offer list UI, make only the first and last item rounded corner. reduce the spacing between items. if there is only one item, make it fully rounded corner.
 [2026-01-18 16:46:33 -08:00] Assistant: Reduced benefit/offer list spacing and rounded only first/last (fully rounded single items) with explicit shapes passed into the cards.
+[2026-01-18 20:05:02 -08:00] User: remove transaction section in benefit creation / editing screen.
+[2026-01-18 20:05:02 -08:00] Assistant: Removed the transaction section and dialog from the benefit create/edit UI and simplified the screen wiring.
+[2026-01-18 20:18:40 -08:00] User: yes, that's the goal. I want transaction to be completely removed from the architecture.
+[2026-01-18 20:18:40 -08:00] User: yes, that's the goal. I want transaction in benefit to be completely removed from the architecture.
+[2026-01-18 20:18:40 -08:00] Assistant: Removed benefit transaction storage from state/repository/DB wiring, dropped the legacy transactions table with a new migration, and updated schema docs.

@@ -405,3 +405,10 @@ val MIGRATION_18_19 = object : Migration(18, 19) {
         database.execSQL("ALTER TABLE trackers ADD COLUMN notes TEXT")
     }
 }
+
+// Migration 19->20 drops legacy benefit transactions table.
+val MIGRATION_19_20 = object : Migration(19, 20) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("DROP TABLE IF EXISTS transactions")
+    }
+}

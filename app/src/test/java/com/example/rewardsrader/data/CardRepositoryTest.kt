@@ -50,7 +50,6 @@ class CardRepositoryTest {
             db.profileCardDao(),
             db.profileCardBenefitDao(),
             db.benefitDao(),
-            db.transactionDao(),
             db.trackerDao(),
             db.trackerTransactionDao(),
             db.notificationRuleDao(),

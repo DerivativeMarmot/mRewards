@@ -1,1 +1,1 @@
-// Deprecated: usage entries have been replaced by TransactionEntity in the updated schema.
+// Deprecated: usage entries have been removed in favor of tracker transactions.

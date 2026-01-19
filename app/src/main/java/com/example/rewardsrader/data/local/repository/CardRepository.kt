@@ -12,7 +12,6 @@ import com.example.rewardsrader.data.local.dao.ProfileCardDao
 import com.example.rewardsrader.data.local.dao.ProfileDao
 import com.example.rewardsrader.data.local.dao.TemplateCardBenefitDao
 import com.example.rewardsrader.data.local.dao.TemplateCardDao
-import com.example.rewardsrader.data.local.dao.TransactionDao
 import com.example.rewardsrader.data.local.dao.TrackerDao
 import com.example.rewardsrader.data.local.dao.TrackerTransactionDao
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
@@ -28,7 +27,6 @@ import com.example.rewardsrader.data.local.entity.ProfileEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardEntity
-import com.example.rewardsrader.data.local.entity.TransactionEntity
 import com.example.rewardsrader.data.local.entity.TrackerEntity
 import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardWithBenefits
@@ -54,7 +52,6 @@ class CardRepository(
     private val profileCardDao: ProfileCardDao,
     private val profileCardBenefitDao: ProfileCardBenefitDao,
     private val benefitDao: BenefitDao,
-    private val transactionDao: TransactionDao,
     private val trackerDao: TrackerDao,
     private val trackerTransactionDao: TrackerTransactionDao,
     private val notificationRuleDao: NotificationRuleDao,
@@ -130,10 +127,6 @@ class CardRepository(
         if (links.isNotEmpty()) profileCardBenefitDao.insertAll(links)
     }
 
-    suspend fun addTransactions(transactions: List<TransactionEntity>) {
-        if (transactions.isNotEmpty()) transactionDao.insertAll(transactions)
-    }
-
     suspend fun insertTrackers(trackers: List<TrackerEntity>) {
         if (trackers.isNotEmpty()) trackerDao.insertAll(trackers)
     }
@@ -198,12 +191,6 @@ class CardRepository(
     suspend fun updateOffer(offer: OfferEntity) = offerDao.update(offer)
 
     suspend fun deleteOffer(offerId: String) = offerDao.deleteById(offerId)
-
-    suspend fun getTransactionsForBenefit(benefitId: String): List<TransactionEntity> =
-        transactionDao.getForBenefit(benefitId)
-
-    suspend fun getTransactionsForProfileCardBenefit(profileCardBenefitId: String): List<TransactionEntity> =
-        transactionDao.getForProfileCardBenefit(profileCardBenefitId)
 
     suspend fun getBenefitsByIds(ids: List<String>): List<BenefitEntity> =
         benefitDao.getByIds(ids)

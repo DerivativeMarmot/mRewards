@@ -15,7 +15,6 @@ import com.example.rewardsrader.data.local.dao.ProfileCardDao
 import com.example.rewardsrader.data.local.dao.ProfileDao
 import com.example.rewardsrader.data.local.dao.TemplateCardBenefitDao
 import com.example.rewardsrader.data.local.dao.TemplateCardDao
-import com.example.rewardsrader.data.local.dao.TransactionDao
 import com.example.rewardsrader.data.local.dao.TrackerDao
 import com.example.rewardsrader.data.local.dao.TrackerTransactionDao
 import com.example.rewardsrader.data.local.entity.ApplicationEntity
@@ -30,7 +29,6 @@ import com.example.rewardsrader.data.local.entity.ProfileCardEntity
 import com.example.rewardsrader.data.local.entity.ProfileEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.TemplateCardEntity
-import com.example.rewardsrader.data.local.entity.TransactionEntity
 import com.example.rewardsrader.data.local.entity.TrackerEntity
 import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
 
@@ -43,7 +41,6 @@ import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
         ProfileCardEntity::class,
         ProfileCardBenefitEntity::class,
         BenefitEntity::class,
-        TransactionEntity::class,
         TrackerEntity::class,
         TrackerTransactionEntity::class,
         NotificationRuleEntity::class,
@@ -52,7 +49,7 @@ import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
         TemplateCardEntity::class,
         TemplateCardBenefitEntity::class
     ],
-    version = 19,
+    version = 20,
     exportSchema = false
 )
 @TypeConverters(EnumConverters::class)
@@ -65,7 +62,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun profileCardBenefitDao(): ProfileCardBenefitDao
     abstract fun applicationDao(): ApplicationDao
     abstract fun benefitDao(): BenefitDao
-    abstract fun transactionDao(): TransactionDao
     abstract fun trackerDao(): TrackerDao
     abstract fun trackerTransactionDao(): TrackerTransactionDao
     abstract fun notificationRuleDao(): NotificationRuleDao

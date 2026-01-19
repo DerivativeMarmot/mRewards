@@ -274,14 +274,7 @@ class MainActivity : ComponentActivity() {
                         onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
                         onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },
                         onAddCustomCategory = { benefitCreateViewModel.addCustomCategory() },
-                        onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) },
-                        onTransactionAmountChange = { benefitCreateViewModel.setTransactionAmount(it) },
-                        onTransactionDateChange = { benefitCreateViewModel.setTransactionDate(it) },
-                        onAddTransaction = { benefitCreateViewModel.saveTransaction() },
-                        onStartTransaction = { benefitCreateViewModel.startNewTransaction() },
-                        onEditTransaction = { benefitCreateViewModel.startEditTransaction(it) },
-                        onDeleteTransaction = { benefitCreateViewModel.deleteTransaction(it) },
-                        onProgressChange = { benefitCreateViewModel.setProgress(it) }
+                        onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) }
                     )
                 }
 
@@ -321,14 +314,7 @@ class MainActivity : ComponentActivity() {
                         onToggleCategory = { benefitCreateViewModel.toggleCategory(it) },
                         onCustomCategoryChange = { benefitCreateViewModel.setCustomCategory(it) },
                         onAddCustomCategory = { benefitCreateViewModel.addCustomCategory() },
-                        onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) },
-                        onTransactionAmountChange = { benefitCreateViewModel.setTransactionAmount(it) },
-                        onTransactionDateChange = { benefitCreateViewModel.setTransactionDate(it) },
-                        onAddTransaction = { benefitCreateViewModel.saveTransaction() },
-                        onStartTransaction = { benefitCreateViewModel.startNewTransaction() },
-                        onEditTransaction = { benefitCreateViewModel.startEditTransaction(it) },
-                        onDeleteTransaction = { benefitCreateViewModel.deleteTransaction(it) },
-                        onProgressChange = { benefitCreateViewModel.setProgress(it) }
+                        onRemoveCustomCategory = { benefitCreateViewModel.removeCustomCategory(it) }
                     )
                 }
 
