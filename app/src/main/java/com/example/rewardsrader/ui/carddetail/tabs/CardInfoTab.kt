@@ -77,7 +77,7 @@ fun CardInfoTab(
         HorizontalDivider()
         InfoRow(
             label = "Notes",
-            value = detail.notes.orEmpty().ifBlank { "Tap to add" },
+            value = detail.notes.orEmpty().ifBlank { "" },
             onClick = {
                 notesDraft = detail.notes.orEmpty()
                 showNotesDialog = true
