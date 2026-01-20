@@ -422,3 +422,8 @@
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`: Supports auto-focus to show the keyboard when edit dialogs open.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`: Enables auto-focus for nickname, last-four, and annual fee edit dialogs.
 - `app/src/main/java/com/example/rewardsrader/ui/carddetail/tabs/CardInfoTab.kt`: Requests focus and shows the keyboard when editing notes.
+
+## 2026-01-19 - Card list snackbar host
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Hosts the card list snackbar in the root scaffold and shows list messages when on the list route.
+- `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Accepts snackbar visibility from the host to adjust padding instead of hosting its own snackbar.
+- `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated list screen test to match the new signature.

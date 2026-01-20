@@ -405,3 +405,6 @@
 
 ## 2026-01-19 - Edit dialog keyboard focus
 - Added auto-focus to edit dialogs for nickname, last-four, and annual fee, plus Notes dialog focus/keyboard display (`app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/tabs/CardInfoTab.kt`).
+
+## 2026-01-19 - Card list snackbar host
+- Moved card list snackbar handling into the main scaffold and pass visibility to adjust list/FAB spacing (`app/src/main/java/com/example/rewardsrader/MainActivity.kt`, `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`, `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`).

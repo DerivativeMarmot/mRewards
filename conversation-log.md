@@ -691,3 +691,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-19 18:22 Assistant: Left-aligned the Notes value while keeping other fields right-aligned.
 2026-01-19 18:53 User: show keyboard after user clicks on `Nickname`, `Last 4-6 digits`, `annual fee` and `Notes`
 2026-01-19 18:53 Assistant: Added auto-focus to the edit dialogs and notes dialog to show the keyboard on open.
+2026-01-19 21:56 User: move snackbar host in card list out,  handle snackbar in MainActivity
+2026-01-19 21:56 Assistant: Moved card list snackbar hosting to MainActivity and passed visibility into the list screen.

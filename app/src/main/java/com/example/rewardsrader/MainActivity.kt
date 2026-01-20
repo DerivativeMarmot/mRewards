@@ -10,6 +10,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -18,10 +19,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -96,8 +101,21 @@ class MainActivity : ComponentActivity() {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         val showBottomBar = currentRoute == "list" || currentRoute == "tracker"
+        val snackbarHostState = remember { SnackbarHostState() }
+        val isSnackbarVisible = snackbarHostState.currentSnackbarData != null
+        val cardListState by cardListViewModel.state.collectAsState()
+
+        LaunchedEffect(currentRoute, cardListState.snackbarMessage) {
+            val message = cardListState.snackbarMessage
+            if (currentRoute == "list" && !message.isNullOrBlank()) {
+                snackbarHostState.showSnackbar(message = message)
+                cardListViewModel.snackbarShown()
+            }
+        }
 
         Scaffold(
+            contentWindowInsets = WindowInsets(0),
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
                 if (showBottomBar) {
                     AppBottomBar(
@@ -140,7 +158,7 @@ class MainActivity : ComponentActivity() {
                         onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
                         onDuplicateCard = { id -> cardListViewModel.duplicateCard(id) },
                         onResume = { cardListViewModel.loadCards(showLoading = false) },
-                        onSnackbarShown = { cardListViewModel.snackbarShown() }
+                        isSnackbarVisible = isSnackbarVisible
                     )
                 }
 

@@ -31,13 +31,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,12 +68,10 @@ fun CardListScreen(
     onDeleteCard: (String) -> Unit,
     onDuplicateCard: (String) -> Unit,
     onResume: () -> Unit,
-    onSnackbarShown: () -> Unit
+    isSnackbarVisible: Boolean
 ) {
     val state by stateFlow.collectAsState()
     val error = state.error
-    val snackbarHostState = remember { SnackbarHostState() }
-    val isSnackbarVisible = snackbarHostState.currentSnackbarData != null
     val fabBottomPadding by animateDpAsState(
         targetValue = if (isSnackbarVisible) 80.dp else 16.dp,
         label = "cardListFabBottomPadding"
@@ -94,19 +89,12 @@ fun CardListScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    LaunchedEffect(state.snackbarMessage) {
-        val message = state.snackbarMessage ?: return@LaunchedEffect
-        snackbarHostState.showSnackbar(message = message)
-        onSnackbarShown()
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Cards") }
             )
-        },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        }
     ) { padding ->
         Box(
             modifier = Modifier

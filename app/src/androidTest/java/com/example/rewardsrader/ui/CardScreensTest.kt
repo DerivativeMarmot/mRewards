@@ -49,7 +49,7 @@ class CardScreensTest {
                 onDeleteCard = {},
                 onDuplicateCard = {},
                 onResume = {},
-                onSnackbarShown = {}
+                isSnackbarVisible = false
             )
         }
 
