@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -47,7 +48,8 @@ fun TrackerScreen(
     onLoad: () -> Unit,
     onResume: () -> Unit,
     onSelectTracker: (String) -> Unit,
-    onFilterChange: (TrackerStatus) -> Unit
+    onFilterChange: (TrackerStatus) -> Unit,
+    paddingValues: PaddingValues
 ) {
     val state by stateFlow.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -90,9 +92,11 @@ fun TrackerScreen(
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(top = padding.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding(),
+                    start = 16.dp,
+                    end = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -130,6 +134,7 @@ fun TrackerScreen(
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 16.dp),
                         state = listState
                     ) {
                         items(grouped.values.toList(), key = { it.profileCardId }) { group ->

@@ -68,7 +68,8 @@ fun CardListScreen(
     onDeleteCard: (String) -> Unit,
     onDuplicateCard: (String) -> Unit,
     onResume: () -> Unit,
-    isSnackbarVisible: Boolean
+    isSnackbarVisible: Boolean,
+    paddingValues: PaddingValues
 ) {
     val state by stateFlow.collectAsState()
     val error = state.error
@@ -99,7 +100,8 @@ fun CardListScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding())
         ) {
             when {
                 state.isLoading -> LoadingMessage(modifier = Modifier.fillMaxSize())

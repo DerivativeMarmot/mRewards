@@ -114,7 +114,7 @@ class MainActivity : ComponentActivity() {
         }
 
         Scaffold(
-            contentWindowInsets = WindowInsets(0),
+//            contentWindowInsets = WindowInsets(0),
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
                 if (showBottomBar) {
@@ -136,7 +136,7 @@ class MainActivity : ComponentActivity() {
             NavHost(
                 navController = navController,
                 startDestination = "list",
-                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+//                modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
                 enterTransition = {
                     slideInHorizontally(initialOffsetX = { it })
                 },
@@ -158,7 +158,8 @@ class MainActivity : ComponentActivity() {
                         onDeleteCard = { id -> cardListViewModel.deleteCard(id) },
                         onDuplicateCard = { id -> cardListViewModel.duplicateCard(id) },
                         onResume = { cardListViewModel.loadCards(showLoading = false) },
-                        isSnackbarVisible = isSnackbarVisible
+                        isSnackbarVisible = isSnackbarVisible,
+                        paddingValues = innerPadding
                     )
                 }
 
@@ -168,7 +169,8 @@ class MainActivity : ComponentActivity() {
                         onLoad = { trackerViewModel.loadTrackers() },
                         onResume = { trackerViewModel.loadTrackers(showLoading = false) },
                         onSelectTracker = { id -> navController.navigate("tracker/$id") },
-                        onFilterChange = { trackerViewModel.setFilter(it) }
+                        onFilterChange = { trackerViewModel.setFilter(it) },
+                        paddingValues = innerPadding
                     )
                 }
 
