@@ -76,6 +76,7 @@ import com.example.rewardsrader.ui.carddetail.components.BenefitCard
 import com.example.rewardsrader.ui.carddetail.components.CardField
 import com.example.rewardsrader.ui.carddetail.components.EditFieldDialog
 import com.example.rewardsrader.ui.carddetail.components.OfferCard
+import com.example.rewardsrader.ui.carddetail.components.StatementCutDialog
 import com.example.rewardsrader.ui.carddetail.components.StatusDialog
 import com.example.rewardsrader.ui.carddetail.tabs.CardInfoTab
 import com.example.rewardsrader.ui.carddetail.tabs.SignupBonusTab
@@ -112,10 +113,9 @@ fun CardDetailScreen(
     val state by stateFlow.collectAsState()
     val detail = state.detail
     var showOpenDatePicker by remember { mutableStateOf(false) }
-    var showStatementDatePicker by remember { mutableStateOf(false) }
+    var showStatementCutDialog by remember { mutableStateOf(false) }
     var showFacePicker by remember { mutableStateOf(false) }
     val openDatePickerState = androidx.compose.material3.rememberDatePickerState()
-    val statementDatePickerState = androidx.compose.material3.rememberDatePickerState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
@@ -179,7 +179,7 @@ fun CardDetailScreen(
                 onUpdateSubSpending = onUpdateSubSpending,
                 onUpdateSubDuration = onUpdateSubDuration,
                 onOpenDateClick = { showOpenDatePicker = true },
-                onStatementDateClick = { showStatementDatePicker = true },
+                onStatementDateClick = { showStatementCutDialog = true },
                 cardFaces = state.cardFaces,
                 showFacePicker = showFacePicker,
                 onDismissFacePicker = { showFacePicker = false },
@@ -210,25 +210,15 @@ fun CardDetailScreen(
         }
     }
 
-    if (showStatementDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showStatementDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    statementDatePickerState.selectedDateMillis?.let { millis ->
-                        val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()).toLocalDate()
-                        val formatted = "%02d/%02d/%d".format(date.monthValue, date.dayOfMonth, date.year)
-                        onUpdateStatementCut(formatted)
-                    }
-                    showStatementDatePicker = false
-                }) { Text("Save") }
+    if (showStatementCutDialog) {
+        StatementCutDialog(
+            current = detail?.statementCut.orEmpty(),
+            onSelect = {
+                onUpdateStatementCut(it)
+                showStatementCutDialog = false
             },
-            dismissButton = {
-                TextButton(onClick = { showStatementDatePicker = false }) { Text("Cancel") }
-            }
-        ) {
-            DatePicker(state = statementDatePickerState)
-        }
+            onDismiss = { showStatementCutDialog = false }
+        )
     }
 }
 
@@ -558,6 +548,7 @@ private fun DetailContent(
         CardField.Nickname -> EditFieldDialog(
             title = "Edit nickname",
             initial = editingValue,
+            autoFocus = true,
             onSave = {
                 onUpdateNickname(it)
                 editingField = null
@@ -570,6 +561,8 @@ private fun DetailContent(
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number
             ),
+            prefixText = "$",
+            autoFocus = true,
             onSave = {
                 onUpdateAnnualFee(it)
                 editingField = null
@@ -577,8 +570,15 @@ private fun DetailContent(
             onDismiss = { editingField = null }
         )
         CardField.LastFour -> EditFieldDialog(
-            title = "Edit last 4 digits",
+            title = "Edit last 4-6 digits",
             initial = editingValue,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            valueFilter = { value ->
+                value.filter { it.isDigit() }.take(6)
+            },
+            autoFocus = true,
             onSave = {
                 onUpdateLastFour(it)
                 editingField = null

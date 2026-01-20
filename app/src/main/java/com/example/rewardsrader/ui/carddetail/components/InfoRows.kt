@@ -13,22 +13,35 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun InfoRow(label: String, value: String, onClick: () -> Unit) {
+fun InfoRow(
+    label: String,
+    value: String,
+    onClick: () -> Unit,
+    alignLabelTop: Boolean = false,
+    valueTextAlign: TextAlign = TextAlign.End
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = if (alignLabelTop) Alignment.Top else Alignment.CenterVertically
     ) {
         Text(label, style = MaterialTheme.typography.bodyMedium)
-        Text(value.ifBlank { "Tap to add" }, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            value.ifBlank { "Tap to add" },
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f),
+            textAlign = valueTextAlign
+        )
     }
 }
 

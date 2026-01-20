@@ -171,7 +171,10 @@ class CardDetailViewModel(
 
     fun updateNickname(value: String) = updateCard { it.copy(nickname = value.ifBlank { null }) }
 
-    fun updateLastFour(value: String) = updateCard { it.copy(lastFour = value.take(6).ifBlank { null }) }
+    fun updateLastFour(value: String) = updateCard {
+        val filtered = value.filter { it.isDigit() }.take(6)
+        it.copy(lastFour = filtered.ifBlank { null })
+    }
 
     fun updateOpenDate(value: String) = updateCard { it.copy(openDateUtc = value.ifBlank { null }) }
 
@@ -212,7 +215,7 @@ class CardDetailViewModel(
                             nickname = updated.nickname,
                             lastFour = updated.lastFour,
                             status = updated.status.name,
-                            annualFee = "${'$'}${updated.annualFee}",
+                            annualFee = formatAnnualFee(updated.annualFee),
                             openDate = updated.openDateUtc,
                             statementCut = updated.statementCutUtc,
                             welcomeOfferProgress = updated.welcomeOfferProgress,
@@ -245,7 +248,7 @@ class CardDetailViewModel(
             nickname = card.profileCard.nickname,
             lastFour = card.profileCard.lastFour,
             status = card.profileCard.status.name,
-            annualFee = "${'$'}${card.profileCard.annualFee}",
+            annualFee = formatAnnualFee(card.profileCard.annualFee),
             openDate = card.profileCard.openDateUtc,
             statementCut = card.profileCard.statementCutUtc,
             welcomeOfferProgress = card.profileCard.welcomeOfferProgress,
@@ -322,6 +325,8 @@ class CardDetailViewModel(
     private fun trimAmount(value: Double): String {
         return if (value % 1.0 == 0.0) value.toInt().toString() else value.toString()
     }
+
+    private fun formatAnnualFee(value: Double): String = "${'$'}${trimAmount(value)}"
 
     private suspend fun getCompletedOfferIds(
         profileCardId: String,

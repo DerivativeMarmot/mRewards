@@ -669,3 +669,25 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-19 16:17 Assistant: Reviewed importer/repository behavior; profile cards reference cards via cardId while benefits are duplicated into new benefits rows and linked via profile_card_benefits.
 2026-01-19 16:59 User: so i checked database, when i try to update the benefit start and end date, something goes wrong and removed that benefit.
 2026-01-19 16:59 Assistant: Switched benefit edits to use SQL UPDATE instead of REPLACE so changing start/end dates no longer deletes the profile benefit link.
+2026-01-19 17:28 User: when adding new card, do not copy card name to Nickname field
+2026-01-19 17:28 Assistant: Removed default nickname population during profile card creation so nicknames start empty.
+2026-01-19 17:30 User: in my card list screen, if Nickname is empty show card name, if not show Nickname as card name
+2026-01-19 17:30 Assistant: Updated card list mapping to prefer nickname when present and fall back to product name when blank.
+2026-01-19 17:34 User: in card detail last 4-6 digits field, add numeric input constrain and maximum of 6 digits.
+2026-01-19 17:34 Assistant: Added numeric-only, max-6 filtering in the last-four edit dialog and sanitized the saved value.
+2026-01-19 17:39 User: in card detail screen, add a leading dollar sign into nnual fee input field
+2026-01-19 17:39 Assistant: Added a dollar prefix to the annual fee edit dialog input.
+2026-01-19 17:41 User: if annual fee is a whole number do not show ending zeros
+2026-01-19 17:41 Assistant: Trimmed annual fee display to drop trailing .0 for whole numbers in card detail.
+2026-01-19 17:51 User: update `statement cut` field, when click, modal pops with options of 1st to 31st, meaning 1st of the month or 31st of the month. for example, show `1st of the month` after user selects `1st`
+2026-01-19 17:51 Assistant: Replaced the statement cut date picker with a day-of-month selector that saves labels like "1st of the month".
+2026-01-19 17:59 User: make statment cut option list scrollable
+2026-01-19 17:59 Assistant: Made the statement cut option list scrollable with a capped height.
+2026-01-19 18:00 User: rename statement cut to `Statement / Closing date`. just udpate the label
+2026-01-19 18:00 Assistant: Renamed the card detail label to "Statement / Closing date".
+2026-01-19 18:11 User: when `Notes` field value gets longer, the label and value will get too close. 1. add more spacing between label and value. 2. align label `Notes` to the top.
+2026-01-19 18:11 Assistant: Added spacing between label/value and top-aligned the Notes label for multiline content.
+2026-01-19 18:22 User: align `Notes` value to the left
+2026-01-19 18:22 Assistant: Left-aligned the Notes value while keeping other fields right-aligned.
+2026-01-19 18:53 User: show keyboard after user clicks on `Nickname`, `Last 4-6 digits`, `annual fee` and `Notes`
+2026-01-19 18:53 Assistant: Added auto-focus to the edit dialogs and notes dialog to show the keyboard on open.

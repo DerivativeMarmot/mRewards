@@ -106,16 +106,19 @@ class CardListViewModel(
         _state.value = _state.value.copy(snackbarMessage = null)
     }
 
-    private fun mapCard(card: ProfileCardWithRelations): CardSummaryUi =
-        CardSummaryUi(
+    private fun mapCard(card: ProfileCardWithRelations): CardSummaryUi {
+        val displayName = card.profileCard.nickname?.takeIf { it.isNotBlank() }
+            ?: card.card?.productName.orEmpty()
+        return CardSummaryUi(
             id = card.profileCard.id,
-            productName = card.card?.productName ?: card.profileCard.nickname.orEmpty(),
+            productName = displayName,
             issuer = card.card?.issuerId ?: "",
             status = card.profileCard.status.name,
             lastFour = card.profileCard.lastFour,
             openDate = card.profileCard.openDateUtc,
             cardFaceUrl = card.cardFace?.remoteUrl
         )
+    }
 
     companion object {
         fun factory(repository: CardRepository, firestoreSyncer: FirestoreSyncer): ViewModelProvider.Factory {

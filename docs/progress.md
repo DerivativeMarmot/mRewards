@@ -372,3 +372,36 @@
 
 ## 2026-01-19 - Benefit date update fix
 - Fixed benefit edit persistence so updating start/end dates no longer deletes the linked benefit by switching the update path to use a SQL UPDATE instead of REPLACE (`app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`).
+
+## 2026-01-19 - Card nickname default
+- Stopped copying card product names into profile card nicknames during creation so the nickname field starts empty (`app/src/main/java/com/example/rewardsrader/template/CardTemplateImporter.kt`).
+
+## 2026-01-19 - Card list nickname display
+- Card list now shows nickname when present and falls back to product name when nickname is blank (`app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListViewModel.kt`).
+
+## 2026-01-19 - Last four input constraints
+- Added numeric-only, max-6 input filtering for the card detail last-four field and enforced digit-only persistence (`app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`).
+
+## 2026-01-19 - Annual fee prefix
+- Added a dollar prefix to the annual fee edit dialog to make the currency explicit (`app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`).
+
+## 2026-01-19 - Annual fee formatting
+- Annual fee display now trims trailing `.0` for whole numbers in card detail (`app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailViewModel.kt`).
+
+## 2026-01-19 - Statement cut picker
+- Replaced the statement cut date picker with a day-of-month selector and display strings like “1st of the month” (`app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`).
+
+## 2026-01-19 - Statement cut list scrolling
+- Made the statement cut day list scrollable with a capped dialog height (`app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`).
+
+## 2026-01-19 - Statement cut label
+- Renamed the card detail label to “Statement / Closing date” (`app/src/main/java/com/example/rewardsrader/ui/carddetail/tabs/CardInfoTab.kt`).
+
+## 2026-01-19 - Notes row spacing
+- Increased spacing between labels and values and top-aligned the Notes label for long values (`app/src/main/java/com/example/rewardsrader/ui/carddetail/components/InfoRows.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/tabs/CardInfoTab.kt`).
+
+## 2026-01-19 - Notes value alignment
+- Left-aligned the Notes value while keeping other fields right-aligned (`app/src/main/java/com/example/rewardsrader/ui/carddetail/components/InfoRows.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/tabs/CardInfoTab.kt`).
+
+## 2026-01-19 - Edit dialog keyboard focus
+- Added auto-focus to edit dialogs for nickname, last-four, and annual fee, plus Notes dialog focus/keyboard display (`app/src/main/java/com/example/rewardsrader/ui/carddetail/components/EditDialogs.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/CardDetailScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/carddetail/tabs/CardInfoTab.kt`).

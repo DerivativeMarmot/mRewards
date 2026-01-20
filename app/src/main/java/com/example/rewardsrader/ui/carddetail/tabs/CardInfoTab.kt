@@ -6,6 +6,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,6 +17,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import com.example.rewardsrader.ui.carddetail.CardDetailUi
 import com.example.rewardsrader.ui.carddetail.components.CardField
@@ -66,7 +70,7 @@ fun CardInfoTab(
         )
         HorizontalDivider()
         InfoRow(
-            label = "Statement cut",
+            label = "Statement / Closing date",
             value = detail.statementCut.orEmpty(),
             onClick = onStatementDateClick
         )
@@ -77,11 +81,19 @@ fun CardInfoTab(
             onClick = {
                 notesDraft = detail.notes.orEmpty()
                 showNotesDialog = true
-            }
+            },
+            alignLabelTop = true,
+            valueTextAlign = androidx.compose.ui.text.style.TextAlign.Start
         )
     }
 
     if (showNotesDialog) {
+        val focusRequester = remember { FocusRequester() }
+        val keyboardController = LocalSoftwareKeyboardController.current
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+            keyboardController?.show()
+        }
         AlertDialog(
             onDismissRequest = { showNotesDialog = false },
             title = { Text("Edit notes") },
@@ -90,7 +102,9 @@ fun CardInfoTab(
                     value = notesDraft,
                     onValueChange = { notesDraft = it },
                     label = { Text("Notes") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
             },
             confirmButton = {
