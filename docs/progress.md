@@ -408,3 +408,6 @@
 
 ## 2026-01-19 - Card list snackbar host
 - Moved card list snackbar handling into the main scaffold and pass visibility to adjust list/FAB spacing (`app/src/main/java/com/example/rewardsrader/MainActivity.kt`, `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`, `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`).
+
+## 2026-01-19 - Tracker period generation
+- Adjusted tracker generation to create only the current period for benefits/offers so future trackers are created when each period starts (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`).

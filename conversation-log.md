@@ -693,3 +693,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-19 18:53 Assistant: Added auto-focus to the edit dialogs and notes dialog to show the keyboard on open.
 2026-01-19 21:56 User: move snackbar host in card list out,  handle snackbar in MainActivity
 2026-01-19 21:56 Assistant: Moved card list snackbar hosting to MainActivity and passed visibility into the list screen.
+2026-01-19 22:43 User: I noticed that current tracker manager creates multiple same benefit at once, for example, a monthly benefit from 1/1/2026 to 3/30/2026. it creates 3 trackers at once. This is not what i want. I want each benefit or offer to have exactly one tracker in a period. then create a new one in next period in the background or front. do you have any questions ?
+2026-01-19 22:44 Assistant: Adjusted tracker generation to create only the current-period tracker for benefits and offers so future periods are created when they start.

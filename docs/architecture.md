@@ -427,3 +427,6 @@
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Hosts the card list snackbar in the root scaffold and shows list messages when on the list route.
 - `app/src/main/java/com/example/rewardsrader/ui/cardlist/CardListScreen.kt`: Accepts snackbar visibility from the host to adjust padding instead of hosting its own snackbar.
 - `app/src/androidTest/java/com/example/rewardsrader/ui/CardScreensTest.kt`: Updated list screen test to match the new signature.
+
+## 2026-01-19 - Tracker period generation
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`: Generates only the current-period tracker for benefits/offers so future periods are created when they begin.
