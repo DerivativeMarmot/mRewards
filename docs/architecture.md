@@ -378,3 +378,6 @@
 - `app/src/main/java/com/example/rewardsrader/data/local/dao/IssuerDao.kt`: Uses Room upserts to avoid REPLACE deletes during sync.
 - `app/src/main/java/com/example/rewardsrader/data/local/dao/CardDao.kt`: Uses upserts to preserve profile card references when syncing cards.
 - `app/src/main/java/com/example/rewardsrader/data/local/dao/CardFaceDao.kt`: Uses upserts to prevent card face deletes from nulling profile card face IDs.
+
+## 2026-01-19 - Benefit date update fix
+- `app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`: Updates benefits via SQL UPDATE in the edit flow so profile benefit links are not deleted when changing start/end dates.

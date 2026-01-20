@@ -224,7 +224,7 @@ class CardRepository(
         startDateUtc: String?,
         endDateUtc: String?
     ) {
-        benefitDao.insert(benefit)
+        benefitDao.update(benefit)
         profileCardBenefitDao.updateDates(profileCardId, benefit.id, startDateUtc, endDateUtc)
     }
 

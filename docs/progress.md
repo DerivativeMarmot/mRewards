@@ -365,3 +365,10 @@
 
 ## 2026-01-19 - Sync upsert safety
 - Switched issuer/card/card-face inserts to Room upserts to avoid REPLACE deletes nulling `profile_cards.cardId` and `profile_cards.cardFaceId` during sync (`app/src/main/java/com/example/rewardsrader/data/local/dao/IssuerDao.kt`, `app/src/main/java/com/example/rewardsrader/data/local/dao/CardDao.kt`, `app/src/main/java/com/example/rewardsrader/data/local/dao/CardFaceDao.kt`).
+
+## 2026-01-19 - Card add behavior clarification
+- Reviewed template import flow and schema docs to confirm card vs benefit persistence when creating a profile card.
+- No code changes; answered that profile cards reference `cards` while benefits are copied into new `benefits` rows linked via `profile_card_benefits`.
+
+## 2026-01-19 - Benefit date update fix
+- Fixed benefit edit persistence so updating start/end dates no longer deletes the linked benefit by switching the update path to use a SQL UPDATE instead of REPLACE (`app/src/main/java/com/example/rewardsrader/data/local/repository/CardRepository.kt`).

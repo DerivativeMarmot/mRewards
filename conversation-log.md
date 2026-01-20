@@ -665,3 +665,7 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 [2026-01-19 12:02:12 -08:00] Assistant: Moved sync logic into the card creation viewmodel, added sync events/snackbar there, and updated wiring/tests.
 2026-01-19 15:07:08 User: question: i just checked the database, so the cardid and cardfaceid turns out to be null after the syncing
 2026-01-19 15:07:10 Assistant: Found REPLACE upserts during Firestore sync were deleting issuers/cards/card_faces and triggering FK SET_NULL on profile_cards cardId/cardFaceId; switched IssuerDao/CardDao/CardFaceDao to Room @Upsert to preserve links and noted existing nulls need manual relink.
+2026-01-19 16:17 User: question: does adding a card copies card record from card table to profile card table and benefit to profile card benefit.
+2026-01-19 16:17 Assistant: Reviewed importer/repository behavior; profile cards reference cards via cardId while benefits are duplicated into new benefits rows and linked via profile_card_benefits.
+2026-01-19 16:59 User: so i checked database, when i try to update the benefit start and end date, something goes wrong and removed that benefit.
+2026-01-19 16:59 Assistant: Switched benefit edits to use SQL UPDATE instead of REPLACE so changing start/end dates no longer deletes the profile benefit link.
