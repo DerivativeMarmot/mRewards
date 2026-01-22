@@ -430,3 +430,32 @@
 
 ## 2026-01-19 - Tracker period generation
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`: Generates only the current-period tracker for benefits/offers so future periods are created when they begin.
+
+## 2026-01-21 - Tracker local notifications
+- `app/src/main/java/com/example/rewardsrader/notifications/NotificationConstants.kt`: Shared constants for tracker reminder channels and alarm extras.
+- `app/src/main/java/com/example/rewardsrader/notifications/NotificationHelper.kt`: Creates the reminder channel and posts tracker reminder notifications with deep links.
+- `app/src/main/java/com/example/rewardsrader/notifications/TrackerReminderScheduler.kt`: Computes reminder timing, checks tracker status, persists schedules, and sets/cancels AlarmManager alarms.
+- `app/src/main/java/com/example/rewardsrader/notifications/NotificationReceiver.kt`: Receives alarms, validates tracker status, and dispatches notifications.
+- `app/src/main/java/com/example/rewardsrader/notifications/BootReceiver.kt`: Reschedules enabled tracker reminders after device reboot.
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/NotificationSourceType.kt`: Enum to label notification schedule sources (currently trackers).
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/NotificationScheduleEntity.kt`: Room entity for persisted alarm schedules (trigger time, days before, enabled).
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/NotificationScheduleDao.kt`: DAO for reading/upserting/deleting notification schedules.
+- `app/src/main/java/com/example/rewardsrader/data/local/EnumConverters.kt`: Adds converters for notification schedule source enums.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Registers notification schedule entity/DAO and bumps DB version.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Adds migration 22->23 to create notification schedule table.
+- `app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`: Reschedules tracker reminder alarms after background tracker refresh.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditState.kt`: Adds reminder toggle and lead-time state.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Loads/saves reminder settings and refreshes alarms on tracker changes.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Adds reminder UI (toggle + 1-7 day selector) and permission prompts.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires reminder scheduler into tracker detail and adds tracker deep link handling.
+- `app/src/main/AndroidManifest.xml`: Declares reminder permissions and registers notification/boot receivers.
+
+## 2026-01-21 - Tracker reminders list
+- `app/src/main/java/com/example/rewardsrader/data/local/entity/NotificationScheduleEntity.kt`: Removes the unique index so multiple reminders can be stored per tracker.
+- `app/src/main/java/com/example/rewardsrader/data/local/dao/NotificationScheduleDao.kt`: Fetches schedules per tracker and deletes by schedule ID.
+- `app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`: Adds migration 23->24 to rebuild notification schedules without a unique constraint.
+- `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`: Bumps the database to v24 for multiple reminders.
+- `app/src/main/java/com/example/rewardsrader/notifications/TrackerReminderScheduler.kt`: Supports multiple reminders with per-schedule alarms and cancel-all logic for inactive trackers.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditState.kt`: Replaces toggle state with a reminders list.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Adds reminder add/remove flows and refreshes reminder lists after tracker changes.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Replaces the toggle UI with a reminder list plus add/remove actions.

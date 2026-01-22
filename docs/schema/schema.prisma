@@ -199,6 +199,18 @@ model NotificationRule {
   @@map("notification_rules")
 }
 
+model NotificationSchedule {
+  id            String                 @id
+  sourceType    NotificationSourceType @map("source_type")
+  sourceId      String                 @map("source_id")
+  triggerAtMillis BigInt               @map("trigger_at_millis")
+  daysBefore    Int                    @map("days_before")
+  enabled       Boolean
+
+  @@index([sourceType, sourceId])
+  @@map("notification_schedules")
+}
+
 enum CardNetwork {
   Visa
   Mastercard
@@ -300,4 +312,8 @@ enum TrackerSourceType {
   Benefit
   Offer
   Sub
+}
+
+enum NotificationSourceType {
+  Tracker
 }

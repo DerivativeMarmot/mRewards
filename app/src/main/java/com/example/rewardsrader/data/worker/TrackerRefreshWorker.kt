@@ -24,7 +24,10 @@ import com.example.rewardsrader.data.local.MIGRATION_18_19
 import com.example.rewardsrader.data.local.MIGRATION_19_20
 import com.example.rewardsrader.data.local.MIGRATION_20_21
 import com.example.rewardsrader.data.local.MIGRATION_21_22
+import com.example.rewardsrader.data.local.MIGRATION_22_23
+import com.example.rewardsrader.data.local.MIGRATION_23_24
 import com.example.rewardsrader.data.local.repository.CardRepository
+import com.example.rewardsrader.notifications.TrackerReminderScheduler
 import com.example.rewardsrader.ui.tracker.TrackerGenerator
 import java.time.LocalDate
 
@@ -58,7 +61,9 @@ class TrackerRefreshWorker(
                 MIGRATION_18_19,
                 MIGRATION_19_20,
                 MIGRATION_20_21,
-                MIGRATION_21_22
+                MIGRATION_21_22,
+                MIGRATION_22_23,
+                MIGRATION_23_24
             )
             .build()
 
@@ -73,20 +78,24 @@ class TrackerRefreshWorker(
             trackerDao = db.trackerDao(),
             trackerTransactionDao = db.trackerTransactionDao(),
             notificationRuleDao = db.notificationRuleDao(),
+            notificationScheduleDao = db.notificationScheduleDao(),
             offerDao = db.offerDao(),
             applicationDao = db.applicationDao(),
             templateCardDao = db.templateCardDao(),
             templateCardBenefitDao = db.templateCardBenefitDao()
         )
+        val reminderScheduler = TrackerReminderScheduler(applicationContext, repository)
 
         return runCatching {
             repository.ensureProfile(DEFAULT_PROFILE_ID, name = "Default Profile")
             val cards = repository.getProfileCardsWithRelations(DEFAULT_PROFILE_ID)
-            if (cards.isEmpty()) return@runCatching Result.success()
-            val existing = repository.getTrackersForProfileCards(cards.map { it.profileCard.id })
-            val generator = TrackerGenerator { repository.newId() }
-            val newTrackers = generator.generateMissingTrackers(cards, existing, LocalDate.now())
-            repository.insertTrackers(newTrackers)
+            if (cards.isNotEmpty()) {
+                val existing = repository.getTrackersForProfileCards(cards.map { it.profileCard.id })
+                val generator = TrackerGenerator { repository.newId() }
+                val newTrackers = generator.generateMissingTrackers(cards, existing, LocalDate.now())
+                repository.insertTrackers(newTrackers)
+            }
+            reminderScheduler.rescheduleEnabledTrackerReminders()
             Result.success()
         }.getOrElse {
             Result.retry()

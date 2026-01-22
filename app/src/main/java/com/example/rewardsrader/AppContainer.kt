@@ -37,7 +37,9 @@ class AppContainer(context: Context) {
             com.example.rewardsrader.data.local.MIGRATION_18_19,
             com.example.rewardsrader.data.local.MIGRATION_19_20,
             com.example.rewardsrader.data.local.MIGRATION_20_21,
-            com.example.rewardsrader.data.local.MIGRATION_21_22
+            com.example.rewardsrader.data.local.MIGRATION_21_22,
+            com.example.rewardsrader.data.local.MIGRATION_22_23,
+            com.example.rewardsrader.data.local.MIGRATION_23_24
         )
         .build()
 
@@ -56,6 +58,7 @@ class AppContainer(context: Context) {
         trackerDao = db.trackerDao(),
         trackerTransactionDao = db.trackerTransactionDao(),
         notificationRuleDao = db.notificationRuleDao(),
+        notificationScheduleDao = db.notificationScheduleDao(),
         offerDao = db.offerDao(),
         applicationDao = db.applicationDao(),
         templateCardDao = db.templateCardDao(),

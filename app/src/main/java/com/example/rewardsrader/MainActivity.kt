@@ -1,5 +1,6 @@
 package com.example.rewardsrader
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -36,6 +37,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateScreen
 import com.example.rewardsrader.ui.benefitcreate.BenefitCreateViewModel
 import com.example.rewardsrader.ui.cardcreate.CardCreateScreen
@@ -51,19 +53,28 @@ import com.example.rewardsrader.ui.tracker.TrackerEditScreen
 import com.example.rewardsrader.ui.tracker.TrackerEditViewModel
 import com.example.rewardsrader.ui.tracker.TrackerScreen
 import com.example.rewardsrader.ui.tracker.TrackerViewModel
+import com.example.rewardsrader.notifications.TrackerReminderScheduler
+import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var appContainer: AppContainer
+    private val pendingTrackerDeepLink = MutableStateFlow<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        pendingTrackerDeepLink.value = extractTrackerId(intent)
         enableEdgeToEdge()
         setContent {
             RewardsRaderTheme {
                 NavigationApp()
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        pendingTrackerDeepLink.value = extractTrackerId(intent)
     }
 
     @Composable
@@ -94,8 +105,9 @@ class MainActivity : ComponentActivity() {
         val trackerViewModel: TrackerViewModel by viewModels {
             TrackerViewModel.factory(appContainer.cardRepository)
         }
+        val reminderScheduler = TrackerReminderScheduler(applicationContext, appContainer.cardRepository)
         val trackerEditViewModel: TrackerEditViewModel by viewModels {
-            TrackerEditViewModel.factory(appContainer.cardRepository)
+            TrackerEditViewModel.factory(appContainer.cardRepository, reminderScheduler)
         }
 
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -104,6 +116,7 @@ class MainActivity : ComponentActivity() {
         val snackbarHostState = remember { SnackbarHostState() }
         val isSnackbarVisible = snackbarHostState.currentSnackbarData != null
         val cardListState by cardListViewModel.state.collectAsState()
+        val trackerDeepLinkId by pendingTrackerDeepLink.collectAsState()
 
         LaunchedEffect(currentRoute, cardListState.snackbarMessage) {
             val message = cardListState.snackbarMessage
@@ -111,6 +124,13 @@ class MainActivity : ComponentActivity() {
                 snackbarHostState.showSnackbar(message = message)
                 cardListViewModel.snackbarShown()
             }
+        }
+        LaunchedEffect(trackerDeepLinkId) {
+            val trackerId = trackerDeepLinkId ?: return@LaunchedEffect
+            navController.navigate("tracker/$trackerId") {
+                launchSingleTop = true
+            }
+            pendingTrackerDeepLink.value = null
         }
 
         Scaffold(
@@ -176,7 +196,8 @@ class MainActivity : ComponentActivity() {
 
                 composable(
                     "tracker/{trackerId}",
-                    arguments = listOf(navArgument("trackerId") { type = NavType.StringType })
+                    arguments = listOf(navArgument("trackerId") { type = NavType.StringType }),
+                    deepLinks = listOf(navDeepLink { uriPattern = "rewardsrader://tracker/{trackerId}" })
                 ) { backStackEntry ->
                     val trackerId = backStackEntry.arguments?.getString("trackerId") ?: return@composable
                     LaunchedEffect(trackerId) {
@@ -196,7 +217,10 @@ class MainActivity : ComponentActivity() {
                             trackerEditViewModel.saveOfferTracker {
                                 navController.popBackStack()
                             }
-                        }
+                        },
+                        onAddReminder = { trackerEditViewModel.addReminder(it) },
+                        onDeleteReminder = { trackerEditViewModel.deleteReminder(it) },
+                        onReminderPermissionDenied = { trackerEditViewModel.notifyReminderPermissionDenied() }
                     )
                 }
 
@@ -410,6 +434,13 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+private fun extractTrackerId(intent: Intent?): String? {
+    val data = intent?.data ?: return null
+    if (data.scheme != "rewardsrader") return null
+    if (data.host != "tracker") return null
+    return data.lastPathSegment
 }
 
 @Composable

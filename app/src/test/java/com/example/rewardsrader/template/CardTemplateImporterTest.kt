@@ -49,6 +49,7 @@ class CardTemplateImporterTest {
             db.trackerDao(),
             db.trackerTransactionDao(),
             db.notificationRuleDao(),
+            db.notificationScheduleDao(),
             db.offerDao(),
             db.applicationDao(),
             db.templateCardDao(),

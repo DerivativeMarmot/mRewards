@@ -9,6 +9,7 @@ import com.example.rewardsrader.data.local.dao.CardDao
 import com.example.rewardsrader.data.local.dao.CardFaceDao
 import com.example.rewardsrader.data.local.dao.IssuerDao
 import com.example.rewardsrader.data.local.dao.NotificationRuleDao
+import com.example.rewardsrader.data.local.dao.NotificationScheduleDao
 import com.example.rewardsrader.data.local.dao.OfferDao
 import com.example.rewardsrader.data.local.dao.ProfileCardBenefitDao
 import com.example.rewardsrader.data.local.dao.ProfileCardDao
@@ -23,6 +24,7 @@ import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardFaceEntity
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.NotificationRuleEntity
+import com.example.rewardsrader.data.local.entity.NotificationScheduleEntity
 import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
@@ -44,12 +46,13 @@ import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
         TrackerEntity::class,
         TrackerTransactionEntity::class,
         NotificationRuleEntity::class,
+        NotificationScheduleEntity::class,
         OfferEntity::class,
         ApplicationEntity::class,
         TemplateCardEntity::class,
         TemplateCardBenefitEntity::class
     ],
-    version = 22,
+    version = 24,
     exportSchema = false
 )
 @TypeConverters(EnumConverters::class)
@@ -65,6 +68,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun trackerDao(): TrackerDao
     abstract fun trackerTransactionDao(): TrackerTransactionDao
     abstract fun notificationRuleDao(): NotificationRuleDao
+    abstract fun notificationScheduleDao(): NotificationScheduleDao
     abstract fun offerDao(): OfferDao
     abstract fun templateCardDao(): TemplateCardDao
     abstract fun templateCardBenefitDao(): TemplateCardBenefitDao

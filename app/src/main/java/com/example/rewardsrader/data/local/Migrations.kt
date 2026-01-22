@@ -479,3 +479,73 @@ val MIGRATION_21_22 = object : Migration(21, 22) {
         database.execSQL("CREATE INDEX IF NOT EXISTS index_offers_profileCardId ON offers(profileCardId)")
     }
 }
+
+// Migration 22->23 adds notification_schedules table.
+val MIGRATION_22_23 = object : Migration(22, 23) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS notification_schedules (
+                id TEXT NOT NULL PRIMARY KEY,
+                sourceType TEXT NOT NULL,
+                sourceId TEXT NOT NULL,
+                triggerAtMillis INTEGER NOT NULL,
+                daysBefore INTEGER NOT NULL,
+                enabled INTEGER NOT NULL
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS index_notification_schedules_source
+            ON notification_schedules(sourceType, sourceId)
+            """.trimIndent()
+        )
+    }
+}
+
+// Migration 23->24 allows multiple schedules per source by removing the unique index.
+val MIGRATION_23_24 = object : Migration(23, 24) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS notification_schedules_new (
+                id TEXT NOT NULL PRIMARY KEY,
+                sourceType TEXT NOT NULL,
+                sourceId TEXT NOT NULL,
+                triggerAtMillis INTEGER NOT NULL,
+                daysBefore INTEGER NOT NULL,
+                enabled INTEGER NOT NULL
+            )
+            """.trimIndent()
+        )
+        database.execSQL(
+            """
+            INSERT INTO notification_schedules_new (
+                id,
+                sourceType,
+                sourceId,
+                triggerAtMillis,
+                daysBefore,
+                enabled
+            )
+            SELECT
+                id,
+                sourceType,
+                sourceId,
+                triggerAtMillis,
+                daysBefore,
+                enabled
+            FROM notification_schedules
+            """.trimIndent()
+        )
+        database.execSQL("DROP TABLE notification_schedules")
+        database.execSQL("ALTER TABLE notification_schedules_new RENAME TO notification_schedules")
+        database.execSQL(
+            """
+            CREATE INDEX IF NOT EXISTS index_notification_schedules_source
+            ON notification_schedules(sourceType, sourceId)
+            """.trimIndent()
+        )
+    }
+}

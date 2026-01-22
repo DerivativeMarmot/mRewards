@@ -7,7 +7,9 @@ import com.example.rewardsrader.data.local.entity.ProfileCardWithRelations
 import com.example.rewardsrader.data.local.entity.TrackerEntity
 import com.example.rewardsrader.data.local.entity.TrackerSourceType
 import com.example.rewardsrader.data.local.entity.TrackerTransactionEntity
+import com.example.rewardsrader.data.local.entity.NotificationSourceType
 import com.example.rewardsrader.data.local.repository.CardRepository
+import com.example.rewardsrader.notifications.TrackerReminderScheduler
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TrackerEditViewModel(
-    private val repository: CardRepository
+    private val repository: CardRepository,
+    private val reminderScheduler: TrackerReminderScheduler
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         TrackerEditState(entryDate = formatTrackerDate(LocalDate.now()))
@@ -34,10 +37,12 @@ class TrackerEditViewModel(
                 val profileCard = repository.getProfileCardWithRelations(tracker.profileCardId)
                 val detail = buildDetailUi(tracker, profileCard)
                 val transactions = loadTransactions(tracker.id)
+                val reminders = loadReminders(tracker)
                 _state.update {
                     it.copy(
                         isLoading = false,
                         tracker = detail.copy(usedAmount = transactions.sumOf { entry -> entry.amount }),
+                        reminders = reminders,
                         offerNotes = tracker.notes.orEmpty(),
                         offerCompleted = tracker.manualCompleted,
                         transactions = transactions,
@@ -74,6 +79,48 @@ class TrackerEditViewModel(
         _state.update { it.copy(offerNotes = value) }
     }
 
+    fun addReminder(daysBefore: Int) {
+        val tracker = currentTracker ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isReminderUpdating = true, error = null) }
+            runCatching {
+                reminderScheduler.addTrackerReminder(tracker.id, daysBefore)
+            }.onSuccess {
+                refreshReminders(tracker.id)
+            }.onFailure { error ->
+                _state.update {
+                    it.copy(
+                        isReminderUpdating = false,
+                        error = error.message ?: "Failed to update reminder"
+                    )
+                }
+            }
+        }
+    }
+
+    fun deleteReminder(reminderId: String) {
+        val tracker = currentTracker ?: return
+        viewModelScope.launch {
+            _state.update { it.copy(isReminderUpdating = true, error = null) }
+            runCatching {
+                reminderScheduler.cancelTrackerReminder(tracker.id, reminderId)
+            }.onSuccess {
+                refreshReminders(tracker.id)
+            }.onFailure { error ->
+                _state.update {
+                    it.copy(
+                        isReminderUpdating = false,
+                        error = error.message ?: "Failed to update reminder"
+                    )
+                }
+            }
+        }
+    }
+
+    fun notifyReminderPermissionDenied() {
+        _state.update { it.copy(error = "Notification permission denied") }
+    }
+
     fun saveOfferTracker(onSaved: (() -> Unit)? = null) {
         val tracker = currentTracker ?: return
         if (tracker.type != TrackerSourceType.Offer) return
@@ -99,6 +146,7 @@ class TrackerEditViewModel(
                         error = null
                     )
                 }
+                refreshReminders(updated.id)
                 onSaved?.invoke()
             }.onFailure { error ->
                 _state.update {
@@ -140,6 +188,7 @@ class TrackerEditViewModel(
                     entryNotes = ""
                 )
             }
+            refreshReminders(tracker.id)
         }
     }
 
@@ -154,6 +203,7 @@ class TrackerEditViewModel(
                     tracker = state.tracker?.copy(usedAmount = transactions.sumOf { it.amount })
                 )
             }
+            refreshReminders(tracker.id)
         }
     }
 
@@ -167,6 +217,22 @@ class TrackerEditViewModel(
                 notes = entry.notes
             )
         }.sortedBy { parseTrackerDate(it.date) ?: LocalDate.MIN }
+    }
+
+    private suspend fun loadReminders(tracker: TrackerEntity): List<TrackerReminderUi> {
+        val schedules = repository.getNotificationSchedules(NotificationSourceType.Tracker, tracker.id)
+        val endDate = parseTrackerDate(tracker.endDateUtc)
+        return schedules.sortedBy { it.daysBefore }.map { schedule ->
+            val fireDateLabel = endDate?.minusDays(schedule.daysBefore.toLong())
+                ?.let { formatTrackerDate(it) }
+                ?.let { "Fires $it 12:00 AM" }
+                ?: "Unknown"
+            TrackerReminderUi(
+                id = schedule.id,
+                daysBefore = schedule.daysBefore,
+                fireDateLabel = fireDateLabel
+            )
+        }
     }
 
     private fun buildDetailUi(
@@ -210,13 +276,31 @@ class TrackerEditViewModel(
         )
     }
 
+    private fun refreshReminders(trackerId: String) {
+        viewModelScope.launch {
+            runCatching {
+                reminderScheduler.refreshTrackerReminders(trackerId)
+            }
+            val tracker = repository.getTracker(trackerId)
+            if (tracker != null) {
+                val reminders = loadReminders(tracker)
+                _state.update { it.copy(reminders = reminders, isReminderUpdating = false) }
+            } else {
+                _state.update { it.copy(reminders = emptyList(), isReminderUpdating = false) }
+            }
+        }
+    }
+
     companion object {
-        fun factory(repository: CardRepository): ViewModelProvider.Factory =
+        fun factory(
+            repository: CardRepository,
+            reminderScheduler: TrackerReminderScheduler
+        ): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     if (modelClass.isAssignableFrom(TrackerEditViewModel::class.java)) {
                         @Suppress("UNCHECKED_CAST")
-                        return TrackerEditViewModel(repository) as T
+                        return TrackerEditViewModel(repository, reminderScheduler) as T
                     }
                     throw IllegalArgumentException("Unknown ViewModel class")
                 }

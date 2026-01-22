@@ -22,10 +22,18 @@ data class TrackerTransactionUi(
     val notes: String?
 )
 
+data class TrackerReminderUi(
+    val id: String,
+    val daysBefore: Int,
+    val fireDateLabel: String
+)
+
 data class TrackerEditState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val tracker: TrackerDetailUi? = null,
+    val reminders: List<TrackerReminderUi> = emptyList(),
+    val isReminderUpdating: Boolean = false,
     val offerNotes: String = "",
     val offerCompleted: Boolean = false,
     val transactions: List<TrackerTransactionUi> = emptyList(),

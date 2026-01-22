@@ -9,6 +9,7 @@ import com.example.rewardsrader.data.local.entity.CardSegment
 import com.example.rewardsrader.data.local.entity.CardStatus
 import com.example.rewardsrader.data.local.entity.CardSubDurationUnit
 import com.example.rewardsrader.data.local.entity.PaymentInstrument
+import com.example.rewardsrader.data.local.entity.NotificationSourceType
 import com.example.rewardsrader.data.local.entity.TrackerSourceType
 
 class EnumConverters {
@@ -74,4 +75,11 @@ class EnumConverters {
     @TypeConverter
     fun toTrackerSourceType(value: String?): TrackerSourceType? =
         value?.let { TrackerSourceType.valueOf(it) }
+
+    @TypeConverter
+    fun fromNotificationSourceType(value: NotificationSourceType?): String? = value?.name
+
+    @TypeConverter
+    fun toNotificationSourceType(value: String?): NotificationSourceType? =
+        value?.let { NotificationSourceType.valueOf(it) }
 }

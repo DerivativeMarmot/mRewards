@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
@@ -22,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,14 +42,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.example.rewardsrader.data.local.entity.TrackerSourceType
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import android.Manifest
+import android.app.AlarmManager
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,15 +74,39 @@ fun TrackerEditScreen(
     onDeleteTransaction: (String) -> Unit,
     onToggleOfferComplete: (Boolean) -> Unit,
     onOfferNotesChange: (String) -> Unit,
-    onSaveOffer: () -> Unit
+    onSaveOffer: () -> Unit,
+    onAddReminder: (Int) -> Unit,
+    onDeleteReminder: (String) -> Unit,
+    onReminderPermissionDenied: () -> Unit
 ) {
     val state by stateFlow.collectAsState()
     val tracker = state.tracker
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
     var showDatePicker by remember { mutableStateOf(false) }
     var showTransactionSheet by remember { mutableStateOf(false) }
+    var showReminderDaysDialog by remember { mutableStateOf(false) }
+    var pendingReminderDays by remember { mutableStateOf<Int?>(null) }
     val datePickerState = rememberDatePickerState()
     val transactionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val alarmManager = remember {
+        context.getSystemService(AlarmManager::class.java)
+    }
+    val exactAlarmLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        val reminderDays = pendingReminderDays
+        pendingReminderDays = null
+        if (granted && reminderDays != null) {
+            onAddReminder(reminderDays)
+            requestExactAlarmPermissionIfNeeded(alarmManager, exactAlarmLauncher)
+        } else if (!granted) {
+            onReminderPermissionDenied()
+        }
+    }
 
     LaunchedEffect(state.entryDate) {
         datePickerState.selectedDateMillis = state.entryDate.toMillisOrNull()
@@ -123,6 +160,14 @@ fun TrackerEditScreen(
                 ) {
                     item {
                         TrackerSummaryCard(tracker = tracker)
+                    }
+                    item {
+                        ReminderListCard(
+                            reminders = state.reminders,
+                            isUpdating = state.isReminderUpdating,
+                            onAdd = { showReminderDaysDialog = true },
+                            onDelete = onDeleteReminder
+                        )
                     }
                     if (tracker.sourceType == TrackerSourceType.Offer) {
                         item {
@@ -291,6 +336,27 @@ fun TrackerEditScreen(
             DatePicker(state = datePickerState)
         }
     }
+
+    if (showReminderDaysDialog) {
+        ReminderDaysDialog(
+            onSelect = {
+                val needsPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                if (needsPermission) {
+                    pendingReminderDays = it
+                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                } else {
+                    onAddReminder(it)
+                    requestExactAlarmPermissionIfNeeded(alarmManager, exactAlarmLauncher)
+                }
+                showReminderDaysDialog = false
+            },
+            onDismiss = { showReminderDaysDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -349,6 +415,59 @@ private fun OfferCompleteRow(
 }
 
 @Composable
+private fun ReminderListCard(
+    reminders: List<TrackerReminderUi>,
+    isUpdating: Boolean,
+    onAdd: () -> Unit,
+    onDelete: (String) -> Unit
+) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Reminders", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                IconButton(onClick = onAdd, enabled = !isUpdating) {
+                    Icon(Icons.Default.Add, contentDescription = "Add reminder")
+                }
+            }
+            if (reminders.isEmpty()) {
+                Text("No reminders yet.", style = MaterialTheme.typography.bodySmall)
+            } else {
+                reminders.forEach { reminder ->
+                    ReminderRow(reminder = reminder, onDelete = onDelete)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReminderRow(
+    reminder: TrackerReminderUi,
+    onDelete: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(reminder.daysBefore.toReminderLabel(), style = MaterialTheme.typography.bodyMedium)
+            Text(reminder.fireDateLabel, style = MaterialTheme.typography.bodySmall)
+        }
+        IconButton(onClick = { onDelete(reminder.id) }) {
+            Icon(Icons.Default.Delete, contentDescription = "Delete reminder")
+        }
+    }
+}
+
+@Composable
 private fun TransactionItem(
     entry: TrackerTransactionUi,
     onDelete: (String) -> Unit
@@ -385,10 +504,68 @@ private fun TransactionItem(
     }
 }
 
+@Composable
+private fun ReminderDaysDialog(
+    onSelect: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var selectedDays by remember { mutableStateOf(1) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Reminder timing") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                (1..7).forEach { day ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = selectedDays == day,
+                                onClick = {
+                                    selectedDays = day
+                                    onSelect(day)
+                                }
+                            )
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = selectedDays == day,
+                            onClick = {
+                                selectedDays = day
+                                onSelect(day)
+                            }
+                        )
+                        Text(
+                            text = day.toReminderLabel(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {}
+    )
+}
+
 private fun String.toMillisOrNull(): Long? {
     val date = parseTrackerDate(this) ?: return null
     return date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 }
+
+private fun requestExactAlarmPermissionIfNeeded(
+    alarmManager: AlarmManager?,
+    launcher: androidx.activity.result.ActivityResultLauncher<Intent>
+) {
+    if (alarmManager == null) return
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
+    if (alarmManager.canScheduleExactAlarms()) return
+    launcher.launch(Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
+}
+
+private fun Int.toReminderLabel(): String =
+    if (this == 1) "1 day before" else "$this days before"
 
 private fun Long.toDateString(): String {
     val date = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()

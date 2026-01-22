@@ -57,6 +57,13 @@ enum TrackerSourceType {
 }
 ```
 
+### NotificationSourceType
+```prisma
+enum NotificationSourceType {
+  Tracker
+}
+```
+
 ### CardNetwork
 ```prisma
 enum CardNetwork {
@@ -181,6 +188,17 @@ enum CardSubDurationUnit {
 | `channel` | String | |
 | `enabled` | Boolean | |
 | `benefit` | Benefit | @relation(fields: [benefitId], references: [id], onDelete: Cascade) |
+
+### NotificationSchedule
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | String | @id |
+| `sourceType` | NotificationSourceType | @map("source_type") |
+| `sourceId` | String | @map("source_id") |
+| `triggerAtMillis` | BigInt | @map("trigger_at_millis") |
+| `daysBefore` | Int | @map("days_before") |
+| `enabled` | Boolean | |
+| Notes |  | Multiple schedules may exist per tracker/source. |
 
 ### Offer
 | Field | Type | Description |

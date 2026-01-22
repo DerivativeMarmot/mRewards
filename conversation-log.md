@@ -695,3 +695,11 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-19 21:56 Assistant: Moved card list snackbar hosting to MainActivity and passed visibility into the list screen.
 2026-01-19 22:43 User: I noticed that current tracker manager creates multiple same benefit at once, for example, a monthly benefit from 1/1/2026 to 3/30/2026. it creates 3 trackers at once. This is not what i want. I want each benefit or offer to have exactly one tracker in a period. then create a new one in next period in the background or front. do you have any questions ?
 2026-01-19 22:44 Assistant: Adjusted tracker generation to create only the current-period tracker for benefits and offers so future periods are created when they start.
+2026-01-21 16:42 User: read `Local Notification` section in `feature_implementation.md`. do you have any questions?
+2026-01-21 16:42 Assistant: Asked for reminder timing, offset range, cancel behavior, schedule persistence, exact alarm fallback, and deep link handling.
+2026-01-21 16:42 User: 1. allow user to select between 1-7 days 2. fires at 12:00 am. for example a tracker ends at 6/30 with a notification fires one day before. The alarm should fires on 6/29 12:00am. 3. yes reminders should be canceled if a tracker completes early or expires, and receiver should ignore non-active trackers. 4. new table, not only tracker uses notification, other modules use it as well. but that's a later topic. 5. `SCHEDULE_EXACT_ALARM` is optional. if it's denied, use inexact alarms. 6. yes open trackereditscreen by trackerId. update `feature_implementation.md` and then start coding.
+2026-01-21 16:42 Assistant: Updated the Local Notification plan and started implementing tracker reminder scheduling, receivers, and UI controls.
+2026-01-22 11:05 User: question: how can i test notification feature, i can not wait for a day to just receive a notification
+2026-01-22 11:05 Assistant: Shared adb broadcast and near-future scheduling options to test notifications quickly.
+2026-01-22 11:05 User: i found a issue... remove reminder switch, allow multiple reminders list with add/remove. do you have any questions?
+2026-01-22 11:05 Assistant: Implemented multiple reminders list with add/remove and updated scheduling storage/logic.

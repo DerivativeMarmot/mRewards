@@ -6,6 +6,7 @@ import com.example.rewardsrader.data.local.dao.CardDao
 import com.example.rewardsrader.data.local.dao.CardFaceDao
 import com.example.rewardsrader.data.local.dao.IssuerDao
 import com.example.rewardsrader.data.local.dao.NotificationRuleDao
+import com.example.rewardsrader.data.local.dao.NotificationScheduleDao
 import com.example.rewardsrader.data.local.dao.OfferDao
 import com.example.rewardsrader.data.local.dao.ProfileCardBenefitDao
 import com.example.rewardsrader.data.local.dao.ProfileCardDao
@@ -20,6 +21,8 @@ import com.example.rewardsrader.data.local.entity.CardEntity
 import com.example.rewardsrader.data.local.entity.CardFaceEntity
 import com.example.rewardsrader.data.local.entity.IssuerEntity
 import com.example.rewardsrader.data.local.entity.NotificationRuleEntity
+import com.example.rewardsrader.data.local.entity.NotificationScheduleEntity
+import com.example.rewardsrader.data.local.entity.NotificationSourceType
 import com.example.rewardsrader.data.local.entity.OfferEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardBenefitEntity
 import com.example.rewardsrader.data.local.entity.ProfileCardEntity
@@ -55,6 +58,7 @@ class CardRepository(
     private val trackerDao: TrackerDao,
     private val trackerTransactionDao: TrackerTransactionDao,
     private val notificationRuleDao: NotificationRuleDao,
+    private val notificationScheduleDao: NotificationScheduleDao,
     private val offerDao: OfferDao,
     private val applicationDao: ApplicationDao,
     private val templateCardDao: TemplateCardDao,
@@ -160,6 +164,32 @@ class CardRepository(
 
     suspend fun addNotificationRules(rules: List<NotificationRuleEntity>) {
         if (rules.isNotEmpty()) notificationRuleDao.insertAll(rules)
+    }
+
+    suspend fun upsertNotificationSchedule(schedule: NotificationScheduleEntity) {
+        notificationScheduleDao.upsert(schedule)
+    }
+
+    suspend fun getNotificationSchedules(
+        sourceType: NotificationSourceType,
+        sourceId: String
+    ): List<NotificationScheduleEntity> =
+        notificationScheduleDao.getForSource(sourceType, sourceId)
+
+    suspend fun getEnabledNotificationSchedules(
+        sourceType: NotificationSourceType
+    ): List<NotificationScheduleEntity> =
+        notificationScheduleDao.getEnabledForSourceType(sourceType)
+
+    suspend fun deleteNotificationSchedule(scheduleId: String) {
+        notificationScheduleDao.deleteById(scheduleId)
+    }
+
+    suspend fun deleteNotificationSchedulesForSource(
+        sourceType: NotificationSourceType,
+        sourceId: String
+    ) {
+        notificationScheduleDao.deleteForSource(sourceType, sourceId)
     }
 
     suspend fun addApplications(applications: List<ApplicationEntity>) {

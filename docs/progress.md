@@ -411,3 +411,15 @@
 
 ## 2026-01-19 - Tracker period generation
 - Adjusted tracker generation to create only the current period for benefits/offers so future trackers are created when each period starts (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerGenerator.kt`).
+
+## 2026-01-21 - Tracker local notifications
+- Added notification scheduling persistence (`NotificationScheduleEntity`, DAO, enum) with migration 22->23 and DB version bump (`app/src/main/java/com/example/rewardsrader/data/local/*`).
+- Implemented tracker reminder scheduling with AlarmManager (exact when allowed, inexact fallback), receiver handling, and boot rescheduling (`app/src/main/java/com/example/rewardsrader/notifications/*`).
+- Wired tracker reminder updates through the worker refresh and tracker detail UI, including permission prompts and 1-7 day lead time selection (`app/src/main/java/com/example/rewardsrader/data/worker/TrackerRefreshWorker.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEdit*`).
+- Added tracker deep link handling and registered receivers/permissions in the manifest (`app/src/main/java/com/example/rewardsrader/MainActivity.kt`, `app/src/main/AndroidManifest.xml`).
+- Updated schema docs to include notification schedules (`docs/schema/schema.prisma`, `docs/schema/schema.md`).
+
+## 2026-01-21 - Tracker reminders list
+- Updated notification schedules to allow multiple reminders per tracker with migration 23->24 and DB version bump (`app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`, `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`).
+- Reworked tracker reminder scheduling to manage per-reminder alarms and cancel all reminders when trackers become inactive (`app/src/main/java/com/example/rewardsrader/notifications/TrackerReminderScheduler.kt`).
+- Replaced the reminder toggle with a reminders list UI that supports add/remove actions and permission prompts (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditState.kt`).
