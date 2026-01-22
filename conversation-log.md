@@ -709,3 +709,9 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-22 11:41 Assistant: Updated reminders section layout to icon+list columns with the add button anchored at the end of the list.
 2026-01-22 12:16 User: in reminder section, make `Add reminder` button vertically align with reminder icon when there is no reminders; when there are reminders the reminder icon and the first reminder should vertically align and icon is always aligned top. new reminders push `add reminder` button down. do not change the button i modifed.
 2026-01-22 12:16 Assistant: Aligned the reminders icon with the list/add button layout without changing the add reminder button.
+2026-01-22 13:51 User: in reminder selection, avoid pre-select any option
+2026-01-22 13:51 Assistant: Removed default pre-selection in the reminder timing dialog.
+2026-01-22 13:59 User: avoid same reminder option being added more than once.
+2026-01-22 13:59 Assistant: Prevented duplicate reminder offsets from being added in the tracker detail flow.
+2026-01-22 14:03 User: update Notes section, remove `Notes` label, split into two column, left column shows notes icon only, right column shows notes content. when user clicks on content, modal pops up allowing user to edit content and save, if there is no content, show `Add notes`
+2026-01-22 14:03 Assistant: Reworked tracker notes into an icon + content row with modal editing and an Add notes placeholder.

@@ -81,10 +81,14 @@ class TrackerEditViewModel(
 
     fun addReminder(daysBefore: Int) {
         val tracker = currentTracker ?: return
+        val normalizedDays = daysBefore.coerceIn(1, 7)
+        if (_state.value.reminders.any { it.daysBefore == normalizedDays }) {
+            return
+        }
         viewModelScope.launch {
             _state.update { it.copy(isReminderUpdating = true, error = null) }
             runCatching {
-                reminderScheduler.addTrackerReminder(tracker.id, daysBefore)
+                reminderScheduler.addTrackerReminder(tracker.id, normalizedDays)
             }.onSuccess {
                 refreshReminders(tracker.id)
             }.onFailure { error ->

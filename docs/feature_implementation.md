@@ -66,7 +66,7 @@
 8) **Deep Linking**: Ensure the notification `PendingIntent` navigates directly to the specific `TrackerEditScreen` by `trackerId`.
 
 ### Card
-- [ ] anniversay 
+- [ ] anniversary
 - [ ] 
 
 

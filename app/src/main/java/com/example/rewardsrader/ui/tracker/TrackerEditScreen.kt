@@ -7,14 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -60,6 +60,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Notes
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.ui.Alignment
 import kotlinx.coroutines.flow.StateFlow
 
@@ -87,6 +91,8 @@ fun TrackerEditScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var showTransactionSheet by remember { mutableStateOf(false) }
     var showReminderDaysDialog by remember { mutableStateOf(false) }
+    var showNotesDialog by remember { mutableStateOf(false) }
+    var notesDraft by remember { mutableStateOf("") }
     var pendingReminderDays by remember { mutableStateOf<Int?>(null) }
     val datePickerState = rememberDatePickerState()
     val transactionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -119,7 +125,7 @@ fun TrackerEditScreen(
                 title = { Text("Tracker Detail") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -178,19 +184,12 @@ fun TrackerEditScreen(
                             )
                         }
                         item {
-                            Text(
-                                text = "Notes",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                        item {
-                            OutlinedTextField(
-                                value = state.offerNotes,
-                                onValueChange = onOfferNotesChange,
-                                label = { Text("Offer notes") },
-                                modifier = Modifier.fillMaxWidth(),
-                                minLines = 3
+                            NotesRow(
+                                notes = state.offerNotes,
+                                onClick = {
+                                    notesDraft = state.offerNotes
+                                    showNotesDialog = true
+                                }
                             )
                         }
                         item {
@@ -225,7 +224,7 @@ fun TrackerEditScreen(
                                     fontWeight = FontWeight.SemiBold
                                 )
                                 IconButton(onClick = { showTransactionSheet = true }) {
-                                    Icon(Icons.Default.Add, contentDescription = "Add transaction")
+                                    Icon(Icons.Outlined.Add, contentDescription = "Add transaction")
                                 }
                             }
                         }
@@ -358,6 +357,18 @@ fun TrackerEditScreen(
             onDismiss = { showReminderDaysDialog = false }
         )
     }
+
+    if (showNotesDialog) {
+        NotesDialog(
+            notes = notesDraft,
+            onNotesChange = { notesDraft = it },
+            onSave = {
+                onOfferNotesChange(notesDraft)
+                showNotesDialog = false
+            },
+            onDismiss = { showNotesDialog = false }
+        )
+    }
 }
 
 @Composable
@@ -423,7 +434,7 @@ private fun ReminderListCard(
             Row(){
                 Icon(
                     modifier = Modifier.padding(top = 12.dp),
-                    imageVector = Icons.Default.Notifications,
+                    imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Reminders"
                 )
             }
@@ -465,8 +476,32 @@ private fun ReminderRow(
             Text(reminder.daysBefore.toReminderLabel(), style = MaterialTheme.typography.bodyLarge)
         }
         IconButton(onClick = { onDelete(reminder.id) }) {
-            Icon(Icons.Default.Delete, contentDescription = "Delete reminder")
+            Icon(Icons.Outlined.Delete, contentDescription = "Delete reminder")
         }
+    }
+}
+
+@Composable
+private fun NotesRow(
+    notes: String,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Notes,
+            contentDescription = "Notes"
+        )
+        Text(
+            text = notes.trim().takeIf { it.isNotBlank() } ?: "Add notes",
+            style = MaterialTheme.typography.bodyLarge,
+        )
     }
 }
 
@@ -496,7 +531,7 @@ private fun TransactionItem(
                 )
             }
             IconButton(onClick = { onDelete(entry.id) }) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete transaction")
+                Icon(Icons.Outlined.Delete, contentDescription = "Delete transaction")
             }
         }
         entry.notes?.takeIf { it.isNotBlank() }?.let { notes ->
@@ -506,11 +541,43 @@ private fun TransactionItem(
 }
 
 @Composable
+private fun NotesDialog(
+    notes: String,
+    onNotesChange: (String) -> Unit,
+    onSave: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Notes") },
+        text = {
+            OutlinedTextField(
+                value = notes,
+                onValueChange = onNotesChange,
+                label = { Text("Notes") },
+                modifier = Modifier.fillMaxWidth(),
+                minLines = 3
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onSave) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
 private fun ReminderDaysDialog(
     onSelect: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedDays by remember { mutableStateOf(1) }
+    var selectedDays by remember { mutableStateOf<Int?>(null) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Reminder timing") },
