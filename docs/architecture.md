@@ -464,6 +464,9 @@
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Removes section card backgrounds, adjusts summary typography/amount formatting, and reworks reminders/notes into icon + content layouts.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Muted placeholder text colors for Add reminder and Add notes.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Auto-focuses the notes dialog input and shows the keyboard on open.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Adds horizontal dividers under tracker info and reminders.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Keeps the notes icon top-aligned with the content vertically centered.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Uses a clickable row for the Add reminder action.
 
 ## 2026-01-22 - Reminder selection safeguards
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Reminder dialog has no default selection, disables already-added offsets, and aligns the reminders icon with the list/add button.

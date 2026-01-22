@@ -54,7 +54,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import android.Manifest
-import android.R.attr.horizontalDivider
 import android.app.AlarmManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -64,6 +63,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -175,12 +176,18 @@ fun TrackerEditScreen(
                         TrackerSummaryCard(tracker = tracker)
                     }
                     item {
+                        HorizontalDivider()
+                    }
+                    item {
                         ReminderListCard(
                             reminders = state.reminders,
                             isUpdating = state.isReminderUpdating,
                             onAdd = { showReminderDaysDialog = true },
                             onDelete = onDeleteReminder
                         )
+                    }
+                    item {
+                        HorizontalDivider()
                     }
                     if (tracker.sourceType == TrackerSourceType.Offer) {
                         item {
@@ -372,14 +379,9 @@ private fun TrackerSummaryCard(tracker: TrackerDetailUi) {
     val endDate = parseTrackerDate(tracker.endDate) ?: LocalDate.now()
     val timeLeft = formatTimeLeftLabel(endDate)
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Text(
-            text = tracker.cardName,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Normal
-        )
         if (tracker.title.isNotBlank()) {
             Text(
                 text = tracker.title,
@@ -387,6 +389,12 @@ private fun TrackerSummaryCard(tracker: TrackerDetailUi) {
                 fontWeight = FontWeight.SemiBold
             )
         }
+        Text(
+            text = tracker.cardName,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Normal
+        )
+        Box(modifier = Modifier.padding(top = 10.dp))
         Text(
             text = "${formatTrackerAmount(tracker.usedAmount)} used / ${formatTrackerAmount(tracker.amount)}",
             style = MaterialTheme.typography.bodyMedium
@@ -432,12 +440,11 @@ private fun ReminderListCard(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Column() {
             Row(){
                 Icon(
-                    modifier = Modifier.padding(top = 12.dp),
                     imageVector = Icons.Outlined.Notifications,
                     contentDescription = "Reminders"
                 )
@@ -447,19 +454,26 @@ private fun ReminderListCard(
 
         Column(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            reminders.forEach { reminder ->
-                ReminderRow(reminder = reminder, onDelete = onDelete)
-            }
-            Row {
-                TextButton(onClick = onAdd, enabled = !isUpdating) {
-                    Text(
-                        text = "Add reminder",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                reminders.forEach { reminder ->
+                    ReminderRow(reminder = reminder, onDelete = onDelete)
                 }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(enabled = !isUpdating, onClick = onAdd)
+                    .padding(top = 2.dp)
+            ) {
+                Text(
+                    text = "Add reminder",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -471,7 +485,7 @@ private fun ReminderRow(
     onDelete: (String) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
+//        modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -494,23 +508,25 @@ private fun NotesRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick).padding(top = 12.dp, bottom = 12.dp),
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Notes,
             contentDescription = "Notes"
         )
         Text(
+            modifier = Modifier.padding(top = 2.dp),
             text = trimmed.takeIf { hasNotes } ?: "Add notes",
             style = MaterialTheme.typography.bodyLarge,
             color = if (hasNotes) {
                 MaterialTheme.colorScheme.onSurface
             } else {
                 MaterialTheme.colorScheme.onSurfaceVariant
-            }
+            },
         )
+
     }
 }
 
