@@ -437,3 +437,7 @@
 
 ## 2026-01-22 - Offer notes autosave
 - Removed the bottom save button in tracker detail and persisted offer completion/notes changes automatically (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`, `app/src/main/java/com/example/rewardsrader/MainActivity.kt`).
+- Moved "Mark offer complete" to a right-aligned text button at the bottom of offer trackers and navigates back to the tracker list on click (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/MainActivity.kt`).
+- Updated the offer completion button label and behavior to toggle between active/complete states (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/MainActivity.kt`).
+- Added a filled background color to the offer completion text button (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
+- Rendered the offer completion action as a filled button so the background is always visible (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).

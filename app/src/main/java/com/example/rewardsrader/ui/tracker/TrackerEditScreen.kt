@@ -16,7 +16,7 @@ import androidx.compose.material.icons.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +51,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import android.Manifest
+import android.R.attr.horizontalDivider
 import android.app.AlarmManager
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -64,6 +65,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.semantics.Role
 import kotlinx.coroutines.flow.StateFlow
@@ -163,8 +165,8 @@ fun TrackerEditScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(start = 24.dp, end = 24.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item {
                         TrackerSummaryCard(tracker = tracker)
@@ -178,12 +180,6 @@ fun TrackerEditScreen(
                         )
                     }
                     if (tracker.sourceType == TrackerSourceType.Offer) {
-                        item {
-                            OfferCompleteRow(
-                                checked = state.offerCompleted,
-                                onCheckedChange = onToggleOfferComplete
-                            )
-                        }
                         item {
                             NotesRow(
                                 notes = state.offerNotes,
@@ -200,6 +196,12 @@ fun TrackerEditScreen(
                                     color = MaterialTheme.colorScheme.error
                                 )
                             }
+                        }
+                        item {
+                            OfferCompleteRow(
+                                isCompleted = state.offerCompleted,
+                                onToggleComplete = onToggleOfferComplete
+                            )
                         }
                     } else {
                         item {
@@ -372,39 +374,46 @@ private fun TrackerSummaryCard(tracker: TrackerDetailUi) {
     ) {
         Text(
             text = tracker.cardName,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Normal
         )
         if (tracker.title.isNotBlank()) {
             Text(
                 text = tracker.title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.SemiBold
             )
         }
         Text(
             text = "${formatTrackerAmount(tracker.usedAmount)} used / ${formatTrackerAmount(tracker.amount)}",
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodyMedium
         )
         Text(
             text = "Ends ${tracker.endDate} ($timeLeft)",
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
 
 @Composable
 private fun OfferCompleteRow(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    isCompleted: Boolean,
+    onToggleComplete: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.End
     ) {
-        Text("Mark offer complete", style = MaterialTheme.typography.bodyMedium)
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        val label = if (isCompleted) "Mark offer active" else "Mark offer complete"
+        Button(
+            onClick = { onToggleComplete(!isCompleted) },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        ) {
+            Text(label)
+        }
     }
 }
 
@@ -417,8 +426,7 @@ private fun ReminderListCard(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(12.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -434,14 +442,13 @@ private fun ReminderListCard(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             reminders.forEach { reminder ->
                 ReminderRow(reminder = reminder, onDelete = onDelete)
             }
-            Row(){
+            Row {
                 TextButton(onClick = onAdd, enabled = !isUpdating) {
                     Text(
                         text = "Add reminder",
@@ -481,10 +488,9 @@ private fun NotesRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(12.dp),
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Notes,

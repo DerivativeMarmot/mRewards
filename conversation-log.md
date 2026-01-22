@@ -722,3 +722,11 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-22 14:32 User: in tracker detail screen, remove save button at the bottom. remove associated saving behavior as well.
 2026-01-22 14:32 Assistant: Removed the bottom save button and auto-save offer completion/notes instead.
 2026-01-22 14:32 Assistant: Disabled already-added reminder options in the selection dialog and aligned the reminders icon with the list/add button.
+2026-01-22 14:43 User: move `mark offer complete` to last row, remove checkbox, make it text button. align the button to the most right. when user clicks, mark offer complete and navigate to tracker list.
+2026-01-22 14:43 Assistant: Moved offer completion to a right-aligned text button at the bottom of the offer tracker detail and navigate back to the tracker list after marking complete.
+2026-01-22 14:48 User: make the button `mark offer active` if the offer is in complete status
+2026-01-22 14:48 Assistant: Updated the offer completion button to toggle its label and state between active and complete.
+2026-01-22 14:49 User: added background color to the button as well
+2026-01-22 14:49 Assistant: Added a filled background color to the offer completion text button.
+2026-01-22 14:49 User: add background color to the button as well
+2026-01-22 14:49 Assistant: Switched the offer completion action to a filled Button so the background color is always visible.

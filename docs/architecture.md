@@ -469,3 +469,7 @@
 ## 2026-01-22 - Offer notes autosave
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Persists offer completion/notes without a separate save action.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires notes save callbacks for tracker detail.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Replaces the offer completion checkbox with a right-aligned text button at the bottom of the tracker detail screen.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Toggles the offer completion button label between active/complete based on state.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Styles the offer completion button with a filled background color.
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Uses a filled `Button` to guarantee the background color is visible.
