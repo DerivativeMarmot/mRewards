@@ -423,3 +423,8 @@
 - Updated notification schedules to allow multiple reminders per tracker with migration 23->24 and DB version bump (`app/src/main/java/com/example/rewardsrader/data/local/Migrations.kt`, `app/src/main/java/com/example/rewardsrader/data/local/AppDatabase.kt`).
 - Reworked tracker reminder scheduling to manage per-reminder alarms and cancel all reminders when trackers become inactive (`app/src/main/java/com/example/rewardsrader/notifications/TrackerReminderScheduler.kt`).
 - Replaced the reminder toggle with a reminders list UI that supports add/remove actions and permission prompts (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditState.kt`).
+
+## 2026-01-22 - Tracker detail UI refresh
+- Removed section card backgrounds and adjusted tracker summary typography/amount formatting in the tracker detail screen (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
+- Updated reminders section layout to use a two-column icon + list layout with the add button anchored at the end of the list (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
+- Aligned the reminders icon with the list/add button layout for empty vs populated lists (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).

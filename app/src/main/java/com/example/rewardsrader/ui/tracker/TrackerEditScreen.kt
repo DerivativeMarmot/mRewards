@@ -1,6 +1,5 @@
 package com.example.rewardsrader.ui.tracker
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,8 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -40,7 +39,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -60,6 +58,9 @@ import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -363,37 +364,30 @@ fun TrackerEditScreen(
 private fun TrackerSummaryCard(tracker: TrackerDetailUi) {
     val endDate = parseTrackerDate(tracker.endDate) ?: LocalDate.now()
     val timeLeft = formatTimeLeftLabel(endDate)
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = tracker.cardName,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Normal
+        )
+        if (tracker.title.isNotBlank()) {
             Text(
-                text = tracker.cardName,
-                style = MaterialTheme.typography.titleMedium,
+                text = tracker.title,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold
             )
-            if (tracker.title.isNotBlank()) {
-                Text(text = tracker.title, style = MaterialTheme.typography.bodyMedium)
-            }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Amount ${formatTrackerAmount(tracker.amount)}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-                Text(
-                    text = "Used ${formatTrackerAmount(tracker.usedAmount)}",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-            Text(
-                text = "Ends ${tracker.endDate} ($timeLeft)",
-                style = MaterialTheme.typography.bodySmall
-            )
         }
+        Text(
+            text = "${formatTrackerAmount(tracker.usedAmount)} used / ${formatTrackerAmount(tracker.amount)}",
+            style = MaterialTheme.typography.bodySmall
+        )
+        Text(
+            text = "Ends ${tracker.endDate} ($timeLeft)",
+            style = MaterialTheme.typography.bodySmall
+        )
     }
 }
 
@@ -402,15 +396,13 @@ private fun OfferCompleteRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Mark offer complete", style = MaterialTheme.typography.bodyMedium)
-            Checkbox(checked = checked, onCheckedChange = onCheckedChange)
-        }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("Mark offer complete", style = MaterialTheme.typography.bodyMedium)
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 
@@ -421,26 +413,38 @@ private fun ReminderListCard(
     onAdd: () -> Unit,
     onDelete: (String) -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Column() {
+            Row(){
+                Icon(
+                    modifier = Modifier.padding(top = 12.dp),
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Reminders"
+                )
+            }
+
+        }
+
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text("Reminders", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                IconButton(onClick = onAdd, enabled = !isUpdating) {
-                    Icon(Icons.Default.Add, contentDescription = "Add reminder")
-                }
+            reminders.forEach { reminder ->
+                ReminderRow(reminder = reminder, onDelete = onDelete)
             }
-            if (reminders.isEmpty()) {
-                Text("No reminders yet.", style = MaterialTheme.typography.bodySmall)
-            } else {
-                reminders.forEach { reminder ->
-                    ReminderRow(reminder = reminder, onDelete = onDelete)
+            Row(){
+                TextButton(onClick = onAdd, enabled = !isUpdating) {
+                    Text(
+                        text = "Add reminder",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -453,7 +457,7 @@ private fun ReminderRow(
     onDelete: (String) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(start = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -472,34 +476,32 @@ private fun TransactionItem(
     entry: TrackerTransactionUi,
     onDelete: (String) -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = formatTrackerAmount(entry.amount),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    Text(
-                        text = entry.date,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-                IconButton(onClick = { onDelete(entry.id) }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete transaction")
-                }
+            Column {
+                Text(
+                    text = formatTrackerAmount(entry.amount),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = entry.date,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
-            entry.notes?.takeIf { it.isNotBlank() }?.let { notes ->
-                Text(text = notes, style = MaterialTheme.typography.bodySmall)
+            IconButton(onClick = { onDelete(entry.id) }) {
+                Icon(Icons.Default.Delete, contentDescription = "Delete transaction")
             }
+        }
+        entry.notes?.takeIf { it.isNotBlank() }?.let { notes ->
+            Text(text = notes, style = MaterialTheme.typography.bodySmall)
         }
     }
 }

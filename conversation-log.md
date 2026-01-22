@@ -703,3 +703,9 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-22 11:05 Assistant: Shared adb broadcast and near-future scheduling options to test notifications quickly.
 2026-01-22 11:05 User: i found a issue... remove reminder switch, allow multiple reminders list with add/remove. do you have any questions?
 2026-01-22 11:05 Assistant: Implemented multiple reminders list with add/remove and updated scheduling storage/logic.
+2026-01-22 11:40 User: update tracker detail UI. 1. remove the default background in all sections. 2. in tracker info section, make card name font weight regular; make tracker name font size larger than card name; format amount used: $0 used / $20;
+2026-01-22 11:40 Assistant: Updated tracker detail UI to remove section card backgrounds and adjust summary typography/amount formatting.
+2026-01-22 11:41 User: update reminders section. remove reminder label. section splits to two columns, left column has a reminder icon only, right column shows reminder list, the reminder plus sign shows at the very last item in the list.
+2026-01-22 11:41 Assistant: Updated reminders section layout to icon+list columns with the add button anchored at the end of the list.
+2026-01-22 12:16 User: in reminder section, make `Add reminder` button vertically align with reminder icon when there is no reminders; when there are reminders the reminder icon and the first reminder should vertically align and icon is always aligned top. new reminders push `add reminder` button down. do not change the button i modifed.
+2026-01-22 12:16 Assistant: Aligned the reminders icon with the list/add button layout without changing the add reminder button.
