@@ -221,16 +221,10 @@ class TrackerEditViewModel(
 
     private suspend fun loadReminders(tracker: TrackerEntity): List<TrackerReminderUi> {
         val schedules = repository.getNotificationSchedules(NotificationSourceType.Tracker, tracker.id)
-        val endDate = parseTrackerDate(tracker.endDateUtc)
         return schedules.sortedBy { it.daysBefore }.map { schedule ->
-            val fireDateLabel = endDate?.minusDays(schedule.daysBefore.toLong())
-                ?.let { formatTrackerDate(it) }
-                ?.let { "Fires $it 12:00 AM" }
-                ?: "Unknown"
             TrackerReminderUi(
                 id = schedule.id,
-                daysBefore = schedule.daysBefore,
-                fireDateLabel = fireDateLabel
+                daysBefore = schedule.daysBefore
             )
         }
     }

@@ -462,8 +462,7 @@ private fun ReminderRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(reminder.daysBefore.toReminderLabel(), style = MaterialTheme.typography.bodyMedium)
-            Text(reminder.fireDateLabel, style = MaterialTheme.typography.bodySmall)
+            Text(reminder.daysBefore.toReminderLabel(), style = MaterialTheme.typography.bodyLarge)
         }
         IconButton(onClick = { onDelete(reminder.id) }) {
             Icon(Icons.Default.Delete, contentDescription = "Delete reminder")

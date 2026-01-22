@@ -24,8 +24,7 @@ data class TrackerTransactionUi(
 
 data class TrackerReminderUi(
     val id: String,
-    val daysBefore: Int,
-    val fireDateLabel: String
+    val daysBefore: Int
 )
 
 data class TrackerEditState(
