@@ -412,7 +412,8 @@ private fun OfferCompleteRow(
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         ) {
-            Text(label)
+            Text(label,
+                fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -453,7 +454,7 @@ private fun ReminderListCard(
                     Text(
                         text = "Add reminder",
                         style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -485,11 +486,13 @@ private fun NotesRow(
     notes: String,
     onClick: () -> Unit
 ) {
+    val trimmed = notes.trim()
+    val hasNotes = trimmed.isNotBlank()
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically,
+            .clickable(onClick = onClick).padding(top = 12.dp, bottom = 12.dp),
+        verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Icon(
@@ -497,8 +500,13 @@ private fun NotesRow(
             contentDescription = "Notes"
         )
         Text(
-            text = notes.trim().takeIf { it.isNotBlank() } ?: "Add notes",
+            text = trimmed.takeIf { hasNotes } ?: "Add notes",
             style = MaterialTheme.typography.bodyLarge,
+            color = if (hasNotes) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            }
         )
     }
 }

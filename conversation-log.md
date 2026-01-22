@@ -730,3 +730,5 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-22 14:49 Assistant: Added a filled background color to the offer completion text button.
 2026-01-22 14:49 User: add background color to the button as well
 2026-01-22 14:49 Assistant: Switched the offer completion action to a filled Button so the background color is always visible.
+2026-01-22 15:13 User: change text color only. 1. change `Add reminder` text color to grey. 2. when there is no notes content, make `Add notes` text color grey
+2026-01-22 15:13 Assistant: Styled the Add reminder label and Add notes placeholder with muted grey text.

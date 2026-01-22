@@ -429,6 +429,7 @@
 - Updated reminders section layout to use a two-column icon + list layout with the add button anchored at the end of the list (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Aligned the reminders icon with the list/add button layout for empty vs populated lists (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Reworked the tracker notes area into an icon + content row with modal editing (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
+- Styled the Add reminder and Add notes placeholders with a muted grey tone (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 
 ## 2026-01-22 - Reminder selection UI
 - Removed default pre-selection in the reminder timing dialog (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
