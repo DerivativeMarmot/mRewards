@@ -73,10 +73,16 @@ class TrackerEditViewModel(
 
     fun setOfferCompleted(isCompleted: Boolean) {
         _state.update { it.copy(offerCompleted = isCompleted) }
+        persistOfferChanges()
     }
 
     fun setOfferNotes(value: String) {
         _state.update { it.copy(offerNotes = value) }
+    }
+
+    fun saveOfferNotes(value: String) {
+        _state.update { it.copy(offerNotes = value) }
+        persistOfferChanges()
     }
 
     fun addReminder(daysBefore: Int) {
@@ -125,7 +131,7 @@ class TrackerEditViewModel(
         _state.update { it.copy(error = "Notification permission denied") }
     }
 
-    fun saveOfferTracker(onSaved: (() -> Unit)? = null) {
+    private fun persistOfferChanges() {
         val tracker = currentTracker ?: return
         if (tracker.type != TrackerSourceType.Offer) return
         viewModelScope.launch {
@@ -151,7 +157,6 @@ class TrackerEditViewModel(
                     )
                 }
                 refreshReminders(updated.id)
-                onSaved?.invoke()
             }.onFailure { error ->
                 _state.update {
                     it.copy(isSaving = false, error = error.message ?: "Failed to save tracker")

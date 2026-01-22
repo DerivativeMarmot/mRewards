@@ -459,3 +459,13 @@
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditState.kt`: Replaces toggle state with a reminders list.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Adds reminder add/remove flows and refreshes reminder lists after tracker changes.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Replaces the toggle UI with a reminder list plus add/remove actions.
+
+## 2026-01-22 - Tracker detail UI refresh
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Removes section card backgrounds, adjusts summary typography/amount formatting, and reworks reminders/notes into icon + content layouts.
+
+## 2026-01-22 - Reminder selection safeguards
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Reminder dialog has no default selection, disables already-added offsets, and aligns the reminders icon with the list/add button.
+
+## 2026-01-22 - Offer notes autosave
+- `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`: Persists offer completion/notes without a separate save action.
+- `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Wires notes save callbacks for tracker detail.

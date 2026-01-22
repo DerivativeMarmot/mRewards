@@ -213,11 +213,7 @@ class MainActivity : ComponentActivity() {
                         onDeleteTransaction = { trackerEditViewModel.deleteTransaction(it) },
                         onToggleOfferComplete = { trackerEditViewModel.setOfferCompleted(it) },
                         onOfferNotesChange = { trackerEditViewModel.setOfferNotes(it) },
-                        onSaveOffer = {
-                            trackerEditViewModel.saveOfferTracker {
-                                navController.popBackStack()
-                            }
-                        },
+                        onSaveOfferNotes = { trackerEditViewModel.saveOfferNotes(it) },
                         onAddReminder = { trackerEditViewModel.addReminder(it) },
                         onDeleteReminder = { trackerEditViewModel.deleteReminder(it) },
                         onReminderPermissionDenied = { trackerEditViewModel.notifyReminderPermissionDenied() }

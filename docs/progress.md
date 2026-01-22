@@ -433,3 +433,7 @@
 ## 2026-01-22 - Reminder selection UI
 - Removed default pre-selection in the reminder timing dialog (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Prevented duplicate reminder offsets from being added in the tracker detail flow (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`).
+- Disabled already-added reminder offsets in the dialog and avoided double selection triggers (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
+
+## 2026-01-22 - Offer notes autosave
+- Removed the bottom save button in tracker detail and persisted offer completion/notes changes automatically (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditViewModel.kt`, `app/src/main/java/com/example/rewardsrader/MainActivity.kt`).

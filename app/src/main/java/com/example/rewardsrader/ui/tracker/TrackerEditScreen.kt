@@ -65,6 +65,7 @@ import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.semantics.Role
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,7 +80,7 @@ fun TrackerEditScreen(
     onDeleteTransaction: (String) -> Unit,
     onToggleOfferComplete: (Boolean) -> Unit,
     onOfferNotesChange: (String) -> Unit,
-    onSaveOffer: () -> Unit,
+    onSaveOfferNotes: (String) -> Unit,
     onAddReminder: (Int) -> Unit,
     onDeleteReminder: (String) -> Unit,
     onReminderPermissionDenied: () -> Unit
@@ -191,17 +192,6 @@ fun TrackerEditScreen(
                                     showNotesDialog = true
                                 }
                             )
-                        }
-                        item {
-                            Button(
-                                onClick = {
-                                    focusManager.clearFocus()
-                                    onSaveOffer()
-                                },
-                                enabled = !state.isSaving
-                            ) {
-                                Text("Save")
-                            }
                         }
                         if (state.error != null) {
                             item {
@@ -339,6 +329,7 @@ fun TrackerEditScreen(
 
     if (showReminderDaysDialog) {
         ReminderDaysDialog(
+            disabledDays = state.reminders.map { it.daysBefore }.toSet(),
             onSelect = {
                 val needsPermission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                     ContextCompat.checkSelfPermission(
@@ -363,7 +354,7 @@ fun TrackerEditScreen(
             notes = notesDraft,
             onNotesChange = { notesDraft = it },
             onSave = {
-                onOfferNotesChange(notesDraft)
+                onSaveOfferNotes(notesDraft)
                 showNotesDialog = false
             },
             onDismiss = { showNotesDialog = false }
@@ -425,7 +416,8 @@ private fun ReminderListCard(
     onDelete: (String) -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(12.dp),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -574,6 +566,7 @@ private fun NotesDialog(
 
 @Composable
 private fun ReminderDaysDialog(
+    disabledDays: Set<Int>,
     onSelect: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -584,11 +577,19 @@ private fun ReminderDaysDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 (1..7).forEach { day ->
+                    val isDisabled = disabledDays.contains(day)
+                    val textColor = if (isDisabled) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .selectable(
                                 selected = selectedDays == day,
+                                enabled = !isDisabled,
+                                role = Role.RadioButton,
                                 onClick = {
                                     selectedDays = day
                                     onSelect(day)
@@ -599,14 +600,13 @@ private fun ReminderDaysDialog(
                     ) {
                         RadioButton(
                             selected = selectedDays == day,
-                            onClick = {
-                                selectedDays = day
-                                onSelect(day)
-                            }
+                            onClick = null,
+                            enabled = !isDisabled
                         )
                         Text(
                             text = day.toReminderLabel(),
                             style = MaterialTheme.typography.bodyMedium,
+                            color = textColor,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }

@@ -715,3 +715,10 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 2026-01-22 13:59 Assistant: Prevented duplicate reminder offsets from being added in the tracker detail flow.
 2026-01-22 14:03 User: update Notes section, remove `Notes` label, split into two column, left column shows notes icon only, right column shows notes content. when user clicks on content, modal pops up allowing user to edit content and save, if there is no content, show `Add notes`
 2026-01-22 14:03 Assistant: Reworked tracker notes into an icon + content row with modal editing and an Add notes placeholder.
+2026-01-22 14:32 User: remove fireDateLabel
+2026-01-22 14:32 Assistant: Removed the fire date label from the tracker reminder UI.
+2026-01-22 14:32 User: found weird issues. 1. I added a `one day before` and then the notification fires. I tried to add another notification, it did not add but replace the existing `one day before` 2. I added a `one day before`, `2 days before`, then `one day before` fires, I tried to remove `one day beofre`, but it removes both `one day before` and `2 days before`
+2026-01-22 14:32 Assistant: Investigated reminder schedule persistence and tightened reminder selection/dedupe handling to avoid replacement or multi-delete behavior.
+2026-01-22 14:32 User: in tracker detail screen, remove save button at the bottom. remove associated saving behavior as well.
+2026-01-22 14:32 Assistant: Removed the bottom save button and auto-save offer completion/notes instead.
+2026-01-22 14:32 Assistant: Disabled already-added reminder options in the selection dialog and aligned the reminders icon with the list/add button.
