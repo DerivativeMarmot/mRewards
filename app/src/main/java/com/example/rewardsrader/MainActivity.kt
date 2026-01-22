@@ -213,13 +213,7 @@ class MainActivity : ComponentActivity() {
                         onDeleteTransaction = { trackerEditViewModel.deleteTransaction(it) },
                         onToggleOfferComplete = { isCompleted ->
                             trackerEditViewModel.setOfferCompleted(isCompleted)
-                            navController.navigate("tracker") {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            navController.popBackStack()
                         },
                         onOfferNotesChange = { trackerEditViewModel.setOfferNotes(it) },
                         onSaveOfferNotes = { trackerEditViewModel.saveOfferNotes(it) },

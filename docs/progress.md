@@ -430,6 +430,7 @@
 - Aligned the reminders icon with the list/add button layout for empty vs populated lists (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Reworked the tracker notes area into an icon + content row with modal editing (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Styled the Add reminder and Add notes placeholders with a muted grey tone (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
+- Auto-focused the notes dialog text field and showed the keyboard on open (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 
 ## 2026-01-22 - Reminder selection UI
 - Removed default pre-selection in the reminder timing dialog (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
@@ -442,3 +443,4 @@
 - Updated the offer completion button label and behavior to toggle between active/complete states (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`, `app/src/main/java/com/example/rewardsrader/MainActivity.kt`).
 - Added a filled background color to the offer completion text button (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Rendered the offer completion action as a filled button so the background is always visible (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
+- Offer completion now navigates back using `popBackStack()` to mirror the back button behavior (`app/src/main/java/com/example/rewardsrader/MainActivity.kt`).
