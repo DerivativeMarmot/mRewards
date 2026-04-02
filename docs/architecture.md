@@ -483,3 +483,4 @@
 ## 2026-04-02 - Project README
 - `README.md`: Repository entry document that gives a brief introduction to Reawrds Radar, its purpose as an Android credit card tracking app, and its main Kotlin/Compose/Room/Firestore-based stack.
 - `docs/screenshoots/*`: Screenshot assets referenced by the README to show the card list, add-card search/filter flow, card detail, benefits, and card face picker UI.
+- `README.md`: Screenshot section uses Markdown table syntax for the 3-column layout.

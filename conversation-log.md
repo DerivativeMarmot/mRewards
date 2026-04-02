@@ -750,3 +750,9 @@ Assistant: Added 2025-12-28 benefit edit bottom sheet entry to progress and arch
 
 2026-04-02 00:16 User: add screenshoots in docs\screenshoots into readme.md
 2026-04-02 00:16 Assistant: Updated README.md to embed the screenshots from docs\screenshoots and logged the documentation changes.
+
+2026-04-02 00:20 User: make every three screenshoots in one row
+2026-04-02 00:20 Assistant: Reformatted the README screenshots into a three-per-row grid and updated the documentation logs.
+
+2026-04-02 00:22 User: use markdown table syntax
+2026-04-02 00:22 Assistant: Replaced the README screenshot HTML table with Markdown table syntax and updated the documentation logs.

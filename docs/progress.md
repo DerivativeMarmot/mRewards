@@ -455,3 +455,11 @@
 ## 2026-04-02 - README screenshots
 - Updated `README.md` to embed screenshots from `docs/screenshoots` for the card list, add-card search/filter flow, card detail, benefits tab, and card face picker.
 - Updated `docs/architecture.md` to note that `docs/screenshoots/*` are README-facing screenshot assets.
+
+## 2026-04-02 - README screenshot grid
+- Reformatted the README screenshot section into a two-row HTML table so screenshots display three per row.
+- Left the existing README title/content intact and only changed the image layout.
+
+## 2026-04-02 - README markdown table
+- Replaced the HTML screenshot grid in `README.md` with Markdown table syntax while keeping the same 3-column layout.
+- Kept the existing README copy and image set unchanged outside the layout format.
