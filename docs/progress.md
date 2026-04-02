@@ -447,3 +447,11 @@
 - Added a filled background color to the offer completion text button (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Rendered the offer completion action as a filled button so the background is always visible (`app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`).
 - Offer completion now navigates back using `popBackStack()` to mirror the back button behavior (`app/src/main/java/com/example/rewardsrader/MainActivity.kt`).
+
+## 2026-04-02 - README introduction
+- Added `README.md` with a brief project introduction covering the app purpose, core domain (credit cards, benefits, offers, trackers, reminders), and primary Android stack.
+- Updated `docs/architecture.md` to document the new repository-level README file.
+
+## 2026-04-02 - README screenshots
+- Updated `README.md` to embed screenshots from `docs/screenshoots` for the card list, add-card search/filter flow, card detail, benefits tab, and card face picker.
+- Updated `docs/architecture.md` to note that `docs/screenshoots/*` are README-facing screenshot assets.

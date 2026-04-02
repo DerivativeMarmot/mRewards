@@ -479,3 +479,7 @@
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Styles the offer completion button with a filled background color.
 - `app/src/main/java/com/example/rewardsrader/ui/tracker/TrackerEditScreen.kt`: Uses a filled `Button` to guarantee the background color is visible.
 - `app/src/main/java/com/example/rewardsrader/MainActivity.kt`: Uses `popBackStack()` for offer completion navigation to mirror the back button behavior.
+
+## 2026-04-02 - Project README
+- `README.md`: Repository entry document that gives a brief introduction to Reawrds Radar, its purpose as an Android credit card tracking app, and its main Kotlin/Compose/Room/Firestore-based stack.
+- `docs/screenshoots/*`: Screenshot assets referenced by the README to show the card list, add-card search/filter flow, card detail, benefits, and card face picker UI.
